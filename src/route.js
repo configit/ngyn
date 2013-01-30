@@ -71,7 +71,7 @@
         parentParam = !parentName ? '' : (':' + (routeContext.scopeParent.options || {name:''}).name + '_id/'),
         resourcePath = parentPath + resource.name + '/',
         resourceParam = ':' + angular.lowercase( resource.name ) + '_id/',
-        viewLocation = angular.lowercase( routeProvider.appRoot + resourcePath + (action.alias || action.key) + '.html' ),
+        viewLocation = angular.lowercase( trail(routeProvider.appRoot, '/') + resourcePath + (action.alias || action.key) + '.html' ),
         routeWithoutKey = angular.lowercase( aliasedParentPath + parentParam + (angular.isDefined(resource.path) ? resource.path : resource.name) + '/' ).replace('//', '/');
 
         if ( action.type === 'member' ) {

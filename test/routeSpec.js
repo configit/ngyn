@@ -68,7 +68,6 @@
     inject( function ( $location, $route, $rootScope, $httpBackend ) {
       $httpBackend.whenGET(/.+/).respond();
       $location.path( '/l/1/i/index' );
-      dump($route.routes)
       $rootScope.$digest();
       expect( $route.current.name ).toEqual( 'Items' );
       expect( $route.current.templateUrl ).toEqual( 'client/app/lists/items/index.html' );
@@ -155,6 +154,20 @@
       $location.path( '/products/index' );
       $rootScope.$digest();
       expect( route.link( { action: 'edit', products_id: 'my-product' } ) ).toEqual( 'products/my-product/edit' );
+    } );
+  } );
+
+  it( 'should observe appRoot', function () {
+    module( function ( routeProvider ) {
+      routeProvider.appRoot = 'store';
+      routeProvider.resource( { name: 'Products' } );
+    } );
+
+    inject( function ( $location, $route, $rootScope, $httpBackend  , route ) {
+      $httpBackend.whenGET(/.+/).respond();
+      $location.path( '/products/index' );
+      $rootScope.$digest();
+      expect( $route.current.templateUrl ).toEqual('store/products/index.html');
     } );
   } );
 
