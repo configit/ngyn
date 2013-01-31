@@ -64,6 +64,21 @@ describe( 'resource-extension', function () {
 
   }));
 
+  iit('should attach errors to collection and persist data', inject(function ($resource, $httpBackend, $http) {
+    $httpBackend.whenGET(/\$top=1/).respond(500, { errors: [{broken: "broken"}] } );
+    var User = $resource('api/users/:userid');
+
+    var users = User.query( { $top:1 }, function() {}, function (response) {
+      // inherently works as we get the raw response
+      expect(response.data.errors.length).toEqual(1);
+    } );
+
+    $httpBackend.flush();
+    // would not work without modification as it doesn't unwrap the response
+    expect(users.errors.length).toEqual(1);
+
+  }));
+
   it('should set totalCount to collection length if no header', inject(function ($resource, $httpBackend, $http) {
     $httpBackend.whenGET(/\$top=1/).respond(200, [{name: "fred"}, {name:'barney'}]);
     var User = $resource('api/users/:userid');
@@ -74,6 +89,23 @@ describe( 'resource-extension', function () {
 
     $httpBackend.flush();
     expect(users.totalCount).toEqual(2);
+
+  }));
+
+  it('should return different results when paged', inject(function ($resource, $httpBackend, $http) {
+    var User = $resource('api/users/:userid');
+
+    // get first page
+    $httpBackend.whenGET(/\$skip=0\&\$top=1/).respond(200, [{name: "fred"}]);
+    var users = User.query( { $top:1, $skip:0 } );
+    $httpBackend.flush();
+    expect(users[0].name).toEqual('fred');
+
+    // get second page
+    $httpBackend.whenGET(/\$skip=1\&\$top=1/).respond(200, [{name: "barney"}]);
+    users.requery( { $top:1, $skip:1 } );
+    $httpBackend.flush();
+    expect(users[0].name).toEqual('barney');
 
   }));
 
