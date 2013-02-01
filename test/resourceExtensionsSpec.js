@@ -64,18 +64,24 @@ describe( 'resource-extension', function () {
 
   }));
 
-  iit('should attach errors to collection and persist data', inject(function ($resource, $httpBackend, $http) {
-    $httpBackend.whenGET(/\$top=1/).respond(500, { errors: [{broken: "broken"}] } );
+  it('should attach errors to collection and persist data', inject(function ($resource, $httpBackend, $http) {
+    $httpBackend.whenGET(/\$top=1/).respond(
+      500, 
+      { errors: [
+        {propertyName: 'forename', message: "too short"}, 
+        {propertyName: 'surname', message: "too long"}
+        ] }
+    );
     var User = $resource('api/users/:userid');
 
     var users = User.query( { $top:1 }, function() {}, function (response) {
       // inherently works as we get the raw response
-      expect(response.data.errors.length).toEqual(1);
+      expect(response.data.errors.length).toEqual(2);
+      expect(response.data.errors[1].propertyName).toEqual("surname");
     } );
 
     $httpBackend.flush();
-    // would not work without modification as it doesn't unwrap the response
-    expect(users.errors.length).toEqual(1);
+    expect(users.errors.length).toEqual(2);
 
   }));
 

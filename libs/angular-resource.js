@@ -400,12 +400,7 @@ angular.module('ngResource', ['ng']).
                 }
               }
               (success||noop)(value, response.headers);
-            }, function(response) {
-              value.errors = response.data.errors;
-              if (error) {
-                error.apply(this, arguments)
-              }
-            });
+            }, error);
 
           return value;
         };

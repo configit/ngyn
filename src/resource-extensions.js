@@ -64,8 +64,8 @@
               }
             },
             function error (response) {
-              // Do not have access to 'value' inside the Resource
-              // to assign the results to
+              //queryResult is contained in a closure at this point
+              queryResult.errors = response.data.errors
             }
             );
 
