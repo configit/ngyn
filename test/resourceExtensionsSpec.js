@@ -3,14 +3,31 @@ describe( 'resource-extension', function () {
 
   beforeEach( function() {
     module( 'ngResource' );
-    module( 'cs.modules.resource-extensions' );
-    inject(function($httpBackend) {
-      $httpBackend.whenGET(/\?surname=flintstone/).respond('[{"name": "fred"}]');
-      $httpBackend.whenGET(/\?surname=rubble/).respond('[{"name": "barney"}]');
-    });
-  } );
+
+    angular.module('cs.modules.config', [])
+      .value('cs.modules.config', {
+        resource: {
+          additionalArgs: function () {
+            return { addedArg:'success' };
+          },
+          success: function (response) {
+            response.addedData = 'response-success';
+            this.addedData = 'data-success';
+          },
+          error: function (response) {
+            response.error = 'response-error';
+            this.error = 'data-error';
+          }
+        }
+      });
+
+    module( 'cs.modules.resource' );
+  });
 
   it('should be able to requery a resource', inject(function ($resource, $httpBackend) {
+    $httpBackend.whenGET(/surname=flintstone/).respond('[{"name": "fred"}]');
+    $httpBackend.whenGET(/surname=rubble/).respond('[{"name": "barney"}]');
+
     var User = $resource('api/users/:userid');
 
     var users = User.query({surname:'flintstone'});
@@ -23,8 +40,7 @@ describe( 'resource-extension', function () {
   }));
 
   it('should return mocked header when using resource', inject(function ($resource, $httpBackend) {
-    $httpBackend.whenGET('api/users').respond(200, [{name: "fred"}], {totalCount: "2"}
-    );
+    $httpBackend.whenGET(/api\/users/).respond(200, [{name: "fred"}], {totalCount: "2"});
     var totalCount = 0;
 
     var User = $resource('api/users/:userid');
@@ -34,85 +50,77 @@ describe( 'resource-extension', function () {
 
     $httpBackend.flush();
     expect(totalCount).toBe('2');
-
   }));
 
-  it('should retrieve totalCount from headers', inject(function ($resource, $httpBackend, $http) {
-    $httpBackend.whenGET(/\$top=1/).respond(200, [{name: "fred"}], {totalCount: "2"});
+  it('should maintain success callback when supplied alone', inject(function ($httpBackend, $resource) {
+    $httpBackend.whenGET(/.+/).respond('[{"name": "fred"}]');
     var User = $resource('api/users/:userid');
-    var totalCount;
-
-    var users = User.query( { $top:1 }, function (data, headerFn) {
-      totalCount = headerFn('totalCount');
-    } );
-
+    var cbResponse;
+    var users = User.query(function success ( response ) {
+      cbResponse = response;
+    });
     $httpBackend.flush();
-    expect(totalCount).toEqual('2');
-
+    expect(cbResponse[0].name).toEqual('fred');
   }));
 
-  it('should retrieve totalCount from collection', inject(function ($resource, $httpBackend, $http) {
-    $httpBackend.whenGET(/\$top=1/).respond(200, [{name: "fred"}], {totalCount: "2"});
-    var User = $resource('api/users/:userid');
-
-    var users = User.query( { $top:1 }, function (data, headerFn) {
-      expect(data.totalCount).toEqual(2);
-    } );
-
-    $httpBackend.flush();
-    expect(users.totalCount).toEqual(2);
-
-  }));
-
-  it('should attach errors to collection and persist data', inject(function ($resource, $httpBackend, $http) {
-    $httpBackend.whenGET(/\$top=1/).respond(
+  it('should maintain error callbacks when supplied alone', inject(function ($httpBackend, $resource) {
+    $httpBackend.whenGET(/.+/).respond(
       500, 
       { errors: [
         {propertyName: 'forename', message: "too short"}, 
-        {propertyName: 'surname', message: "too long"}
         ] }
     );
     var User = $resource('api/users/:userid');
-
-    var users = User.query( { $top:1 }, function() {}, function (response) {
-      // inherently works as we get the raw response
-      expect(response.data.errors.length).toEqual(2);
-      expect(response.data.errors[1].propertyName).toEqual("surname");
-    } );
-
+    var cbResponse;
+    var users = User.query(angular.noop ,function success ( response ) {
+      cbResponse = response.data;
+    });
     $httpBackend.flush();
-    expect(users.errors.length).toEqual(2);
-
+    expect(cbResponse.errors.length).toEqual(1);
   }));
 
-  it('should set totalCount to collection length if no header', inject(function ($resource, $httpBackend, $http) {
-    $httpBackend.whenGET(/\$top=1/).respond(200, [{name: "fred"}, {name:'barney'}]);
+  it('should maintain callbacks when supplied with arguments', inject(function ($httpBackend, $resource) {
+    $httpBackend.whenGET(/.+/).respond(
+      500, 
+      { errors: [
+        {propertyName: 'forename', message: "too short"}, 
+        ] }
+    );
     var User = $resource('api/users/:userid');
-
-    var users = User.query( { $top:1 }, function (data, headerFn) {
-      expect(data.totalCount).toEqual(2);
-    } );
-
+    var cbResponse;
+    var users = User.query({}, angular.noop ,function success ( response ) {
+      cbResponse = response.data;
+    });
     $httpBackend.flush();
-    expect(users.totalCount).toEqual(2);
-
+    expect(cbResponse.errors.length).toEqual(1);    
   }));
 
-  it('should return different results when paged', inject(function ($resource, $httpBackend, $http) {
+  it('should be able to append arbitrary data to a request', inject(function($httpBackend, $resource) {
+    $httpBackend.expectGET(/addedArg=success/).respond([{name: 'fred'}]);
     var User = $resource('api/users/:userid');
-
-    // get first page
-    $httpBackend.whenGET(/\$skip=0\&\$top=1/).respond(200, [{name: "fred"}]);
-    var users = User.query( { $top:1, $skip:0 } );
+    var users = User.query();
     $httpBackend.flush();
-    expect(users[0].name).toEqual('fred');
+  }));
 
-    // get second page
-    $httpBackend.whenGET(/\$skip=1\&\$top=1/).respond(200, [{name: "barney"}]);
-    users.requery( { $top:1, $skip:1 } );
+  it('should be able to append data to a success response via global callback', inject(function($httpBackend, $resource) {
+    $httpBackend.whenGET(/.+/).respond([])
+    var User = $resource('api/users/:userid');
+    var users = User.query(function success (response) {
+      // we expect to get the value pushed on to the data in success conditions
+      expect(response.addedData).toEqual('data-success');
+    });
     $httpBackend.flush();
-    expect(users[0].name).toEqual('barney');
+    expect(users.addedData).toEqual('data-success');
+  }));
 
+  it('should be able to append data to an error response via global callback', inject(function($httpBackend, $resource) {
+    $httpBackend.whenGET(/.+/).respond(500, [])
+    var User = $resource('api/users/:userid');
+    var users = User.query(angular.noop, function error (response) {
+      expect(response.error).toEqual('response-error');
+    });
+    $httpBackend.flush();
+    expect(users.error).toEqual('data-error');
   }));
 
 });

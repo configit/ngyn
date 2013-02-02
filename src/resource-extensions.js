@@ -43,7 +43,10 @@
     return newargs;
   };
 
-  angular.module('cs.modules.resource-extensions', ['ng']).config(['$provide', function($provide) {
+  var config = {};
+
+  angular.module('cs.modules.resource', ['ng', 'cs.modules.config'])
+  .config(['$provide', function($provide) {
     $provide.decorator('$resource', function ($delegate) {
       return function $resourceDecoratorFn () {
         var resourceResult = $delegate.apply(this, arguments);
@@ -52,22 +55,28 @@
 
         resourceResult.query = function queryOveride() {
           var queryargs = injectCallback.call(this ,arguments,
-            function success (response, headerFn) {
-              var headerVal = headerFn('totalCount');
-              if (headerVal) {
-                response.totalCount = parseInt(headerVal);
-                if (response.totalCount === NaN) {
-                  response.totalCount = undefined;
-                }
-              } else if (angular.isArray(response)) {
-                response.totalCount = response.length;
+            function success() {
+              if (config.success) {
+                config.success.apply(queryResult, arguments);
               }
             },
-            function error (response) {
+            function error() {
               //queryResult is contained in a closure at this point
-              queryResult.errors = response.data.errors
+              if (config.error) {
+                config.error.apply(queryResult, arguments);
+              }
             }
             );
+
+          if ( angular.isFunction( queryargs[0] ) ) {
+            // inject new empty arguments to ensure globally added args are possible
+            queryargs.splice( 0, 0, {} );
+          }
+
+          if (config.additionalArgs) {
+            var additionalArgs = config.additionalArgs();
+            angular.extend(queryargs[0], additionalArgs);
+          }
 
           var queryResult = oldQuery.apply( this, queryargs);
 
@@ -85,7 +94,10 @@
         };
         return resourceResult;
       }
-    });
-}]);    
+    })
+  }])
+  .run(['cs.modules.config', function (moduleConfig) {
+    config = moduleConfig.resource || {};
+  }]);
 
 })(window.angular);
