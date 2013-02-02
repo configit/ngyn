@@ -45,7 +45,7 @@
 
   var config = {};
 
-  angular.module('cs.modules.resource', ['ng', 'cs.modules.config'])
+  angular.module('cs.modules.resource', ['ng', 'ngResource'])
   .config(['$provide', function($provide) {
     $provide.decorator('$resource', function ($delegate) {
       return function $resourceDecoratorFn () {

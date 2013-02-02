@@ -2,9 +2,7 @@ describe( 'resource-extension', function () {
   "use strict";
 
   beforeEach( function() {
-    module( 'ngResource' );
-
-    angular.module('cs.modules.config', [])
+    angular.module('app', [])
       .value('cs.modules.config', {
         resource: {
           additionalArgs: function () {
@@ -20,6 +18,7 @@ describe( 'resource-extension', function () {
           }
         }
       });
+    module('app');
 
     module( 'cs.modules.resource' );
   });
