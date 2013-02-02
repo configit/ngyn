@@ -38,17 +38,18 @@ describe( 'resource-extension', function () {
     expect(users[0].name).toEqual('barney');
   }));
 
+  // this is $resource included behavior but it tested here as the extensions could interfere with it
   it('should return mocked header when using resource', inject(function ($resource, $httpBackend) {
-    $httpBackend.whenGET(/api\/users/).respond(200, [{name: "fred"}], {totalCount: "2"});
-    var totalCount = 0;
+    $httpBackend.whenGET(/api\/users/).respond(200, [{name: "fred"}], {'x-myheader': "header-value"});
+    var header;
 
     var User = $resource('api/users/:userid');
     var users = User.query(function (data, headerFn) {
-      totalCount = headerFn('totalCount');
+      header = headerFn('x-myheader');
     });
 
     $httpBackend.flush();
-    expect(totalCount).toBe('2');
+    expect(header).toBe('header-value');
   }));
 
   it('should maintain success callback when supplied alone', inject(function ($httpBackend, $resource) {
