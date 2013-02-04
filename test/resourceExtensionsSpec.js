@@ -9,6 +9,9 @@ describe( 'resource-extension', function () {
           modifyArgs: function (args, action) {
             args.addedArg = 'success';
           },
+          actions: {
+            'update': { method: 'PUT' }
+          },
           success: function (response) {
             response.addedData = 'response-success';
             this.addedData = 'data-success';
@@ -65,6 +68,17 @@ describe( 'resource-extension', function () {
     expect(cbResponse[0].name).toEqual('fred');
   }));
 
+  it('should maintain success callback when supplied alone for a POST request', inject(function ($httpBackend, $resource) {
+    $httpBackend.whenPOST(/.+/).respond('{"name": "fred"}');
+    var User = $resource('api/users/:userid');
+    var cbResponse;
+    var users = User.save(function success ( response ) {
+      cbResponse = response;
+    });
+    $httpBackend.flush();
+    expect(cbResponse.name).toEqual('fred');
+  }));
+
   it('should maintain error callbacks when supplied alone', inject(function ($httpBackend, $resource) {
     $httpBackend.whenGET(/.+/).respond(
       500, 
@@ -97,6 +111,22 @@ describe( 'resource-extension', function () {
     expect(cbResponse.errors.length).toEqual(1);    
   }));
 
+    it('should maintain callbacks when supplied with arguments for a POST (hasBody)', inject(function ($httpBackend, $resource) {
+    $httpBackend.whenPOST(/.+/).respond(
+      500,
+      { errors: [
+        {propertyName: 'forename', message: "too short"}, 
+        ] }
+        );
+    var User = $resource('api/users/:userid');
+    var cbResponse;
+    var users = User.save({}, angular.noop ,function success ( response ) {
+      cbResponse = response.data;
+    });
+    $httpBackend.flush();
+    expect(cbResponse.errors.length).toEqual(1);    
+  }));
+
   it('should be able to append arbitrary data to a request', inject(function($httpBackend, $resource) {
     $httpBackend.expectGET(/addedArg=success/).respond([{name: 'fred'}]);
     var User = $resource('api/users/:userid');
@@ -123,6 +153,13 @@ describe( 'resource-extension', function () {
     });
     $httpBackend.flush();
     expect(users.error).toEqual('data-error');
+  }));
+
+  it('should be possible to provide new default_actions', inject(function ($resource, $httpBackend) {
+    $httpBackend.whenPUT(/api\/users/).respond({})
+    var User = $resource('api/users/:userid');
+    User.update();
+    $httpBackend.flush();
   }));
 
 });
