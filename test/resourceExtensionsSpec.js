@@ -3,10 +3,11 @@ describe( 'resource-extension', function () {
 
   beforeEach( function() {
     angular.module('app', [])
-      .value('cs.modules.config', {
+    .factory('cs.modules.config', function() {
+      return {
         resource: {
-          additionalArgs: function () {
-            return { addedArg:'success' };
+          modifyArgs: function (args, action) {
+            args.addedArg = 'success';
           },
           success: function (response) {
             response.addedData = 'response-success';
@@ -17,7 +18,8 @@ describe( 'resource-extension', function () {
             this.error = 'data-error';
           }
         }
-      });
+      }
+    });
     module('app');
 
     module( 'cs.modules.resource' );
@@ -69,7 +71,7 @@ describe( 'resource-extension', function () {
       { errors: [
         {propertyName: 'forename', message: "too short"}, 
         ] }
-    );
+        );
     var User = $resource('api/users/:userid');
     var cbResponse;
     var users = User.query(angular.noop ,function success ( response ) {
@@ -85,7 +87,7 @@ describe( 'resource-extension', function () {
       { errors: [
         {propertyName: 'forename', message: "too short"}, 
         ] }
-    );
+        );
     var User = $resource('api/users/:userid');
     var cbResponse;
     var users = User.query({}, angular.noop ,function success ( response ) {
