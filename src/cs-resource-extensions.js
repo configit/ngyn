@@ -102,6 +102,7 @@
             }
 
             var methodResult = oldMethod.apply( this, methodargs );
+            methodResult.parameters = methodargs[0];
 
             if ( action === 'query' ) {
               methodResult.requery = function() {
@@ -111,6 +112,9 @@
                     methodResult.push( r );
                   } );
                 } );
+
+                requeryargs[0] = angular.extend( {}, methodargs[0], requeryargs[0] );
+
                 resourceResult.query.apply( this, requeryargs );
               };
             };
