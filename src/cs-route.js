@@ -1,13 +1,13 @@
-﻿( function ( window, angular, undefined ) {
+﻿( function( angular ) {
   'use strict';
 
   var trail = function( str, ch ) {
     return !str.match( new RegExp( ch + '$' ) ) ? str + ch : str;
   };
 
-  var RouteContext = function ( routeProvider ) {
+  var RouteContext = function( routeProvider ) {
 
-    // Turns action object.
+    // Turns action key/value pair into object.
     //
     // Examples:
     //
@@ -22,7 +22,7 @@
     //
     // objectifyAction( { type: 'member', alias:'edit'}, 'details' )
     // returns { type: 'member', alias:'edit', key : 'details' };
-    var objectifyAction = function ( action, key ) {
+    var objectifyAction = function( action, key ) {
       var actionObj = {},
       keyalias = key.split( ':' );
 
@@ -45,7 +45,7 @@
       return angular.extend( actionObj, { key: key } );
     };
 
-    this.resource = function ( options, scopedObject ) {
+    this.resource = function( options, scopedObject ) {
 
       var routeContext = new RouteContext( routeProvider );
       routeContext.scopeParent = this;
@@ -55,24 +55,32 @@
       var resource = routeContext.options;
       var actions = resource.actions || routeProvider.defaultActions;
 
-      var scope = resource.scope ? resource.scope + '/' : '';
+      var path = resource.path ? resource.path + '/' : '';
       var routePrefix = resource.routePrefix || '/';
+
+      var ctx = routeContext;
+      var controllerPath = '';
+      while (ctx.scopeParent) {
+        controllerPath = ctx.options.name + '/' + controllerPath;
+        ctx = ctx.scopeParent;
+      }
+      controllerPath = controllerPath.replace(/\/$/, '');
 
       // put collection actions first to ensure for example, that pr/new is not read as a details route (pr/:code).
       var orderedKeys = _.sortBy( _.keys( actions ), function( key ) { return actions[key] !== 'collection'; } );
 
-      angular.forEach( orderedKeys, function ( key ) {
+      angular.forEach( orderedKeys, function( key ) {
         var action = objectifyAction( actions[key], key ),
-        parentName = (routeContext.scopeParent.options || {name:''}).name || '',
-        aliasedParentName = angular.isDefined((routeContext.scopeParent.options || {}).path)
-                     ? routeContext.scopeParent.options.path : (routeContext.scopeParent.options || {name:''}).name || '',
-        parentPath = ( scope + parentName ) ? trail( scope + parentName, '/' ) : '',
-        aliasedParentPath = ( scope + aliasedParentName ) ? trail( scope + aliasedParentName, '/' ) : '',
-        parentParam = !parentName ? '' : (':' + (routeContext.scopeParent.options || {name:''}).name + '_id/'),
+        parentName = ( routeContext.scopeParent.options || { name: '' } ).name || '',
+        aliasedParentName = angular.isDefined(( routeContext.scopeParent.options || {} ).urlAlias )
+                     ? routeContext.scopeParent.options.urlAlias : ( routeContext.scopeParent.options || { name: '' } ).name || '',
+        parentPath = ( path + parentName ) ? trail( path + parentName, '/' ) : '',
+        aliasedParentPath = ( path + aliasedParentName ) ? trail( path + aliasedParentName, '/' ) : '',
+        parentParam = !parentName ? '' : ( ':' + ( routeContext.scopeParent.options || { name: '' } ).name + '_id/' ),
         resourcePath = parentPath + resource.name + '/',
         resourceParam = ':' + angular.lowercase( resource.name ) + '_id/',
-        viewLocation = angular.lowercase( trail(routeProvider.appRoot, '/') + resourcePath + (action.alias || action.key) + '.html' ),
-        routeWithoutKey = angular.lowercase( aliasedParentPath + parentParam + (angular.isDefined(resource.path) ? resource.path : resource.name) + '/' ).replace('//', '/');
+        viewLocation = angular.lowercase( trail( routeProvider.appRoot, '/' ) + resourcePath + ( action.alias || action.key ) + '.html' ),
+        routeWithoutKey = angular.lowercase( aliasedParentPath + parentParam + ( angular.isDefined( resource.urlAlias ) ? resource.urlAlias : resource.name ) + '/' ).replace( '//', '/' );
 
         if ( action.type === 'member' ) {
           routeWithoutKey += resourceParam;
@@ -87,10 +95,12 @@
           layoutUrl: resource.layoutUrl,
           action: action.key,
           path: resource.path || '',
+          urlAlias: resource.urlAlias,
           routePrefix: routePrefix,
           routePath: routePath,
           isResource: true,
-          viewScope: action.type || 'member'
+          viewScope: action.type || 'member',
+          controllerPath: controllerPath
         };
 
         if ( resource.routeTransform ) {
@@ -122,7 +132,7 @@
       return routeContext;
     };
 
-    this.scope = function ( options, scopedObject ) {
+    this.scope = function( options, scopedObject ) {
       var scopeContext = new RouteContext( routeProvider );
       scopeContext.options = options;
       angular.extend( scopeContext.options, this.options );
@@ -133,7 +143,7 @@
 
   };
 
-  var routeProvider = function () {
+  var routeProvider = function() {
     // -- config
 
     this.$routeProvider = routeProvider.$routeProvider;
@@ -149,16 +159,16 @@
 
     // -- end config
 
-    this.resource = function ( options, scopedObject ) {
-      if (angular.isString(options)) 
+    this.resource = function( options, scopedObject ) {
+      if ( angular.isString( options ) )
         options = { name: options };
-      
+
       var routeContext = new RouteContext( this );
       routeContext.resource( options, scopedObject );
       return routeContext;
     };
 
-    this.scope = function ( options, scopedObject ) {
+    this.scope = function( options, scopedObject ) {
       var routeContext = new RouteContext( this );
       routeContext.options = angular.extend( {}, options, this.options );
 
@@ -166,29 +176,36 @@
       return routeContext;
     };
 
-    this.$get = ['$route', '$routeParams', '$location', function ( $route, $routeParams, $location ) {
+    this.$get = ['$route', '$routeParams', '$location', function( $route, $routeParams, $location ) {
 
       return {
-        link: function ( options ) {
-          var params = angular.extend( { }, $routeParams, options ),
+        link: function( options ) {
+          var params = angular.extend( {}, $routeParams, options ),
           intendedRoute = null,
           searchTerm = '',
-          search;
+          search,
+          action,
+          path,
+          controller;
+
+          if ($route.current) {
+            controller = angular.lowercase(options.controller || $route.current.controllerPath);
+            action = angular.lowercase(options.action || $route.current.action);
+            path = angular.lowercase( options.path || $route.current.path || '' );
+          }
 
           if ( !options.action ) {
             intendedRoute = $route.current;
-          } else if ( $route.current && angular.isDefined( $route.current.path ) ) {
-            intendedRoute = _.find( $route.routes, function ( r ) {
-              return angular.isDefined( r.path ) &&
-              angular.lowercase( r.path ) === angular.lowercase( $route.current.path ) &&
-              r.routePrefix === $route.current.routePrefix &&
-              r.name === $route.current.name &&
-              r.action === ( options.action || $route.current.action );
+          } else if ( $route.current ) {
+            intendedRoute = _.find( $route.routes, function( r ) {
+              return angular.lowercase( r.path || '' ) === path &&
+              angular.lowercase( r.controllerPath ) === controller &&
+              angular.lowercase( r.action ) === action;
             } );
           }
 
           if ( !intendedRoute ) {
-            return 'notfound?action=' + options.action;
+            return 'notfound?controller=' + controller +'&action=' + action;
           }
           // carry the search term over if the same route name
           search = $location.search();
@@ -204,28 +221,28 @@
             }
           }
           var path = ( intendedRoute.routePath + ( intendedRoute.action || '' ) ).
-          replace( /:([^\/]+)/ig, function ( match, group1 ) { return params[group1]; } );
+          replace( /:([^\/]+)/ig, function( match, group1 ) { return params[group1]; } );
           // remove trailing '/' to ensure hrefs works when running under a url prefix (http://localhost/Ace/)
-          path = path.replace(/^\/+/, '');
+          path = path.replace( /^\/+/, '' );
 
           return path + ( searchTerm ? '?' + searchTerm : '' );
         },
-        action: function ( action ) {
+        action: function( action ) {
           return this.link( { action: action } );
         },
-        gotoLink: function ( options ) {
+        gotoLink: function( options ) {
           $location.url( this.link( options ) );
         },
-        gotoAction: function ( action ) {
+        gotoAction: function( action ) {
           $location.url( this.action( action ) );
         }
       };
     }];
   };
 
-  angular.module( 'cs.modules' ).config( ['$provide', '$routeProvider', function ( $provide, $routeProvider ) {
+  angular.module( 'cs.modules' ).config( ['$provide', '$routeProvider', function( $provide, $routeProvider ) {
     routeProvider.$routeProvider = $routeProvider;
     $provide.provider( 'route', routeProvider );
-  } ] );
+  }] );
 
-} )( window, window.angular );
+} )( window.angular );
