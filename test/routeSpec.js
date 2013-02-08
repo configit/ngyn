@@ -19,6 +19,7 @@
     } );
   } );
 
+
   it( 'should serve basic route to resourceful index using short syntax', function() {
     module( function( routeProvider ) {
       routeProvider.resource( 'Products' );
@@ -32,9 +33,9 @@
     } );
   } );
 
-  it( 'should serve basic route to resourceful index with scope', function() {
+  it( 'should serve basic route to resourceful index with path', function() {
     module( function( routeProvider ) {
-      routeProvider.resource( { name: 'Products', scope: 'admin' } );
+      routeProvider.resource( { name: 'Products', path: 'admin' } );
     } );
 
     inject( function ( $location, $route, $rootScope, $httpBackend ) {
@@ -45,9 +46,9 @@
     } );
   } );
 
-  it( 'should serve basic route to resourceful index with path alias', function() {
+  it( 'should serve basic route to resourceful index with url alias', function() {
     module( function( routeProvider ) {
-      routeProvider.resource( { name: 'Products', path: 'p' } );
+      routeProvider.resource( { name: 'Products', urlAlias: 'p' } );
     } );
 
     inject( function ( $location, $route, $rootScope, $httpBackend ) {
@@ -60,8 +61,8 @@
 
   it( 'should serve route to nested index with path alias', function() {
     module( function( routeProvider ) {
-      routeProvider.resource( { name: 'Lists', path: 'l' }, function () {
-        this.resource( { name: 'Items', path: 'i' } );
+      routeProvider.resource( { name: 'Lists', urlAlias: 'l' }, function () {
+        this.resource( { name: 'Items', urlAlias: 'i' } );
       } ); 
     } );
 
@@ -77,11 +78,12 @@
   it( 'should serve route to nested index with empty path alias', function() {
     module( function( routeProvider ) {
       routeProvider.resource( { name: 'Lists' }, function () {
-        this.resource( { name: 'Items', path: '' } );
+        this.resource( { name: 'Items', urlAlias: '' } );
       } ); 
     } );
 
     inject( function ( $location, $route, $rootScope, $httpBackend ) {
+      console.log($route.routes);
       $httpBackend.whenGET(/.+/).respond();
       $location.path( '/lists/1/index' );
       $rootScope.$digest();
@@ -206,4 +208,80 @@
       expect( $route.routes['/products/add'].templateUrl ).toEqual( 'client/app/products/details.html' );
     } );
   } );
+
+  it( 'should generate a link for an action', function() {
+    module( function( routeProvider ) {
+      routeProvider.resource( { name: 'Theatres' } );
+    } );
+
+    inject( function ( $route, $httpBackend, $location, $rootScope, route ) {
+      $httpBackend.whenGET(/.+/).respond();
+      $location.path( '/theatres/index' );
+      $rootScope.$digest();
+      expect( $route.current.name ).toEqual( 'Theatres' );
+      expect( $route.current.action ).toEqual( 'index' );
+      expect( route.link( {action: 'details', theatres_id: 1 } ) ).toMatch('theatres/1/details');
+    } );
+  } );
+
+  it( 'should generate a link for an action in a nested resource', function() {
+    module( function( routeProvider ) {
+      routeProvider.resource( { name: 'Theatres' }, function() {
+        this.resource( { name: 'Screens'  });
+      } );
+    } );
+
+    inject( function ( $route, $httpBackend, $location, $rootScope, route ) {
+      $httpBackend.whenGET(/.+/).respond();
+      $location.path( '/theatres/1/screens/' );
+      $rootScope.$digest();
+      expect( $route.current.name ).toEqual( 'Screens' );
+      expect( $route.current.action ).toEqual( 'index' );
+      expect( route.link( 
+        {action: 'details', theatres_id: 1, screens_id: 3 } ) 
+      ).toMatch('theatres/1/screens/3/details');
+    } );
+  } );
+
+  it( 'should generate a link for an action in a nested resource with ambiguous choices', function() {
+    module( function( routeProvider ) {
+      routeProvider.resource( { name: 'Theatres' }, function() {
+        this.resource( { name: 'Screens'  });
+      } );
+      routeProvider.resource( { name: 'DemoTheatres' }, function() {
+        this.resource( { name: 'Screens'  });
+      } );
+    } );
+
+    inject( function ( $route, $httpBackend, $location, $rootScope, route ) {
+      $httpBackend.whenGET(/.+/).respond();
+      $location.path( '/theatres/1/screens/' );
+      $rootScope.$digest();
+      expect( $route.current.name ).toEqual( 'Screens' );
+      expect( $route.current.action ).toEqual( 'index' );
+      expect( route.link( 
+          { action: 'details', theatres_id: 1, screens_id: 3 } 
+        ) ).toMatch('theatres/1/screens/3/details');
+    } );
+  } );
+
+  it( 'should route to complex nested controller/action path', function() {
+    module( function( $routeProvider, routeProvider ) {
+      $routeProvider.when('/', {template:'test'});
+      routeProvider.resource( { name: 'Theatres' }, function() {
+        this.resource( { name: 'Screens'  });
+      } );
+    } );
+
+    inject( function ( $route, $httpBackend, $location, $rootScope, route ) {
+      console.log(route.resources);
+      $httpBackend.whenGET(/.+/).respond();
+      $location.path( '/' );
+      $rootScope.$digest();
+      expect( route.link( 
+        { controller: 'theatres/screens', action: 'details', theatres_id: 1, screens_id: 3 } ) 
+      ).toMatch('theatres/1/screens/3/details');
+    } );
+  } );
+
 } );
