@@ -218,7 +218,7 @@
             intendedRoute = _.find( $route.routes, function( r ) {
               return angular.lowercase( r.path || '' ) === path &&
                 angular.lowercase( r.controllerPath ) === controller &&
-                ( angular.lowercase( r.action ) === ( options[r.name + "_id"] ? 'details' : 'index' ) );
+                ( angular.lowercase( r.action ) === ( options[angular.lowercase(r.name) + "_id"] ? 'details' : 'index' ) );
             } );
           } else {
             intendedRoute = _.find( $route.routes, function( r ) {
