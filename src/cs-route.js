@@ -60,11 +60,11 @@
 
       var ctx = routeContext;
       var controllerPath = '';
-      while (ctx.scopeParent) {
+      while ( ctx.scopeParent ) {
         controllerPath = ctx.options.name + '/' + controllerPath;
         ctx = ctx.scopeParent;
       }
-      controllerPath = controllerPath.replace(/\/$/, '');
+      controllerPath = controllerPath.replace( /\/$/, '' );
 
       // put collection actions first to ensure for example, that pr/new is not read as a details route (pr/:code).
       var orderedKeys = _.sortBy( _.keys( actions ), function( key ) { return actions[key] !== 'collection'; } );
@@ -191,12 +191,12 @@
           path,
           controller;
 
-          if ( angular.isString(options) ) {
+          if ( angular.isString( options ) ) {
             var linkText = options;
             options = additionalOptions || {};
-            if (linkText.indexOf('#') >= 0) {
-              options.controller = linkText.substr(0, linkText.indexOf('#'));
-              options.action = linkText.substr(linkText.indexOf('#') +1 );
+            if ( linkText.indexOf( '#' ) >= 0 ) {
+              options.controller = linkText.substr( 0, linkText.indexOf( '#' ) );
+              options.action = linkText.substr( linkText.indexOf( '#' ) + 1 );
             }
             else {
               options.controller = linkText;
@@ -204,7 +204,7 @@
           }
           params = angular.extend( {}, $routeParams, options );
 
-          if ($route.current) {
+          if ( $route.current ) {
             controller = angular.lowercase( options.controller || $route.current.controllerPath );
             action = angular.lowercase( options.action || $route.current.action );
             path = angular.lowercase( options.path || $route.current.path || '' );
@@ -213,23 +213,25 @@
             action = angular.lowercase( options.action );
             path = angular.lowercase( options.path );
           }
-          
-          if ( controller && !action ) { // we're just moving to a new controller and accepting the default action
+
+          if ( options.controller && !options.action ) { // we're just moving to a new controller and accepting the default action
             intendedRoute = _.find( $route.routes, function( r ) {
               return angular.lowercase( r.path || '' ) === path &&
-              angular.lowercase( r.controllerPath ) === controller
+                angular.lowercase( r.controllerPath ) === controller &&
+                ( angular.lowercase( r.action ) === ( options[r.name + "_id"] ? 'details' : 'index' ) );
             } );
           } else {
             intendedRoute = _.find( $route.routes, function( r ) {
-                return (!$route.current || angular.lowercase( r.path || '' ) === path) &&
-                angular.lowercase( r.controllerPath ) === controller &&
-                angular.lowercase( r.action ) === action;
+              return ( !$route.current || angular.lowercase( r.path || '' ) === path ) &&
+              angular.lowercase( r.controllerPath ) === controller &&
+              angular.lowercase( r.action ) === action;
             } );
           }
 
           if ( !intendedRoute ) {
-            return 'notfound?controller=' + controller +'&action=' + action;
+            return 'notfound?controller=' + controller + '&action=' + action;
           }
+
           // carry the search term over if the same route name
           search = $location.search();
           if ( !_.isEmpty( search ) && ( $route.current && intendedRoute.name === $route.current.$route.name ) ) {
@@ -243,12 +245,13 @@
               searchTerm = _.toKeyValue( search );
             }
           }
-          var path = ( intendedRoute.routePath + ( intendedRoute.action || '' ) ).
-          replace( /:([^\/]+)/ig, function( match, group1 ) { return params[group1]; } );
-          // remove trailing '/' to ensure hrefs works when running under a url prefix (e.g. http://localhost/MyApp/)
-          path = path.replace( /^\/+/, '' );
 
-          return path + ( searchTerm ? '?' + searchTerm : '' );
+          var resultPath = ( intendedRoute.routePath + ( intendedRoute.action || '' ) ).
+            replace( /:([^\/]+)/ig, function( match, group1 ) { return params[group1]; } );
+          // remove trailing '/' to ensure hrefs works when running under a url prefix (e.g. http://localhost/MyApp/)
+          resultPath = resultPath.replace( /^\/+/, '' );
+
+          return resultPath + ( searchTerm ? '?' + searchTerm : '' );
         },
         action: function( action ) {
           return this.link( { action: action } );
