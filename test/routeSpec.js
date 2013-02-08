@@ -83,7 +83,6 @@
     } );
 
     inject( function ( $location, $route, $rootScope, $httpBackend ) {
-      console.log($route.routes);
       $httpBackend.whenGET(/.+/).respond();
       $location.path( '/lists/1/index' );
       $rootScope.$digest();
@@ -224,6 +223,16 @@
     } );
   } );
 
+  it( 'should generate a link for an action when not on a resourceful route', function() {
+    module( function( routeProvider ) {
+      routeProvider.resource( { name: 'Theatres' } );
+    } );
+
+    inject( function ( $route, $httpBackend, $location, $rootScope, route ) {
+      expect( route.link( { controller: 'Theatres', action: 'details', theatres_id: 1 } ) ).toMatch('theatres/1/details');
+    } );
+  } );
+
   it( 'should generate a link for an action in a nested resource', function() {
     module( function( routeProvider ) {
       routeProvider.resource( { name: 'Theatres' }, function() {
@@ -274,13 +283,62 @@
     } );
 
     inject( function ( $route, $httpBackend, $location, $rootScope, route ) {
-      console.log(route.resources);
       $httpBackend.whenGET(/.+/).respond();
       $location.path( '/' );
       $rootScope.$digest();
       expect( route.link( 
         { controller: 'theatres/screens', action: 'details', theatres_id: 1, screens_id: 3 } ) 
       ).toMatch('theatres/1/screens/3/details');
+    } );
+  } );
+
+  it( 'should route to complex nested controller/action path with concise syntax', function() {
+    module( function( $routeProvider, routeProvider ) {
+      $routeProvider.when('/', {template:'test'});
+      routeProvider.resource( { name: 'Theatres' }, function() {
+        this.resource( { name: 'Screens'  });
+      } );
+    } );
+
+    inject( function ( $route, $httpBackend, $location, $rootScope, route ) {
+      $httpBackend.whenGET(/.+/).respond();
+      $location.path( '/' );
+      $rootScope.$digest();
+      expect( 
+        route.link( 'theatres/screens#details', { theatres_id: 1, screens_id: 3 } ) 
+      ).toMatch('theatres/1/screens/3/details');
+    } );
+  } );
+
+  it( 'should route to controller#action with concise syntax', function() {
+    module( function( $routeProvider, routeProvider ) {
+      $routeProvider.when('/', {template:'test'});
+      routeProvider.resource( { name: 'Theatres' } );
+    } );
+
+    inject( function ( $route, $httpBackend, $location, $rootScope, route ) {
+      $httpBackend.whenGET(/.+/).respond();
+      $location.path( '/' );
+      $rootScope.$digest();
+      expect( 
+        route.link( 'theatres#new' ) 
+      ).toMatch('theatres/new');
+    } );
+  } );
+
+  it( 'should go to defualt controller action when called with concise syntax', function() {
+    module( function( $routeProvider, routeProvider ) {
+      $routeProvider.when('/', {template:'test'});
+      routeProvider.resource( { name: 'Theatres' } );
+    } );
+
+    inject( function ( $route, $httpBackend, $location, $rootScope, route ) {
+      $httpBackend.whenGET(/.+/).respond();
+      $location.path( '/' );
+      $rootScope.$digest();
+      route.gotoLink( 'theatres' );
+      $rootScope.$digest();
+      expect($location.path()).toMatch('theatres/index');
     } );
   } );
 
