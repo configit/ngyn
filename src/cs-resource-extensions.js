@@ -108,9 +108,8 @@
             if ( config.modifyArgs ) {
               config.modifyArgs( methodargs[0], action );
             }
-
+            
             var methodResult = oldMethod.apply( this, methodargs );
-            methodResult.parameters = methodargs[0];
 
             if ( action === 'query' ) {
               methodResult.requery = function() {
@@ -125,8 +124,11 @@
                 methodargs[0] = requeryargs[0];
 
                 resourceResult.query.apply( methodResult, requeryargs );
+                methodResult.parameters = requeryargs[0];
               };
             };
+            
+            methodResult.parameters = methodargs[0];
             return methodResult;
           };
         } );
