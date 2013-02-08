@@ -55,8 +55,16 @@
       var resource = routeContext.options;
       var actions = resource.actions || routeProvider.defaultActions;
 
-      var scope = resource.scope ? resource.scope + '/' : '';
+      var path = resource.path ? resource.path + '/' : '';
       var routePrefix = resource.routePrefix || '/';
+
+      var ctx = routeContext;
+      var controllerPath = '';
+      while (ctx.scopeParent) {
+        controllerPath = ctx.options.name + '/' + controllerPath;
+        ctx = ctx.scopeParent;
+      }
+      controllerPath = controllerPath.replace(/\/$/, '');
 
       // put collection actions first to ensure for example, that pr/new is not read as a details route (pr/:code).
       var orderedKeys = _.sortBy( _.keys( actions ), function( key ) { return actions[key] !== 'collection'; } );
@@ -64,15 +72,15 @@
       angular.forEach( orderedKeys, function( key ) {
         var action = objectifyAction( actions[key], key ),
         parentName = ( routeContext.scopeParent.options || { name: '' } ).name || '',
-        aliasedParentName = angular.isDefined(( routeContext.scopeParent.options || {} ).path )
-                     ? routeContext.scopeParent.options.path : ( routeContext.scopeParent.options || { name: '' } ).name || '',
-        parentPath = ( scope + parentName ) ? trail( scope + parentName, '/' ) : '',
-        aliasedParentPath = ( scope + aliasedParentName ) ? trail( scope + aliasedParentName, '/' ) : '',
+        aliasedParentName = angular.isDefined(( routeContext.scopeParent.options || {} ).urlAlias )
+                     ? routeContext.scopeParent.options.urlAlias : ( routeContext.scopeParent.options || { name: '' } ).name || '',
+        parentPath = ( path + parentName ) ? trail( path + parentName, '/' ) : '',
+        aliasedParentPath = ( path + aliasedParentName ) ? trail( path + aliasedParentName, '/' ) : '',
         parentParam = !parentName ? '' : ( ':' + ( routeContext.scopeParent.options || { name: '' } ).name + '_id/' ),
         resourcePath = parentPath + resource.name + '/',
         resourceParam = ':' + angular.lowercase( resource.name ) + '_id/',
         viewLocation = angular.lowercase( trail( routeProvider.appRoot, '/' ) + resourcePath + ( action.alias || action.key ) + '.html' ),
-        routeWithoutKey = angular.lowercase( aliasedParentPath + parentParam + ( angular.isDefined( resource.path ) ? resource.path : resource.name ) + '/' ).replace( '//', '/' );
+        routeWithoutKey = angular.lowercase( aliasedParentPath + parentParam + ( angular.isDefined( resource.urlAlias ) ? resource.urlAlias : resource.name ) + '/' ).replace( '//', '/' );
 
         if ( action.type === 'member' ) {
           routeWithoutKey += resourceParam;
@@ -87,10 +95,12 @@
           layoutUrl: resource.layoutUrl,
           action: action.key,
           path: resource.path || '',
+          urlAlias: resource.urlAlias,
           routePrefix: routePrefix,
           routePath: routePath,
           isResource: true,
-          viewScope: action.type || 'member'
+          viewScope: action.type || 'member',
+          controllerPath: controllerPath
         };
 
         if ( resource.routeTransform ) {
@@ -173,22 +183,29 @@
           var params = angular.extend( {}, $routeParams, options ),
           intendedRoute = null,
           searchTerm = '',
-          search;
+          search,
+          action,
+          path,
+          controller;
+
+          if ($route.current) {
+            controller = angular.lowercase(options.controller || $route.current.controllerPath);
+            action = angular.lowercase(options.action || $route.current.action);
+            path = angular.lowercase( options.path || $route.current.path || '' );
+          }
 
           if ( !options.action ) {
             intendedRoute = $route.current;
-          } else if ( $route.current && angular.isDefined( $route.current.path ) ) {
+          } else if ( $route.current ) {
             intendedRoute = _.find( $route.routes, function( r ) {
-              return angular.isDefined( r.path ) &&
-              angular.lowercase( r.path ) === angular.lowercase( $route.current.path ) &&
-              r.routePrefix === $route.current.routePrefix &&
-              r.name === $route.current.name &&
-              r.action === ( options.action || $route.current.action );
+              return angular.lowercase( r.path || '' ) === path &&
+              angular.lowercase( r.controllerPath ) === controller &&
+              angular.lowercase( r.action ) === action;
             } );
           }
 
           if ( !intendedRoute ) {
-            return 'notfound?action=' + options.action;
+            return 'notfound?controller=' + controller +'&action=' + action;
           }
           // carry the search term over if the same route name
           search = $location.search();

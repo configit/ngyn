@@ -71,16 +71,24 @@
         angular.forEach( actionKeys, function( action ) {
           var oldMethod = resourceResult[action];
           resourceResult[action] = function methodOveride() {
+            var previousResult = this;
+
             var methodargs = injectCallback.call( this, arguments,
               function success() {
                 if ( config.success ) {
-                  config.success.apply( methodResult, arguments );
+                  config.success.apply(
+                    (angular.isArray(previousResult) ? previousResult : methodResult),
+                    arguments
+                  );
                 }
               },
               function error() {
                 //methodResult is contained in a closure at this point
                 if ( config.error ) {
-                  config.error.apply( methodResult, arguments );
+                  config.error.apply(
+                    ( angular.isArray( previousResult ) ? previousResult : methodResult ),
+                    arguments
+                  );
                 }
               }
             );
@@ -114,8 +122,9 @@
                 } );
 
                 requeryargs[0] = angular.extend( {}, methodargs[0], requeryargs[0] );
+                methodargs[0] = requeryargs[0];
 
-                resourceResult.query.apply( this, requeryargs );
+                resourceResult.query.apply( methodResult, requeryargs );
               };
             };
             return methodResult;

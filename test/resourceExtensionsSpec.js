@@ -13,12 +13,13 @@ describe( 'resource-extension', function () {
             'update': { method: 'PUT' }
           },
           success: function (response) {
-            response.addedData = 'response-success';
-            this.addedData = 'data-success';
+            response.addedData = 'success';
+            this.totalCount = response.length;
+            response.totalCount = response.length;
           },
           error: function (response) {
-            response.error = 'response-error';
-            this.error = 'data-error';
+            response.error = 'error';
+            this.error = 'error';
           }
         }
       }
@@ -139,20 +140,20 @@ describe( 'resource-extension', function () {
     var User = $resource('api/users/:userid');
     var users = User.query(function success (response) {
       // we expect to get the value pushed on to the data in success conditions
-      expect(response.addedData).toEqual('data-success');
+      expect(response.addedData).toEqual('success');
     });
     $httpBackend.flush();
-    expect(users.addedData).toEqual('data-success');
+    expect(users.addedData).toEqual('success');
   }));
 
   it('should be able to append data to an error response via global callback', inject(function($httpBackend, $resource) {
     $httpBackend.whenGET(/.+/).respond(500, [])
     var User = $resource('api/users/:userid');
     var users = User.query(angular.noop, function error (response) {
-      expect(response.error).toEqual('response-error');
+      expect(response.error).toEqual('error');
     });
     $httpBackend.flush();
-    expect(users.error).toEqual('data-error');
+    expect(users.error).toEqual('error');
   }));
 
   it('should be possible to provide new default_actions', inject(function ($resource, $httpBackend) {
@@ -160,6 +161,20 @@ describe( 'resource-extension', function () {
     var User = $resource('api/users/:userid');
     User.update();
     $httpBackend.flush();
+  }));
+
+  it('should update additional parameters on collection after requery', inject(function ($resource, $httpBackend) {
+    $httpBackend.whenGET(/top=1/).respond([{name:'fred'}]);
+    var User = $resource('api/users/:userid');
+    var users = User.query({top:1});
+    $httpBackend.flush();
+    expect(users.totalCount).toEqual(1);
+
+    $httpBackend.whenGET(/top=2/).respond([{name:'fred'}, {name:'barney'}]);
+    users.requery({top:2});
+    $httpBackend.flush();
+    expect(users.totalCount).toEqual(2);
+
   }));
 
 });
