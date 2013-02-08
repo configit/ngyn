@@ -111,6 +111,9 @@
 
         if ( action.key === routeProvider.collectionDefaultAction || action.key === routeProvider.memberDefaultAction ) {
           routeProvider.$routeProvider.when( routePath, {
+            controllerPath: controllerPath,
+            path: routeProperties.path,
+            routePath: routePath,
             redirectTo: angular.lowercase( routePath + action.key )
           } );
         }
@@ -179,8 +182,8 @@
     this.$get = ['$route', '$routeParams', '$location', function( $route, $routeParams, $location ) {
 
       return {
-        link: function( options ) {
-          var params = angular.extend( {}, $routeParams, options ),
+        link: function( options, additionalOptions ) {
+          var params,
           intendedRoute = null,
           searchTerm = '',
           search,
@@ -188,19 +191,39 @@
           path,
           controller;
 
-          if ($route.current) {
-            controller = angular.lowercase(options.controller || $route.current.controllerPath);
-            action = angular.lowercase(options.action || $route.current.action);
-            path = angular.lowercase( options.path || $route.current.path || '' );
+          if ( angular.isString(options) ) {
+            var linkText = options;
+            options = additionalOptions || {};
+            if (linkText.indexOf('#') >= 0) {
+              options.controller = linkText.substr(0, linkText.indexOf('#'));
+              options.action = linkText.substr(linkText.indexOf('#') +1 );
+            }
+            else {
+              options.controller = linkText;
+            }
           }
+          params = angular.extend( {}, $routeParams, options );
 
-          if ( !options.action ) {
-            intendedRoute = $route.current;
-          } else if ( $route.current ) {
+          if ($route.current) {
+            controller = angular.lowercase( options.controller || $route.current.controllerPath );
+            action = angular.lowercase( options.action || $route.current.action );
+            path = angular.lowercase( options.path || $route.current.path || '' );
+          } else {
+            controller = angular.lowercase( options.controller );
+            action = angular.lowercase( options.action );
+            path = angular.lowercase( options.path );
+          }
+          
+          if ( controller && !action ) { // we're just moving to a new controller and accepting the default action
             intendedRoute = _.find( $route.routes, function( r ) {
               return angular.lowercase( r.path || '' ) === path &&
-              angular.lowercase( r.controllerPath ) === controller &&
-              angular.lowercase( r.action ) === action;
+              angular.lowercase( r.controllerPath ) === controller
+            } );
+          } else {
+            intendedRoute = _.find( $route.routes, function( r ) {
+                return (!$route.current || angular.lowercase( r.path || '' ) === path) &&
+                angular.lowercase( r.controllerPath ) === controller &&
+                angular.lowercase( r.action ) === action;
             } );
           }
 
@@ -209,7 +232,7 @@
           }
           // carry the search term over if the same route name
           search = $location.search();
-          if ( !_.isEmpty( search ) && ( intendedRoute.name === $route.current.$route.name ) ) {
+          if ( !_.isEmpty( search ) && ( $route.current && intendedRoute.name === $route.current.$route.name ) ) {
             if ( intendedRoute.action === 'index' ) {
               searchTerm = decodeURIComponent( search.back || '' );
             }
@@ -222,7 +245,7 @@
           }
           var path = ( intendedRoute.routePath + ( intendedRoute.action || '' ) ).
           replace( /:([^\/]+)/ig, function( match, group1 ) { return params[group1]; } );
-          // remove trailing '/' to ensure hrefs works when running under a url prefix (http://localhost/Ace/)
+          // remove trailing '/' to ensure hrefs works when running under a url prefix (e.g. http://localhost/MyApp/)
           path = path.replace( /^\/+/, '' );
 
           return path + ( searchTerm ? '?' + searchTerm : '' );
