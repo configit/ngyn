@@ -47,7 +47,7 @@
 
   angular.module( 'cs.modules.resource', ['ng', 'ngResource'] )
   .config( ['$provide', function( $provide ) {
-    $provide.decorator( '$resource', function( $delegate ) {
+    $provide.decorator( '$resource', [ '$delegate', function( $delegate ) {
       return function $resourceDecoratorFn() {
 
         var DEFAULT_ACTIONS = {
@@ -134,7 +134,7 @@
         } );
         return resourceResult;
       };
-    } );
+    }] );
   }] )
   .run( ['cs.modules.config', function( moduleConfig ) {
     config = moduleConfig.resource || {};
