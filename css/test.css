@@ -1,0 +1,9 @@
+select, .select2-container {
+  width:90%;
+}
+.code {
+  padding:2px;
+  border:solid 1px #dddddd;
+  background-color:#eeeeee;
+  border-radius: 3px;
+}
