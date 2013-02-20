@@ -207,25 +207,32 @@
           if ( $route.current ) {
             controller = angular.lowercase( options.controller || $route.current.controllerPath );
             action = angular.lowercase( options.action || $route.current.action );
-            path = angular.lowercase( options.path || $route.current.path || '' );
+            path = angular.lowercase( angular.isDefined(options.path) ? options.path : $route.current.path || '' );
           } else {
             controller = angular.lowercase( options.controller );
             action = angular.lowercase( options.action );
             path = angular.lowercase( options.path );
           }
 
-          if ( options.controller && !options.action ) { // we're just moving to a new controller and accepting the default action
-            intendedRoute = _.find( $route.routes, function( r ) {
-              return angular.lowercase( r.path || '' ) === path &&
+          // non-resourceful routes will allow you to change the route params of the current route but no more
+          if (!options.controller && !options.action) {
+            intendedRoute = $route.current;
+          }
+
+          if ( !intendedRoute ) {
+            if ( options.controller && !options.action ) { // we're just moving to a new controller and accepting the default action
+              intendedRoute = _.find( $route.routes, function( r ) {
+                return angular.lowercase( r.path || '' ) === path &&
+                  angular.lowercase( r.controllerPath ) === controller &&
+                  ( angular.lowercase( r.action ) === ( options[angular.lowercase( r.name ) + "_id"] ? 'details' : 'index' ) );
+              } );
+            } else {
+              intendedRoute = _.find( $route.routes, function( r ) {
+                return ( !$route.current || angular.lowercase( r.path || '' ) === path ) &&
                 angular.lowercase( r.controllerPath ) === controller &&
-                ( angular.lowercase( r.action ) === ( options[angular.lowercase(r.name) + "_id"] ? 'details' : 'index' ) );
-            } );
-          } else {
-            intendedRoute = _.find( $route.routes, function( r ) {
-              return ( !$route.current || angular.lowercase( r.path || '' ) === path ) &&
-              angular.lowercase( r.controllerPath ) === controller &&
-              angular.lowercase( r.action ) === action;
-            } );
+                angular.lowercase( r.action ) === action;
+              } );
+            }
           }
 
           if ( !intendedRoute ) {
