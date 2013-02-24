@@ -1,19 +1,20 @@
+<!DOCTYPE html>
 <html ng-app="app">
 <head>
   <link rel="stylesheet" href="css/select2.css" media="all">
   <link rel="stylesheet" href="css/test.css" media="all">
 </head>
 <body ng-controller="TestController">
-  <select id='s1' select2 ng-model="currentTitle" ng-options="t.text for t in titles">
+  <select id="s1" cs-select2 ng-model="currentTitle" ng-options="t.text for t in titles">
     <option value="">Select a value</option>
   </select>
   <hr>
-  <input id='s2' placeholder="Select a value" type="hidden" ng-model="currentTitle2" select2="select2inputOptions"></input>
+  <input id="s2" placeholder="Select a value" type="hidden" ng-model="currentTitle2" cs-select2="select2inputOptions">
   <hr>
   <button id="btn">Update</button>
   <button ng-click="setSingle()">Set Single</button>
   <button ng-click="setMultiple()">Set Multiple</button>
-  <div>select val </span><span class="code" id="selectValLabel"></span></div>
+  <div>select val <span class="code" id="selectValLabel"></span></div>
   <div>input val <span class="code" id="inputValLabel"></span></div>
   <div>select select2 val <span class="code" id="selectVal2Label"></span></div>
   <div>input select2 val <span class="code" id="inputVal2Label"></span></div>
@@ -31,14 +32,14 @@
   <script src="test-controller.js"></script>
 
   <script>
-    $('#btn').click(function() {
-      $('#selectValLabel').text($('#s1').val());
-      $('#inputValLabel').text($('#s2').val());
-      $('#selectVal2Label').text($('#s1').select2('val'));
-      $('#inputVal2Label').text($('#s2').select2('val'));
-      $('#selectDataLabel').text($('#s1').select2('data'));
-      $('#inputDataLabel').text($('#s2').select2('data'));
-    }); 
+    $( '#btn' ).click( function() {
+      $( '#selectValLabel' ).text( $( '#s1' ).val() );
+      $( '#inputValLabel' ).text( $( '#s2' ).val() );
+      $( '#selectVal2Label' ).text( $( '#s1' ).select2( 'val' ) );
+      $( '#inputVal2Label' ).text( $( '#s2' ).select2( 'val' ) );
+      $( '#selectDataLabel' ).text( $( '#s1' ).select2( 'data' ) );
+      $( '#inputDataLabel' ).text( $( '#s2' ).select2( 'data' ) );
+    } );
   </script>
 
 </body>
