@@ -92,10 +92,12 @@
 
           // whilst this should be in a timeout to allow rendering to continue, for many selects
           // on a page this causes severe re-rendering performance problems.
-          elm.select2( options );
-          if ( !elm.is( 'select' ) ) {
-            elm.select2( 'data', parseResult( ngModelController.$modelValue ) );
-          }
+          $( function() {
+            elm.select2( options );
+            if ( !elm.is( 'select' ) ) {
+              elm.select2( 'data', parseResult( ngModelController.$modelValue ) );
+            }
+          } );
         };
       }
     };

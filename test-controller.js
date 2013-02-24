@@ -1,11 +1,10 @@
 angular.module('app', ['cs.modules']).controller('TestController', 
-  function($scope, $timeout) {
+  function($scope) {
     $scope.titles = [
     {id:'1981', text:'Hello World', code: 'AA34'},
     {id:'1982', text:'Hello World II', code: 'AA35'}
     ];
 
-  //TODO: Test initial selection
   $scope.currentTitle = $scope.titles[1];
   $scope.currentTitle2 = $scope.titles[1];
 
