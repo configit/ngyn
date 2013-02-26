@@ -4,7 +4,7 @@
   .directive( 'select', ['$parse', function( $parse ) {
     return {
       restrict: 'E',
-      priority:'100',
+      priority: '100',
       require: ['?ngModel', '?select'],
       link: function( scope, elm, attrs, controllers ) {
         var ngModelController = controllers[0];
@@ -49,7 +49,7 @@
         /* 
         * Watch the underlying collection for changes and cause reselection
         */
-        scope.$watch( match[7], function() {
+        scope.$watch( '(' + match[7] + ').length', function() {
           if ( angular.isDefined( modelValue ) ) {
             replaceModelValue();
           }

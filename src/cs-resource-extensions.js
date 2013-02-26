@@ -47,7 +47,7 @@
 
   angular.module( 'cs.modules.resource', ['ng', 'ngResource'] )
   .config( ['$provide', function( $provide ) {
-    $provide.decorator( '$resource', ['$delegate', function( $delegate ) {
+    $provide.decorator( '$resource', [ '$delegate', function( $delegate ) {
       return function $resourceDecoratorFn() {
 
         var DEFAULT_ACTIONS = {
@@ -57,7 +57,7 @@
           'remove': { method: 'DELETE' },
           'delete': { method: 'DELETE' }
         };
-
+        
         var factoryArgs = [];
         for ( var i = 0; i < 3; i++ ) {
           factoryArgs.push( arguments[i] || {} );
@@ -77,7 +77,7 @@
               function success() {
                 if ( config.success ) {
                   config.success.apply(
-                    ( angular.isArray( previousResult ) ? previousResult : methodResult ),
+                    (angular.isArray(previousResult) ? previousResult : methodResult),
                     arguments
                   );
                 }
@@ -99,16 +99,16 @@
               // inject new empty arguments to ensure globally added args are possible
               methodargs.splice( 0, 0, {} );
             }
-
+            
             // non-GET "class" actions have 2 object arguments: ([parameters], postData, [success], [error])
-            if ( hasBody && angular.isFunction( methodargs[1] ) ) {
+            if (hasBody && angular.isFunction(methodargs[1])) {
               methodargs.splice( 0, 0, {} );
             }
 
             if ( config.modifyArgs ) {
               config.modifyArgs( methodargs[0], action );
             }
-
+            
             var methodResult = oldMethod.apply( this, methodargs );
 
             if ( action === 'query' ) {
@@ -127,7 +127,7 @@
                 methodResult.parameters = requeryargs[0];
               };
             };
-
+            
             methodResult.parameters = methodargs[0];
             return methodResult;
           };
