@@ -7,7 +7,7 @@
   .directive( 'csSelect2', ['$parse', '$timeout', function( $parse, $timeout ) {
     return {
       require: 'ngModel',
-      priority:'150', // must be higher priority than cs-key
+      priority: '150', // must be higher priority than cs-key
       restrict: 'A',
 
       compile: function( originalElement ) {
@@ -20,6 +20,15 @@
         }
 
         return function link( scope, elm, attrs, ngModelController ) {
+          var NG_OPTIONS_REGEXP = /^\s*(.*?)(?:\s+as\s+(.*?))?(?:\s+group\s+by\s+(.*))?\s+for\s+(?:([\$\w][\$\w\d]*)|(?:\(\s*([\$\w][\$\w\d]*)\s*,\s*([\$\w][\$\w\d]*)\s*\)))\s+in\s+(.*)$/
+          var optionsExp = attrs.ngOptions,
+              match,
+              valuesFn;
+          if ( optionsExp ) {
+            match = optionsExp.match( NG_OPTIONS_REGEXP );
+            valuesFn = $parse( match[7] );
+          }
+
           var key = attrs.keyPath || 'id';
           var display = attrs.displayPath || 'text';
           var keyParser = $parse( key );
@@ -79,20 +88,29 @@
 
           /* Problem 1 */
           /*
-          * take advantage of angular's digest cycle to ensure select2 is kept in sync with
+          * watch the model and the collection to ensure select2 is kept in sync with
           * the underlying select
-          * NB: We would ideally dirty check this, but sometimes select2 needs a forceful kick to reset the value
           */
 
           if ( elm.is( 'select' ) ) {
-            scope.$watch( function() {
-              elm.select2( 'val', elm.val() );
+            scope.$watch( attrs.ngModel, function() {
+              setTimeout( function() {
+                elm.select2( 'val', elm.val() );
+              } );
             } );
+
+            if ( valuesFn ) {
+              scope.internalCollection = valuesFn( scope );
+              scope.$watch( 'internalCollection.length', function() {
+                setTimeout( function() {
+                  elm.select2( 'val', elm.val() );
+                } );
+              } );
+            }
+
           }
 
-          // whilst this should be in a timeout to allow rendering to continue, for many selects
-          // on a page this causes severe re-rendering performance problems.
-          $( function() {
+          setTimeout( function() {
             elm.select2( options );
             if ( !elm.is( 'select' ) ) {
               elm.select2( 'data', parseResult( ngModelController.$modelValue ) );
