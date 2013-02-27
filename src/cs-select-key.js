@@ -49,7 +49,7 @@
         /* 
         * Watch the underlying collection for changes and cause reselection
         */
-        scope.$watch( '(' + match[7] + ').length', function() {
+        scope.$watch( function() { return valuesFn( scope ); }, function() {
           if ( angular.isDefined( modelValue ) ) {
             replaceModelValue();
           }
