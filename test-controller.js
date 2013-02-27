@@ -23,4 +23,15 @@ angular.module('app', ['cs.modules']).controller('TestController',
       query.callback( { results: $scope.titles } )
     }
   }
+  
+  $scope.asyncTitles = [];
+  $scope.asyncCurrentTitle = undefined;
+  
+  window.setTimeout(function() {
+    $scope.$apply(function() {
+      angular.copy($scope.titles, $scope.asyncTitles);
+      $scope.asyncCurrentTitle = $scope.currentTitle;
+    });
+  }, 1000);
+  
 });
