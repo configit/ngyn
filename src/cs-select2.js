@@ -6,7 +6,7 @@
   */
   .directive( 'csSelect2', ['$parse', '$timeout', function( $parse, $timeout ) {
     return {
-      require: 'ngModel',
+      require: '?ngModel',
       priority: '150', // must be higher priority than cs-key
       restrict: 'A',
 
@@ -72,9 +72,7 @@
           }
 
           // initialize the select2
-          var options = {
-            allowClear: true
-          };
+          var options = {};
 
           if ( placeholderText ) {
             options.placeholder = placeholderText;
@@ -100,8 +98,8 @@
             } );
 
             if ( valuesFn ) {
-              scope.internalCollection = valuesFn( scope );
-              scope.$watch( 'internalCollection.length', function() {
+              // watch the collection; re-evaluating it's reresentation and state every $digest
+              scope.$watch( function() { return valuesFn( scope ); }, function() {
                 setTimeout( function() {
                   elm.select2( 'val', elm.val() );
                 } );
