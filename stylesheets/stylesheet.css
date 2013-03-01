@@ -369,3 +369,35 @@ footer a:hover {
 
 /* Mobile Portrait Size to Mobile Landscape Size (devices and browsers) */
 @media only screen and (max-width: 479px) {}
+
+#topbar{
+  font-size:14px;
+  color:#3b5d14;
+  background:#b2d281;
+  font-weight:bold;
+  padding:6px;
+  overflow:auto;
+  height:1%;
+  clear:both;
+}
+#topbar a{
+  color:#3b5d14;
+  text-decoration:none;
+  margin:0 10px;
+  height:23px;
+  line-height:23px;
+  float:left;
+  display:block;
+}
+a:hover{
+  height:23px;
+  line-height:23px;
+  background:url(pic/tb_a.png) right top no-repeat;
+  padding-right:10px;
+}
+a:hover span{
+  background:url(pic/tb_span.png) left top no-repeat;
+  height:23px;
+  display:block;
+  padding-left:10px;
+}
