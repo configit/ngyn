@@ -388,16 +388,9 @@ footer a:hover {
   line-height:23px;
   float:left;
   display:block;
+  border-radius:5px;
+  padding:5px;
 }
-a:hover{
-  height:23px;
-  line-height:23px;
-  background:url(pic/tb_a.png) right top no-repeat;
-  padding-right:10px;
-}
-a:hover span{
-  background:url(pic/tb_span.png) left top no-repeat;
-  height:23px;
-  display:block;
-  padding-left:10px;
+#topbar a:hover{
+  background-color:white;
 }
