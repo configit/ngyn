@@ -15,7 +15,9 @@ title: ngx - AngularJS Extensions by Configit
 
 ### JavaScript
 
-    route.resource('Products');
+```javascript
+route.resource('Products');
+```
 
 ## ngResource Extensions
 
@@ -24,6 +26,8 @@ title: ngx - AngularJS Extensions by Configit
 ## Select2 Directive
 
 ### html
-    <select ngx-select2="select2options">
-      <option value=""></value>
-    </select>
+```html
+<select ngx-select2="select2options">
+  <option value=""></value>
+</select>
+```
