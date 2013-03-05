@@ -2,16 +2,11 @@
 layout: default
 title: ngyn - AngularJS Extensions by Configit
 ---
-<link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
 
-<!-- <div id="topbar">
-  <a href="#resourceful_routing"><span>Resourceful Routing</span></a>
-  <a href="#ngresource_extensions" class="active"><span>ngResource Extensions</span></a>
-  <a href="#select_extensions"><span>Select Extensions</span></a>
-  <a href="#select2_directive"><span>Select2 Directive</span></a>
-</div> -->
+# Modules
 
-# Resourceful Routing
+<a id="resourceful_routing"></a>
+## Resourceful Routing
 
 ### JavaScript
 
@@ -19,13 +14,17 @@ title: ngyn - AngularJS Extensions by Configit
 route.resource('Products');
 ```
 
-# ngResource Extensions
+---
+<a id="ngresource_extensions"></a>
+## ngResource Extensions
 ### JavaScript
 ```javascript
 // code goes here
 ```
+---
 
-# Select Extensions
+<a id="select_extensions"></a>
+## Select Extensions
 ### HTML
 ```html
 <select ng-model="user.role" 
@@ -40,7 +39,10 @@ route.resource('Products');
   $scope.user.availableRoles = Roles.query();
 ```
 
-# Select2 Directive
+# Directives
+
+<a id="select2_directive"></a>
+## Select2 Directive
 
 ### html
 ```html
