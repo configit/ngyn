@@ -1,6 +1,6 @@
 ---
 layout: default
-title: ngx - AngularJS Extensions by Configit
+title: ngyn - AngularJS Extensions by Configit
 ---
 <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
 
