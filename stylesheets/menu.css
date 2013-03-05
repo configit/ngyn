@@ -64,14 +64,14 @@ ul#navbar ul{
   position:absolute;
   left:0;
   top:100%;
-  padding:0 10px 10px;
+  /*padding:0 10px 10px;*/
   border-radius:0px 0px 4px 4px;
   background: #f2f2f2;
   border-style: solid;
   box-shadow: 0px 4px 7px #ccc;
 }
 
-ul#navbar > li:hover > ul {
+ul#navbar > li:hover > ul, ul#navbar > li.open > ul {
   display:block;
 }
 
@@ -88,9 +88,12 @@ ul#navbar ul li{
   float:none;
   margin:10px 0 0;
 }
-ul#navbar ul a{
+ul#navbar ul a {
   text-align:left;
-  padding:4px;
+  padding-left:10px;
+  padding-right:10px;
+  padding-top:4px;
+  padding-bottom:4px;
   border-width:0;
   border-radius:0px;
   -moz-border-radius:0px;
@@ -99,7 +102,7 @@ ul#navbar ul a{
   text-decoration:none;
   text-shadow: #ddd 0 0 1px;
 }
-ul#navbar li a:hover {
+ul#navbar li a:hover, ul#navbar li.open > a {
   background-color:#0c97e2;
   color:#ffffff;
   text-decoration:none;
