@@ -5,6 +5,7 @@ title: ngyn - AngularJS Extensions by Configit
 
 # Modules
 
+<a id="resourceful_routing"></a>
 ## Resourceful Routing
 
 ### JavaScript
@@ -14,7 +15,7 @@ route.resource('Products');
 ```
 
 ---
-
+<a id="ngresource_extensions"></a>
 ## ngResource Extensions
 ### JavaScript
 ```javascript
@@ -22,6 +23,7 @@ route.resource('Products');
 ```
 ---
 
+<a id="select_extensions"></a>
 ## Select Extensions
 ### HTML
 ```html
@@ -39,6 +41,7 @@ route.resource('Products');
 
 # Directives
 
+<a id="select2_directive"></a>
 ## Select2 Directive
 
 ### html

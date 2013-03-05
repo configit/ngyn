@@ -29,6 +29,12 @@ ul#navbar {
   box-shadow: 0px 1px 5px #e8e8e8;
 }
 
+@media only screen and (max-width: 767px) {
+  ul#navbar {
+    width:100%;
+  }
+}
+
 ul#navbar li{
   display:block;
   white-space:nowrap;
