@@ -72,8 +72,9 @@
       angular.forEach( orderedKeys, function( key ) {
         var action = objectifyAction( actions[key], key ),
         parentName = ( routeContext.scopeParent.options || { name: '' } ).name || '',
-        aliasedParentName = angular.isDefined(( routeContext.scopeParent.options || {} ).urlAlias )
-                     ? routeContext.scopeParent.options.urlAlias : ( routeContext.scopeParent.options || { name: '' } ).name || '',
+        aliasedParentName = angular.isDefined(( routeContext.scopeParent.options || {} ).urlAlias ) ?
+          routeContext.scopeParent.options.urlAlias :
+          ( routeContext.scopeParent.options || { name: '' } ).name || '',
         parentPath = ( path + parentName ) ? trail( path + parentName, '/' ) : '',
         aliasedParentPath = ( path + aliasedParentName ) ? trail( path + aliasedParentName, '/' ) : '',
         parentParam = !parentName ? '' : ( ':' + ( routeContext.scopeParent.options || { name: '' } ).name + '_id/' ),
@@ -241,7 +242,7 @@
 
           // carry the search term over if the same route name
           search = $location.search();
-          if ( !_.isEmpty( search ) && ( $route.current && intendedRoute.name === $route.current.$route.name ) ) {
+          if ( !_.isEmpty( search ) && ( $route.current && $route.current.$route && intendedRoute.name === $route.current.$route.name ) ) {
             if ( intendedRoute.action === 'index' ) {
               searchTerm = decodeURIComponent( search.back || '' );
             }
