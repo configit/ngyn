@@ -3,17 +3,12 @@
 
   var injectCallback = function( args, successFn, errorFn ) {
     var oldSuccessFn, oldErrorFn, newargs = [];
-    // if the last parameter is a function
-    if ( angular.isFunction( args[args.length - 1] ) ) {
-      // and the 2nd to last is...
-      if ( args.length >= 2 && angular.isFunction( args[args.length - 2] ) ) {
-        // we have both callbacks
+    if ( args.length >= 2 && angular.isFunction( args[args.length - 2] ) ) {
         oldSuccessFn = args[args.length - 2];
         oldErrorFn = args[args.length - 1];
-      }
-      if ( !oldSuccessFn ) {
-        oldSuccessFn = args[args.length - 1];
-      }
+    }
+    else if ( angular.isFunction( args[args.length - 1] ) ) {
+      oldSuccessFn = args[args.length - 1];
     }
 
     angular.forEach( args, function( arg ) {
