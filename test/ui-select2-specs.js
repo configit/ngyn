@@ -24,21 +24,17 @@ describe( 'uiSelect2', function() {
    */
   function compile( template ) {
     var element = $compile( template )( scope );
+    $timeout.flush();
     scope.$apply();
     return element;
   }
 
   describe( 'with a <select> element', function() {
     describe( 'compiling this directive', function() {
-      it( 'should throw an error if we have no model defined', function() {
-        expect( function() {
-          compile( '<select type="text" cs-select2></select>' );
-        } ).toThrow();
-      } );
-      it( 'should create proper DOM structure', function() {
+      it( 'should create proper DOM structure', inject(function($timeout) {
         var element = compile( '<div><select cs-select2 ng-model="foo"></select></div>' );
-        expect( element.children().is( 'div.select2-container' ) ).toBe( true );
-      } );
+        expect( element.children().is( 'div.select2-container' ) ).toBe(true);
+      } ) );
     } );
     describe( 'when model is changed programmatically', function() {
       it( 'should set select2 to the value', function() {
@@ -71,8 +67,7 @@ describe( 'uiSelect2', function() {
       expect( element.siblings().hasClass( 'select2-container-disabled' ) ).toBe( false );
     } );
     xit( 'should observe the multiple attribute', function() {
-      var element = $compile( '<div><select cs-select2 ng-model="foo" ng-multiple="multiple"></select></div>' )( scope );
-
+      var element = compile( '<div><select cs-select2 ng-model="foo" ng-multiple="multiple"></select></div>' )( scope );
       expect( element.siblings().hasClass( 'select2-container-multi' ) ).toBe( false );
       scope.$apply( 'multiple = true' );
       expect( element.siblings().hasClass( 'select2-container-multi' ) ).toBe( true );
@@ -82,14 +77,9 @@ describe( 'uiSelect2', function() {
   } );
   describe( 'with an <input> element', function() {
     describe( 'compiling this directive', function() {
-      it( 'should throw an error if we have no model defined', function() {
-        expect( function() {
-          compile( '<input cs-select2>' );
-        } ).toThrow();
-      } );
       it( 'should create proper DOM structure', function() {
         var element = compile( '<div><input ng-model="foo" cs-select2="options"></div>' );
-        expect( element.find( '.select2-container' ).length ).toEqual( 1 );
+        expect( element.children().is( 'div.select2-container' ) ).toBe(true);
       } );
     } );
     describe( 'when model is changed programmatically', function() {

@@ -92,28 +92,27 @@
 
           if ( elm.is( 'select' ) ) {
             scope.$watch( attrs.ngModel, function() {
-              setTimeout( function() {
-                elm.select2( 'val', elm.val() );
-              } );
+              elm.select2( 'val', elm.val() );
             } );
 
             if ( valuesFn ) {
               // watch the collection; re-evaluating it's reresentation and state every $digest
               scope.$watch( function() { return valuesFn( scope ); }, function() {
-                setTimeout( function() {
-                  elm.select2( 'val', elm.val() );
-                } );
+                elm.select2( 'val', elm.val() );
               } );
             }
 
           }
-
-          setTimeout( function() {
+          
+          // running in a $timeout yields significant performance improvements
+          // we do however ensure the apply phase is skipped by setting the 3rd arg to false
+          // this also incidentally avoids the dom being corrupted during linking
+          $timeout( function() {
             elm.select2( options );
             if ( !elm.is( 'select' ) ) {
               elm.select2( 'data', parseResult( ngModelController.$modelValue ) );
             }
-          } );
+          }, 0, false );
         };
       }
     };
