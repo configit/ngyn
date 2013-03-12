@@ -4,17 +4,19 @@
   var injectCallback = function( args, successFn, errorFn ) {
     var oldSuccessFn, oldErrorFn, newargs = [];
     if ( args.length >= 2 && angular.isFunction( args[args.length - 2] ) ) {
-        oldSuccessFn = args[args.length - 2];
-        oldErrorFn = args[args.length - 1];
+      oldSuccessFn = args[args.length - 2];
+      oldErrorFn = args[args.length - 1];
     }
     else if ( angular.isFunction( args[args.length - 1] ) ) {
       oldSuccessFn = args[args.length - 1];
     }
 
+    // push on all arguments, up to the first callback function
     angular.forEach( args, function( arg ) {
-      if ( !angular.isFunction( arg ) ) {
-        newargs.push( arg );
+      if ( angular.isFunction( arg ) ) {
+        return;
       }
+      newargs.push( arg );
     } );
 
     newargs.push( function success() {
@@ -42,7 +44,7 @@
 
   angular.module( 'cs.modules.resource', ['ng', 'ngResource'] )
   .config( ['$provide', function( $provide ) {
-    $provide.decorator( '$resource', [ '$delegate', function( $delegate ) {
+    $provide.decorator( '$resource', ['$delegate', function( $delegate ) {
       return function $resourceDecoratorFn() {
 
         var DEFAULT_ACTIONS = {
@@ -52,7 +54,7 @@
           'remove': { method: 'DELETE' },
           'delete': { method: 'DELETE' }
         };
-        
+
         var factoryArgs = [];
         for ( var i = 0; i < 3; i++ ) {
           factoryArgs.push( arguments[i] || {} );
@@ -72,7 +74,7 @@
               function success() {
                 if ( config.success ) {
                   config.success.apply(
-                    (angular.isArray(previousResult) ? previousResult : methodResult),
+                    ( angular.isArray( previousResult ) ? previousResult : methodResult ),
                     arguments
                   );
                 }
@@ -94,16 +96,16 @@
               // inject new empty arguments to ensure globally added args are possible
               methodargs.splice( 0, 0, {} );
             }
-            
+
             // non-GET "class" actions have 2 object arguments: ([parameters], postData, [success], [error])
-            if (hasBody && angular.isFunction(methodargs[1])) {
+            if ( hasBody && angular.isFunction( methodargs[1] ) ) {
               methodargs.splice( 0, 0, {} );
             }
 
             if ( config.modifyArgs ) {
               config.modifyArgs( methodargs[0], action );
             }
-            
+
             var methodResult = oldMethod.apply( this, methodargs );
 
             if ( action === 'query' ) {
@@ -122,7 +124,7 @@
                 methodResult.parameters = requeryargs[0];
               };
             };
-            
+
             methodResult.parameters = methodargs[0];
             return methodResult;
           };
