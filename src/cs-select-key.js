@@ -53,7 +53,7 @@
           if ( angular.isDefined( modelValue ) ) {
             replaceModelValue();
           }
-        } );
+        }, true );
 
         /*
         * Push on a formatter to watch changes to the underlying model
