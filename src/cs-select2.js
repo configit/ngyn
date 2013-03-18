@@ -98,12 +98,14 @@
             if ( valuesFn ) {
               // watch the collection; re-evaluating it's reresentation and state every $digest
               scope.$watch( function() { return valuesFn( scope ); }, function() {
-                elm.select2( 'val', elm.val() );
-              } );
+                $timeout( function() {
+                  elm.select2( 'val', elm.val() );
+                } );
+              }, true );
             }
 
           }
-          
+
           // running in a $timeout yields significant performance improvements
           // we do however ensure the apply phase is skipped by setting the 3rd arg to false
           // this also incidentally avoids the dom being corrupted during linking

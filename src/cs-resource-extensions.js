@@ -12,12 +12,13 @@
     }
 
     // push on all arguments, up to the first callback function
-    angular.forEach( args, function( arg ) {
+    for ( var i = 0; i < args.length; i++ ) {
+      var arg = args[i];
       if ( angular.isFunction( arg ) ) {
-        return;
+        break;
       }
       newargs.push( arg );
-    } );
+    }
 
     newargs.push( function success() {
       if ( successFn ) {
