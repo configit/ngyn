@@ -3,6 +3,11 @@ layout: default
 title: ngyn - AngularJS Extensions by Configit
 ---
 
+# Build Status
+
+<script type="text/javascript" src="http://build.configit.com/externalStatus.html?js=1&buildTypeId=bt27">
+</script>
+
 # Modules
 
 <a id="resourceful_routing"></a>
