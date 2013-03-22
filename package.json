@@ -1,0 +1,8 @@
+{
+  "name": "ngyn-js-tests",
+  "description": "Karma and jasmine test runners for ace",
+  "devDependencies": {
+    "karma" : "0.8.0",
+    "phantomjs" : "1.8.2-1"
+  }
+}
