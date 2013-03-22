@@ -1,0 +1,1 @@
+%~dp0run-tests.bat --single-run --no-colors --reporters junit %*
