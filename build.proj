@@ -4,7 +4,7 @@
     <Message Text="##teamcity[progressMessage 'Running Karma with args: $(KarmaArgs)']" Importance="high" />
     <Message Text="-------- Running Karma --------" Importance="high" />
     <Exec Command="&quot;$(MSBuildProjectDirectory)\build-server-run-tests.bat&quot; $(KarmaArgs)" IgnoreExitCode="True" />
-    <Message Text="##teamcity[importData type='junit' path='$(MSBuildProjectDirectory)test-results.xml']" />
+    <Message Text="##teamcity[importData type='junit' path='$(MSBuildProjectDirectory)\test-results.xml']" />
   </Target>
   <Target Name="Build">
     <Message Text="Nothing to build" />
