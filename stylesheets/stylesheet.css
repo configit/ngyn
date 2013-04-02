@@ -65,7 +65,7 @@ a:hover {
 
 header {
   padding-top: 35px;
-  padding-bottom: 25px;
+  padding-bottom: 10px;
 }
 
 header h1 {
@@ -175,7 +175,8 @@ code, pre {
 code {
   background-color: #f2f2f2;
   border: solid 1px #ddd;
-  padding: 0 3px;
+  border-radius:2px;
+  padding: 3px 3px;
 }
 
 pre {
@@ -218,17 +219,19 @@ em {
 
 table {
   width: 100%;
-  border: 1px solid #ebebeb;
+  background:#EEEEEE;
+  margin-bottom:20px;
 }
 
 th {
-  font-weight: 500;
+  border: 1px solid #AAAAAA;
+  font-weight: bold;
 }
 
 td {
-  border: 1px solid #ebebeb;
-  text-align: center; 
+  border: 1px solid #CCCCCC;
   font-weight: 300;
+  padding: 5px 10px;
 }
 
 form {

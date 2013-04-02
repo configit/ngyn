@@ -1,0 +1,50 @@
+.buildStatus {
+  clear:right;
+  float:right;
+}
+.buildStatusLabel {
+  font-weight:bold;
+  float:right;
+  padding-right:5px;
+  display:none;
+}
+table.tcTable {
+  background:transparent;
+  border:none;
+  width:inherit;
+  float:right;
+}
+.tcTable td {
+  border:none;
+  display:none;
+}
+.tcTable td.buildConfigurationName {
+  display: inline;
+  vertical-align:middle;
+}
+@media only screen and (min-width: 400px) {
+  .tcTable td.buildNumberDate {
+    display:inline;
+  }
+}
+.tcTable td.buildConfigurationName a, .tcTable td.buildNumberDate div {
+  display:none;
+}
+.tcTable td.buildNumberDate div.teamCityDateTime {
+  display:inline;
+}
+
+@media only screen and (min-width: 768px) {
+  .buildStatus {
+    padding-top:8px;
+  }
+  .buildStatusLabel  {
+    display:block;
+  }
+
+}
+@media only screen and (max-width: 767px) {
+  .buildStatus {
+    margin-top:-20px;
+  }
+}
