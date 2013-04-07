@@ -1,4 +1,4 @@
 ngyn
 =======
 
-Various angular modules 
+Various angular modules. 
