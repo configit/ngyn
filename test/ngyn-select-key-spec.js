@@ -1,7 +1,7 @@
-describe( 'select2', function() {
+describe( 'select-key', function() {
   var element, scope;
 
-  beforeEach( module( 'cs.modules' ) );
+  beforeEach( module( 'ngyn.select-key' ) );
 
   beforeEach( function() {
     inject( function( $compile, $rootScope ) {
@@ -10,7 +10,7 @@ describe( 'select2', function() {
     } );
   } );
 
-  it( 'should be unable to select an existing item in the collection without cs-key', inject( function( $compile ) {
+  it( 'should be unable to select an existing item in the collection without key', inject( function( $compile ) {
     scope.person = { name: 'Wilma', remote: true };
     element = $compile( '<select ng-model="person" ng-options="p.name for p in people"></select>' )( scope );
     scope.$digest();

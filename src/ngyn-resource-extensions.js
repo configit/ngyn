@@ -41,11 +41,12 @@
     return newargs;
   };
 
-  var config = {};
-
-  angular.module( 'cs.modules.resource', ['ng', 'ngResource'] )
-  .config( ['$provide', function( $provide ) {
-    $provide.decorator( '$resource', ['$delegate', function( $delegate ) {
+  var ngynResourceProvider = {$get:angular.noop};
+  
+  angular.module( 'ngyn.resource', ['ng', 'ngResource'] )
+  .config( function( $provide ) {
+    $provide.provider('ngynResource', ngynResourceProvider);
+    $provide.decorator( '$resource', function( $delegate ) {
       return function $resourceDecoratorFn() {
 
         var DEFAULT_ACTIONS = {
@@ -60,7 +61,7 @@
         for ( var i = 0; i < 3; i++ ) {
           factoryArgs.push( arguments[i] || {} );
         }
-        factoryArgs[2] = angular.extend( factoryArgs[2], DEFAULT_ACTIONS, ( config.actions || {} ) );
+        factoryArgs[2] = angular.extend( factoryArgs[2], DEFAULT_ACTIONS, ( ngynResourceProvider.actions || {} ) );
         var actions = factoryArgs[2];
         var actionKeys = Object.keys( actions );
 
@@ -73,8 +74,8 @@
 
             var methodargs = injectCallback.call( this, arguments,
               function success() {
-                if ( config.success ) {
-                  config.success.apply(
+                if ( ngynResourceProvider.success ) {
+                  ngynResourceProvider.success.apply(
                     ( angular.isArray( previousResult ) ? previousResult : methodResult ),
                     arguments
                   );
@@ -82,8 +83,8 @@
               },
               function error() {
                 //methodResult is contained in a closure at this point
-                if ( config.error ) {
-                  config.error.apply(
+                if ( ngynResourceProvider.error ) {
+                  ngynResourceProvider.error.apply(
                     ( angular.isArray( previousResult ) ? previousResult : methodResult ),
                     arguments
                   );
@@ -103,8 +104,8 @@
               methodargs.splice( 0, 0, {} );
             }
 
-            if ( config.modifyArgs ) {
-              config.modifyArgs( methodargs[0], action );
+            if ( ngynResourceProvider.modifyArgs ) {
+              ngynResourceProvider.modifyArgs( methodargs[0], action );
             }
 
             var methodResult = oldMethod.apply( this, methodargs );
@@ -132,10 +133,7 @@
         } );
         return resourceResult;
       };
-    }] );
-  }] )
-  .run( ['cs.modules.config', function( moduleConfig ) {
-    config = moduleConfig.resource || {};
-  }] );
+    } );
+  } );
 
 } )( window.angular );
