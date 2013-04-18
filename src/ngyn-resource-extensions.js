@@ -43,7 +43,7 @@
 
   var ngynResourceProvider = {$get:angular.noop};
   
-  angular.module( 'ngyn.resource', ['ng', 'ngResource'] )
+  angular.module( 'ngynResource', ['ng', 'ngResource'] )
   .config( function( $provide ) {
     $provide.provider('ngynResource', ngynResourceProvider);
     $provide.decorator( '$resource', function( $delegate ) {

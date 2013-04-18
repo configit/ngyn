@@ -2,7 +2,7 @@
   "use strict";
 
   beforeEach( function() {
-    module( 'ngyn.route' );
+    module( 'ngynRoute' );
   } );
 
 

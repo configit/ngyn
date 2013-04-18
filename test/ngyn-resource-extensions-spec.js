@@ -1,8 +1,8 @@
-describe( 'resource-extension', function() {
+describe( 'ngyn resource extensions', function() {
   "use strict";
 
   beforeEach( function() {
-    module( 'ngyn.resource' );
+    module( 'ngynResource' );
 
     module( function( ngynResourceProvider ) {
       ngynResourceProvider.modifyArgs = function( args, action ) {

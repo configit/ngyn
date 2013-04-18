@@ -1,6 +1,6 @@
 ( function( angular ) {
 
-  angular.module( 'ngyn.select2', [] )
+  angular.module( 'ngynSelect2', [] )
   /*
   * Applies the jQuery-based select2 to the selected element 
   */

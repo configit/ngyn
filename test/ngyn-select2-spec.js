@@ -1,8 +1,13 @@
-describe( 'uiSelect2', function() {
+/*
+ * This suite of tests is taken from the angular-ui project as the directives
+ * share some of the same requirements. 
+ */
+
+describe( 'ngyn select2', function() {
   'use strict';
 
   var scope, $compile, options, $timeout;
-  beforeEach( module( 'ngyn.select2' ) );
+  beforeEach( module( 'ngynSelect2' ) );
   beforeEach( inject( function( _$rootScope_, _$compile_, _$window_, _$timeout_ ) {
     scope = _$rootScope_.$new();
     $compile = _$compile_;

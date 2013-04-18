@@ -274,7 +274,7 @@
     }];
   };
 
-  angular.module( 'ngyn.route', [] ).config( ['$provide', '$routeProvider', function( $provide, $routeProvider ) {
+  angular.module( 'ngynRoute', [] ).config( ['$provide', '$routeProvider', function( $provide, $routeProvider ) {
     routeProvider.$routeProvider = $routeProvider;
     $provide.provider( 'ngynRoute', routeProvider );
   }] );

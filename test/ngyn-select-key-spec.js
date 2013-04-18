@@ -1,7 +1,7 @@
 describe( 'select-key', function() {
   var element, scope;
 
-  beforeEach( module( 'ngyn.select-key' ) );
+  beforeEach( module( 'ngynSelectKey' ) );
 
   beforeEach( function() {
     inject( function( $compile, $rootScope ) {

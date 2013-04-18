@@ -1,6 +1,6 @@
 ( function( angular ) {
 
-  angular.module( 'ngyn.select-key', [] )
+  angular.module( 'ngynSelectKey', [] )
   .directive( 'select', ['$parse', function( $parse ) {
     return {
       restrict: 'E',

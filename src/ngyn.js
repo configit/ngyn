@@ -1,7 +1,7 @@
 ( function ( angular ) {
   'use strict';
   
-  angular.module( 'ngyn', ['ngyn.select2', 'ngyn.select-key',
-                           'ngyn.route', 'ngyn.resource-extensions'] );
+  angular.module( 'ngyn', ['ngynSelect2', 'ngynSelectKey',
+                           'ngynRoute', 'ngynResource'] );
 
 } )( window.angular );
