@@ -1,6 +1,6 @@
 ( function( angular ) {
 
-  angular.module( 'cs.modules' )
+  angular.module( 'ngynSelectKey', [] )
   .directive( 'select', ['$parse', function( $parse ) {
     return {
       restrict: 'E',

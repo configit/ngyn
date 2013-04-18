@@ -1,13 +1,13 @@
 ( function( angular ) {
 
-  angular.module( 'cs.modules' )
+  angular.module( 'ngynSelect2', [] )
   /*
   * Applies the jQuery-based select2 to the selected element 
   */
-  .directive( 'csSelect2', ['$parse', '$timeout', function( $parse, $timeout ) {
+  .directive( 'ngynSelect2', ['$parse', '$timeout', function( $parse, $timeout ) {
     return {
       require: '?ngModel',
-      priority: '150', // must be higher priority than cs-key
+      priority: '150', // must be higher priority than ngyn-select-key
       restrict: 'A',
 
       compile: function( originalElement ) {
@@ -82,7 +82,7 @@
             options.multiple = angular.isDefined( attrs.multiple );
           }
 
-          angular.extend( options, scope.$eval( attrs.csSelect2 ) );
+          angular.extend( options, scope.$eval( attrs.ngynSelect2 ) );
 
           /* Problem 1 */
           /*

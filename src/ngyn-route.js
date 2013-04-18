@@ -274,9 +274,9 @@
     }];
   };
 
-  angular.module( 'cs.modules' ).config( ['$provide', '$routeProvider', function( $provide, $routeProvider ) {
+  angular.module( 'ngynRoute', [] ).config( ['$provide', '$routeProvider', function( $provide, $routeProvider ) {
     routeProvider.$routeProvider = $routeProvider;
-    $provide.provider( 'route', routeProvider );
+    $provide.provider( 'ngynRoute', routeProvider );
   }] );
 
 } )( window.angular );
