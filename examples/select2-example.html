@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head>
+  <link rel="stylesheet" href="css/select2.css" media="all">
+  <link rel="stylesheet" href="css/examples.css" media="all">
+
+  <script src="../libs/jquery.min.js"></script>
+  <script src="../libs/select2.js"></script>
+  <script src="../libs/angular.js"></script>
+  <script src="../src/ngyn-select2.js"></script>
+  <script src="../src/ngyn-select-key.js"></script>
+  <script src="select2-example-controller.js"></script>
+</head>
+<body ng-controller="TestController">
+  <h3>Single choice using &lt;select&gt; element</h3>
+  <select id="input1" ngyn-select2 ng-model="colorPickers[0]" ng-options="c.name for c in colors">
+    <option value="">Pick a color...</option>
+  </select>
+  <p>Model: <span class="code">{{colorPickers[0]}}</span></p>
+  <p>jQuery value: <span class="code" id="valLabel1"></span></p>
+  <p>select2 value and data: <span class="code" id="selectInfoLabel1"></span></p>
+  <div><button ng-click="setPickerToGreen(0)">Set to green</button> <button ng-click="clear(0)">Clear</button></div>
+  <hr>
+  <h3>Single choice, Simulating ajax request with &lt;input&gt; element</h3>
+  <input id="input2" placeholder="Pick a color..." type="hidden" ng-model="colorPickers[1]" ngyn-select2="select2inputOptions">
+  <p>Model: <span class="code">{{colorPickers[1]}}</span></p>
+  <p>jQuery value: <span class="code" id="valLabel2"></span></p>
+  <p>select2 value and data: <span class="code" id="selectInfoLabel2"></span></p>
+  <div><button ng-click="setPickerToGreen(1)">Set to green</button> <button ng-click="clear(1)">Clear</button></div>
+  <hr>
+
+  <h3>Multiple choice, using &lt;select&gt; element</h3>
+  <select id="input3" multiple ngyn-select2 ng-model="colorPickers[2]" ng-options="c.name for c in colors">
+    <option value="">Pick a color...</option>
+  </select>
+  <p>Model: <span class="code">{{colorPickers[2]}}</span></p>
+  <p>jQuery value: <span class="code" id="valLabel3"></span></p>
+  <p>select2 value and data: <span class="code" id="selectInfoLabel3"></span></p>
+  <div><button ng-click="setPickerToRedAndBlue(2)">Set to red and blue</button> <button ng-click="clear(2)">Clear</button></div>
+  <hr>
+  <h3>Multiple choice, simulating ajax request with &lt;input&gt; element</h3>
+  <input id="input4" multiple placeholder="Pick a color..." type="hidden" ng-model="colorPickers[3]" ngyn-select2="select2inputOptions">
+  <p>Model: <span class="code">{{colorPickers[3]}}</span></p>
+  <p>jQuery value: <span class="code" id="valLabel4"></span></p>
+  <p>select2 value and data: <span class="code" id="selectInfoLabel4"></span></p>
+  <div><button ng-click="setPickerToRedAndBlue(3)">Set to red and blue</button> <button ng-click="clear(3)">Clear</button></div>
+  <hr>
+
+  <h3>Collection populated immediately, model set to green immediately</h3>
+  <select id="input5" ngyn-select2 key="id" ng-model="colorPickers[5]" ng-options="c.name for c in colors">
+    <option value="">Pick a color...</option>
+  </select>
+  <p>Model: <span class="code">{{colorPickers[5]}}</span></p>
+  <hr>
+
+  <h3>Collection populated immediately, model set to red asynchronously</h3>
+  <select id="input6" ngyn-select2 key="id" ng-model="colorPickers[6]" ng-options="c.name for c in colors">
+    <option value="">Pick a color...</option>
+  </select>
+  <p>Model: <span class="code">{{colorPickers[6]}}</span></p>
+  <hr>
+  <h3>Model set immediately, collection populated asynchronously (relies on ngyn-select-key)</h3>
+  <select id="input7" ngyn-select2 key="id" ng-model="colorPickers[7]" ng-options="c.name for c in asyncColors">
+    <option value="">Pick a color...</option>
+  </select>
+  <p>Model: <span class="code">{{colorPickers[7]}}</span></p>
+  <hr>
+
+  <p><i>jQuery val() results are calculated every second</i></p>
+
+  <script>
+    window.setInterval(function() {
+      for (var x = 1; x <= 4; x++) {
+        $( '#valLabel'+x ).text( $( '#input'+x ).val() );
+        $( '#selectInfoLabel'+x ).text( 
+          $( '#input'+x ).select2( 
+            'val' ) + ' / ' + JSON.stringify($( '#input'+x ).select2( 'data'), 
+              function(k, v) { 
+                if (k == 'element') 
+                  return ''; 
+                return v;
+              }
+            ) 
+        );
+      }
+    }, 1000 );
+  </script>
+
+</body>
+</html>
