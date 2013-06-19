@@ -6,19 +6,14 @@ SET CONFIGURATION=%2
 
 :: Test if correct version of msbuild is installed
 IF NOT EXIST %MSBUILD% (
-  ECHO msbuild.exe version 4.0.30319.1 doesn't exist. Install Visual Studio 2010.
+  ECHO msbuild.exe version 4.0.30319.1 doesn't exist. Install Visual Studio 2010 or greater.
   EXIT /B
 )
 
-:: Set default target to Build
+:: Set default target to Test
 IF %TARGET%.==. (
-  SET TARGET=Build
-)
-
-:: Prefix Configuration with p/:Configuration if configuration is specified
-IF NOT %CONFIGURATION%.==. (
-  SET CONFIGURATION=/p:Configuration=%CONFIGURATION%
+  SET TARGET=Test
 )
 
 :: Now run msbuild
-%MSBUILD% /t:%TARGET% %CONFIGURATION% /v:n /nologo Build.proj
+%MSBUILD% /t:%TARGET% /v:n /nologo Build.proj

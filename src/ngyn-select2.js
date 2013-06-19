@@ -65,9 +65,7 @@
 
             /* Problem 2 */
             elm.on( 'change', function( e ) {
-              scope.$apply( function() {
-                ngModelController.$setViewValue( e.val );
-              } );
+              ngModelController.$setViewValue( e.val );
             } );
           }
 

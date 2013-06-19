@@ -1,5 +1,8 @@
-select, .select2-container {
+select, input[type="hidden"] {
   width:90%;
+}
+p, .code {
+  line-height: 14pt;
 }
 .code {
   padding:2px;
