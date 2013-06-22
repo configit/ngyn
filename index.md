@@ -99,12 +99,17 @@ Besides `action` the functions also take the following parameters
 ## ngResource Extensions
 ### JavaScript
 ```javascript
-// code goes here
+// !! May be deprecated when angular 1.2 brings advanced interceptors
 ```
 ---
 
 <a id="select_extensions"></a>
 ## Select Extensions
+
+The AngularJS select directive lacks the capability to select an existing option based on anything other than referential equality. The `ngynSelectKey` module extends select with the capability to specify how items should be compared. This makes it trivial to match an item in the select list with a value being returned, for example from a query.
+
+Usage is simple, just supply a value within a `key` attribute, this will typically be a property name but it can be anything which will resolve using `$scope.$eval()`, such as a function on each attribute.
+
 ### HTML
 ```html
 <select ng-model="user.role" 
@@ -119,14 +124,20 @@ Besides `action` the functions also take the following parameters
   $scope.user.availableRoles = Roles.query();
 ```
 
+See the **select-key-example** in the [examples](https://github.com/configit/ngyn/tree/master/examples) folder for more information.
+
 # Directives
 
 <a id="select2_directive"></a>
 ## Select2 Directive
 
+Applies the jQuery [Select2 plugin](http://ivaynberg.github.io/select2/) to an angular select element. This is an entirely progressive enhancement, just add the `ngyn-select2` tag and your select will be turned into a select2.
+
+See the **select2-example** in the [examples](https://github.com/configit/ngyn/tree/master/examples) folder for more information and a demonstration of it's capabilities.
+
 ### html
 ```html
-<select ngx-select2="select2options">
-  <option value=""></value>
+<select nygn-select2="optionalSelect2options" options="f.name for f in friends">
+  <option value="">Choose a friend</value>
 </select>
 ```
