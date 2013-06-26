@@ -11,6 +11,7 @@ files = [
   JASMINE,
   JASMINE_ADAPTER,
   'libs/jquery.min.js',
+  'libs/jasmine-jquery.js',
   'libs/angular.js',
   'libs/**/*.js',
   'src/**/*.js',

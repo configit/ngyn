@@ -20,6 +20,14 @@ describe( 'ngyn select2', function() {
         query.callback( data );
       }
     };
+    scope.customRenderingOptions = {
+      query: function( query ) {
+        var data = {
+          results: [{ first: 'Donald', second: 'Duck' }, { first: 'Bugs', second: 'Bunny' }, { first: 'Mickey', second: 'Mouse' }]
+        };
+        query.callback( data );
+      }
+    };
   } ) );
 
   /**
@@ -95,11 +103,12 @@ describe( 'ngyn select2', function() {
           scope.$apply( 'foo={ id: 1, text: "first" }' );
           expect( element.find( 'input' ).select2 ).toHaveBeenCalledWith( 'data', { id: 1, text: "first" } );
         } );
-        xit( 'should call select2(val, ...) for strings', function() {
-          var element = compile( '<div><input ng-model="foo" ngyn-select2="options"></div>' );
+        it( 'should call select2(data, ...) for objects with custom rendering', function() {
+          var element = compile( '<div><input ng-model="foo" custom-rendering ngyn-select2="customRenderingOptions"></div>' );
+          setFixtures( element );
           spyOn( $.fn, 'select2' );
-          scope.$apply( 'foo="first"' );
-          expect( element.find( 'input' ).select2 ).toHaveBeenCalledWith( 'data', 'first' );
+          scope.$apply( 'foo={ first:\'Donald\', last:\'Duck\' }' );
+          expect( element.find( 'input' ).select2 ).toHaveBeenCalledWith( 'data', { first:"Donald", last:"Duck" } );
         } );
       } );
       describe( 'for multi-select', function() {
@@ -115,11 +124,11 @@ describe( 'ngyn select2', function() {
           scope.$apply( 'foo=[]' );
           expect( element.select2 ).toHaveBeenCalledWith( 'data', [] );
         } );
-        xit( 'should call select2(val, ...) for strings', function() {
-          var element = compile( '<input ng-model="foo" multiple ngyn-select2="options">' );
+        it( 'should call select2(data, ...) for arrays with custom rendering', function() {
+          var element = compile( '<div><input ng-model="foo" custom-rendering multiple ngyn-select2="customRenderingOptions"></div>' );
           spyOn( $.fn, 'select2' );
-          scope.$apply( 'foo="first,second"' );
-          expect( element.select2 ).toHaveBeenCalledWith( 'val', 'first,second' );
+          scope.$apply( 'foo=[{ first: "Mickey", last: "Mouse" },{ first: "Donald", last: "Duck" }]' );
+          expect( element.select2 ).toHaveBeenCalledWith( 'data', [{ first: 'Mickey', last: 'Mouse' }, { first: 'Donald', last: 'Duck' }] );
         } );
       } );
     } );
