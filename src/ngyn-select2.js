@@ -3,6 +3,11 @@
   angular.module( 'ngynSelect2', [] )
   /*
   * Applies the jQuery-based select2 to the selected element 
+  * 
+  * If a custom-rendering attribute is specified the default object structure is not used (id and text properties expected)
+  * in favour of using the item itself. This is useful when used with input elements where full responsiblity is taken for querying and formatting results.
+  * 
+  * <input type="hidden" ngyn-select2="options" ng-model="selection" multiple custom-rendering class="span11" ></input>
   */
   .directive( 'ngynSelect2', ['$parse', '$timeout', function( $parse, $timeout ) {
     return {
@@ -20,7 +25,7 @@
         }
 
         return function link( scope, elm, attrs, ngModelController ) {
-          var NG_OPTIONS_REGEXP = /^\s*(.*?)(?:\s+as\s+(.*?))?(?:\s+group\s+by\s+(.*))?\s+for\s+(?:([\$\w][\$\w\d]*)|(?:\(\s*([\$\w][\$\w\d]*)\s*,\s*([\$\w][\$\w\d]*)\s*\)))\s+in\s+(.*)$/
+          var NG_OPTIONS_REGEXP = /^\s*(.*?)(?:\s+as\s+(.*?))?(?:\s+group\s+by\s+(.*))?\s+for\s+(?:([\$\w][\$\w\d]*)|(?:\(\s*([\$\w][\$\w\d]*)\s*,\s*([\$\w][\$\w\d]*)\s*\)))\s+in\s+(.*)$/;
           var optionsExp = attrs.ngOptions,
               match,
               valuesFn;
@@ -29,26 +34,35 @@
             valuesFn = $parse( match[7] );
           }
 
-          var key = attrs.keyPath || 'id';
-          var display = attrs.displayPath || 'text';
-          var keyParser = $parse( key );
-          var displayParser = $parse( display );
+          var createDefaultResultParser = function() {
+            var key = attrs.keyPath || 'id';
+            var display = attrs.displayPath || 'text';
+            var keyParser = $parse( key );
+            var displayParser = $parse( display );
+            return function( result ) {
+              return {
+                id: keyParser( result ),
+                text: displayParser( result )
+              };
+            };
+          };
 
-          var parseResult = function( originalvalues ) {
-            if ( !originalvalues ) {
-              return originalvalues;
+          var parseResult = angular.isDefined( attrs.customRendering )
+            ? function( result ) { return result; }
+            : createDefaultResultParser();
+
+          var parseResults = function( originalValues ) {
+            if ( !originalValues ) {
+              return originalValues;
             }
 
-            var values = angular.isArray( originalvalues ) ? originalvalues : [originalvalues];
+            var values = angular.isArray( originalValues ) ? originalValues : [originalValues];
 
             var results = [];
             angular.forEach( values, function( r ) {
-              results.push( {
-                id: keyParser( r ),
-                text: displayParser( r )
-              } );
+              results.push( parseResult( r ) );
             } );
-            return angular.isArray( originalvalues ) ? results : results[0];
+            return angular.isArray( originalValues ) ? results : results[0];
           };
 
           if ( !elm.is( 'select' ) ) {
@@ -57,15 +71,18 @@
             ngModelController.$parsers.push( function() {
               return elm.select2( 'data' );
             } );
+
             /* Problem 4 */
             ngModelController.$formatters.push( function( newval ) {
-              elm.select2( 'data', parseResult( newval ) );
+              elm.select2( 'data', parseResults( newval ) );
               return newval;
             } );
 
             /* Problem 2 */
             elm.on( 'change', function( e ) {
-              ngModelController.$setViewValue( e.val );
+              scope.$apply( function() {
+                ngModelController.$setViewValue( e.val );
+              } );
             } );
           }
 
@@ -110,7 +127,7 @@
           $timeout( function() {
             elm.select2( options );
             if ( !elm.is( 'select' ) ) {
-              elm.select2( 'data', parseResult( ngModelController.$modelValue ) );
+              elm.select2( 'data', parseResults( ngModelController.$modelValue ) );
             }
           }, 0, false );
         };
