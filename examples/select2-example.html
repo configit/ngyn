@@ -47,30 +47,38 @@
   <hr>
 
   <h3>Collection populated immediately, model set to green immediately</h3>
-  <select id="input5" ngyn-select2 key="id" ng-model="colorPickers[5]" ng-options="c.name for c in colors">
+  <select ngyn-select2 key="id" ng-model="colorPickers[5]" ng-options="c.name for c in colors">
     <option value="">Pick a color...</option>
   </select>
   <p>Model: <span class="code">{{colorPickers[5]}}</span></p>
   <hr>
 
   <h3>Collection populated immediately, model set to red asynchronously</h3>
-  <select id="input6" ngyn-select2 key="id" ng-model="colorPickers[6]" ng-options="c.name for c in colors">
+  <select ngyn-select2 key="id" ng-model="colorPickers[6]" ng-options="c.name for c in colors">
     <option value="">Pick a color...</option>
   </select>
   <p>Model: <span class="code">{{colorPickers[6]}}</span></p>
   <hr>
   <h3>Model set immediately, collection populated asynchronously (relies on ngyn-select-key)</h3>
-  <select id="input7" ngyn-select2 key="id" ng-model="colorPickers[7]" ng-options="c.name for c in asyncColors">
+  <select ngyn-select2 key="id" ng-model="colorPickers[7]" ng-options="c.name for c in asyncColors">
     <option value="">Pick a color...</option>
   </select>
   <p>Model: <span class="code">{{colorPickers[7]}}</span></p>
   <hr>
 
+  <h3>Multiple choice, using custom rendering with &lt;input&gt; element</h3>
+  <input id="input5" multiple custom-rendering placeholder="Pick a tenor..." type="hidden" ng-model="namePickers[0]" ngyn-select2="select2CustomInputOptions">
+  <p>Model: <span class="code">{{namePickers[0]}}</span></p>
+  <p>jQuery value: <span class="code" id="valLabel5"></span></p>
+  <p>select2 value and data: <span class="code" id="selectInfoLabel5"></span></p>
+  <div><button ng-click="setPickerToPavarottiAndCarrera(0)">Set to Pavarotti and Carrera</button> <button ng-click="clearNames(0)">Clear</button></div>
+  <hr>
+  
   <p><i>jQuery val() results are calculated every second</i></p>
 
   <script>
     window.setInterval(function() {
-      for (var x = 1; x <= 4; x++) {
+      for (var x = 1; x <= 5; x++) {
         $( '#valLabel'+x ).text( $( '#input'+x ).val() );
         $( '#selectInfoLabel'+x ).text( 
           $( '#input'+x ).select2( 
