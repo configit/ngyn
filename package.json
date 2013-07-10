@@ -1,5 +1,6 @@
 {
   "name": "ngyn-js-tests",
+  "version": "0.1.0",
   "description": "Karma and jasmine test runners for ace",
   "devDependencies": {
     "karma" : "0.8.0",

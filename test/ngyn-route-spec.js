@@ -326,7 +326,7 @@
     } );
   } );
 
-  it( 'should go to defualt controller action when called with concise syntax', function() {
+  it( 'should go to default controller action when called with concise syntax', function() {
     module( function( $routeProvider, ngynRouteProvider ) {
       $routeProvider.when( '/', { template: 'test' } );
       ngynRouteProvider.resource( { name: 'Theatres' } );
@@ -341,5 +341,19 @@
       expect( $location.path() ).toMatch( 'theatres/index' );
     } );
   } );
+
+  it ('should overflow unused resource parameters onto querystring' , function() {
+    module( function( $routeProvider, ngynRouteProvider ) {
+      $routeProvider.when( '/', { template: 'test' } );
+      ngynRouteProvider.resource( 'Theatres' );
+    } );
+
+    inject( function( $location, $rootScope, ngynRoute ) {
+      $location.path( '/' );
+      $rootScope.$digest();
+      var linkResult = ngynRoute.link( 'theatres#edit', { theatres_id: 1, include_private: 'true', include_prototype: 'true' } );
+      expect( linkResult ).toEqual( 'theatres/1/edit?include_private=true&include_prototype=true' );
+    } );
+  });
 
 } );
