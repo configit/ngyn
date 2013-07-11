@@ -5,6 +5,32 @@
     return !str.match( new RegExp( ch + '$' ) ) ? str + ch : str;
   };
 
+  var toKeyValue = function( obj ) {
+    var parts = [];
+    angular.forEach( obj, function( value, key ) {
+      parts.push( encodeUriQuery( key, true ) + ( value === true ? '' : '=' + encodeUriQuery( value, true ) ) );
+    } );
+    return parts.length ? parts.join( '&' ) : '';
+  };
+
+  // This method is intended for encoding *key* or *value* parts of query component. We need a custom
+  // method becuase encodeURIComponent is too agressive and encodes stuff that doesn't have to be
+  // encoded per http://tools.ietf.org/html/rfc3986:
+  //    query       =//( pchar / "/" / "?" )
+  //    pchar         = unreserved / pct-encoded / sub-delims / ":" / "@"
+  //    unreserved    = ALPHA / DIGIT / "-" / "." / "_" / "~"
+  //    pct-encoded   = "%" HEXDIG HEXDIG
+  //    sub-delims    = "!" / "$" / "&" / "'" / "(" / ")"
+  //                     / "*" / "+" / "," / ";" / "="
+  encodeUriQuery = function( val, pctEncodeSpaces ) {
+    return encodeURIComponent( val ).
+      replace( /%40/gi, '@' ).
+      replace( /%3A/gi, ':' ).
+      replace( /%24/g, '$' ).
+      replace( /%2C/gi, ',' ).
+      replace( ( pctEncodeSpaces ? null : /%20/g ), '+' );
+  };
+
   var RouteContext = function( routeProvider ) {
 
     // Turns action key/value pair into object.
@@ -185,12 +211,14 @@
       return {
         link: function( options, additionalOptions ) {
           var params,
-          intendedRoute = null,
-          searchTerm = '',
-          search,
-          action,
-          path,
-          controller;
+              unusedOptions,
+              unusedOptionKeyValues = '',
+              intendedRoute = null,
+              querystring = '',
+              search,
+              action,
+              path,
+              controller;
 
           if ( angular.isString( options ) ) {
             var linkText = options;
@@ -204,11 +232,15 @@
             }
           }
           params = angular.extend( {}, $routeParams, options );
+          unusedOptions = angular.copy( options );
+          delete unusedOptions.controller;
+          delete unusedOptions.action;
+          delete unusedOptions.path;
 
           if ( $route.current ) {
             controller = angular.lowercase( options.controller || $route.current.controllerPath );
             action = angular.lowercase( options.action || $route.current.action );
-            path = angular.lowercase( angular.isDefined(options.path) ? options.path : $route.current.path || '' );
+            path = angular.lowercase( angular.isDefined( options.path ) ? options.path : $route.current.path || '' );
           } else {
             controller = angular.lowercase( options.controller );
             action = angular.lowercase( options.action );
@@ -216,7 +248,7 @@
           }
 
           // non-resourceful routes will allow you to change the route params of the current route but no more
-          if (!options.controller && !options.action) {
+          if ( !options.controller && !options.action ) {
             intendedRoute = $route.current;
           }
 
@@ -242,33 +274,41 @@
 
           // carry the search term over if the same route name
           search = $location.search();
-          if ( !_.isEmpty( search ) && ( $route.current && $route.current.$route && intendedRoute.name === $route.current.$route.name ) ) {
+
+          if ( !_.isEmpty( search ) && ( $route.current && intendedRoute.name === $route.current.name ) ) {
             if ( intendedRoute.action === 'index' ) {
-              searchTerm = decodeURIComponent( search.back || '' );
+              querystring = decodeURIComponent( search.back || '' );
             }
             else if ( _.isUndefined( search.back ) ) {
-              searchTerm = 'back=' + _.encodeUriQuery( _.toKeyValue( search ) );
+              querystring = 'back=' + encodeUriQuery( toKeyValue( search ) );
             }
             else {
-              searchTerm = _.toKeyValue( search );
+              querystring = toKeyValue( search );
             }
           }
 
           var resultPath = ( intendedRoute.routePath + ( intendedRoute.action || '' ) ).
-            replace( /:([^\/]+)/ig, function( match, group1 ) { return params[group1]; } );
+            replace( /:([^\/]+)/ig, function( match, group1 ) {
+              delete unusedOptions[group1];
+              return params[group1];
+            } );
           // remove trailing '/' to ensure hrefs works when running under a url prefix (e.g. http://localhost/MyApp/)
           resultPath = resultPath.replace( /^\/+/, '' );
 
-          return resultPath + ( searchTerm ? '?' + searchTerm : '' );
+          // append anything passed into the link function and not used to the querystring
+          unusedOptionKeyValues = toKeyValue( unusedOptions );
+          querystring += ( querystring.length && unusedOptionKeyValues.length ? '&' : '' ) + unusedOptionKeyValues;
+
+          return resultPath + ( querystring.length ? '?' + querystring : '' );
         },
-        action: function( action ) {
-          return this.link( { action: action } );
+        action: function( action, options ) {
+          return this.link( angular.extend( { action: action }, options ) );
         },
         gotoLink: function( options ) {
           $location.url( this.link( options ) );
         },
-        gotoAction: function( action ) {
-          $location.url( this.action( action ) );
+        gotoAction: function( action, options ) {
+          $location.url( this.action( action, options ) );
         }
       };
     }];
