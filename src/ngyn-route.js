@@ -8,25 +8,9 @@
   var toKeyValue = function( obj ) {
     var parts = [];
     angular.forEach( obj, function( value, key ) {
-      parts.push( _.encodeUriQuery( key, true ) + ( value === true ? '' : '=' + _.encodeUriQuery( value, true ) ) );
+      parts.push( encodeUriQuery( key, true ) + ( value === true ? '' : '=' + encodeUriQuery( value, true ) ) );
     } );
     return parts.length ? parts.join( '&' ) : '';
-  };
-
-  // We need our custom method because encodeURIComponent is too agressive and doesn't follow
-  // http://www.ietf.org/rfc/rfc3986.txt with regards to the character set (pchar) allowed in path
-  // segments:
-  //    segment       = *pchar
-  //    pchar         = unreserved / pct-encoded / sub-delims / ":" / "@"
-  //    pct-encoded   = "%" HEXDIG HEXDIG
-  //    unreserved    = ALPHA / DIGIT / "-" / "." / "_" / "~"
-  //    sub-delims    = "!" / "$" / "&" / "'" / "(" / ")"
-  //                     / "*" / "+" / "," / ";" / "="
-  _.encodeUriSegment = function( val ) {
-    return _.encodeUriQuery( val, true ).
-      replace( /%26/gi, '&' ).
-      replace( /%3D/gi, '=' ).
-      replace( /%2B/gi, '+' );
   };
 
   // This method is intended for encoding *key* or *value* parts of query component. We need a custom
@@ -38,7 +22,7 @@
   //    pct-encoded   = "%" HEXDIG HEXDIG
   //    sub-delims    = "!" / "$" / "&" / "'" / "(" / ")"
   //                     / "*" / "+" / "," / ";" / "="
-  _.encodeUriQuery = function( val, pctEncodeSpaces ) {
+  encodeUriQuery = function( val, pctEncodeSpaces ) {
     return encodeURIComponent( val ).
       replace( /%40/gi, '@' ).
       replace( /%3A/gi, ':' ).
@@ -296,7 +280,7 @@
               querystring = decodeURIComponent( search.back || '' );
             }
             else if ( _.isUndefined( search.back ) ) {
-              querystring = 'back=' + _.encodeUriQuery( toKeyValue( search ) );
+              querystring = 'back=' + encodeUriQuery( toKeyValue( search ) );
             }
             else {
               querystring = toKeyValue( search );
