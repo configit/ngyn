@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Karma and jasmine test runners for ace",
   "devDependencies": {
-    "karma" : ">0.8.0",
-    "phantomjs" : ">1.8.2-1"
+    "karma" : "0.8.0",
+    "phantomjs" : "1.9.0-2"
   }
 }
