@@ -50,9 +50,9 @@
   var ngynResourceProvider = {$get:angular.noop};
 
   angular.module( 'ngynResource', ['ng', 'ngResource'] )
-  .config( function( $provide ) {
+  .config( [ '$provide', function( $provide ) {
     $provide.provider('ngynResource', ngynResourceProvider);
-    $provide.decorator( '$resource', function( $delegate ) {
+    $provide.decorator( '$resource', ['$delegate', function( $delegate ) {
       return function $resourceDecoratorFn() {
 
         var DEFAULT_ACTIONS = {
@@ -148,7 +148,7 @@
         } );
         return resourceResult;
       };
-    } );
-  } );
+    } ] );
+  } ] );
 
 } )( window.angular );
