@@ -11,3 +11,5 @@ Modules Currently include
 * __Resource Extensions__: Hooks for adding data on the way out or parsing it on the way in.
 * __Select Key__: Allows you to specify a way to match an ng-option element to the select's ng-model.
 * __Select2__: A directive to perform an in-place progressive enhancement to convert a select element into a select2 one. 
+
+Full documentation: http://configit.github.io/ngyn
