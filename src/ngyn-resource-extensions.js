@@ -41,8 +41,14 @@
     return newargs;
   };
 
+  // append meta object to obj._meta, creating obj._meta if necessary
+  function appendToMeta( obj, meta ) {
+    obj._meta = obj._meta || {}
+    angular.extend( obj._meta, meta );
+  }
+
   var ngynResourceProvider = {$get:angular.noop};
-  
+
   angular.module( 'ngynResource', ['ng', 'ngResource'] )
   .config( function( $provide ) {
     $provide.provider('ngynResource', ngynResourceProvider);
@@ -64,7 +70,6 @@
         factoryArgs[2] = angular.extend( factoryArgs[2], DEFAULT_ACTIONS, ( ngynResourceProvider.actions || {} ) );
         var actions = factoryArgs[2];
         var actionKeys = Object.keys( actions );
-
         var resourceResult = $delegate.apply( this, factoryArgs );
 
         angular.forEach( actionKeys, function( action ) {
@@ -75,6 +80,10 @@
             var methodargs = injectCallback.call( this, arguments,
               function success() {
                 if ( ngynResourceProvider.success ) {
+                  // append arguments from request before calling success callback
+                  appendToMeta( arguments[0], { requestArgs: methodargs[0] } );
+
+                  // call supplied success handler on result with arguments
                   ngynResourceProvider.success.apply(
                     ( angular.isArray( previousResult ) ? previousResult : methodResult ),
                     arguments
@@ -84,6 +93,10 @@
               function error() {
                 //methodResult is contained in a closure at this point
                 if ( ngynResourceProvider.error ) {
+                  // append arguments from request before calling error callback
+                  appendToMeta( arguments[0], { requestArgs: methodargs[0] } );
+
+                  // call supplied error handler on result with arguments
                   ngynResourceProvider.error.apply(
                     ( angular.isArray( previousResult ) ? previousResult : methodResult ),
                     arguments
@@ -92,7 +105,9 @@
               }
             );
 
-            var hasBody = actions[action].method == 'POST' || actions[action].method == 'PUT' || actions[action].method == 'PATCH';
+            var hasBody = actions[action].method == 'POST' ||
+                          actions[action].method == 'PUT' ||
+                          actions[action].method == 'PATCH';
 
             if ( angular.isFunction( methodargs[0] ) ) {
               // inject new empty arguments to ensure globally added args are possible

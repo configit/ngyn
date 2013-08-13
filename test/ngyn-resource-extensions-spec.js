@@ -11,14 +11,16 @@ describe( 'ngyn resource extensions', function() {
       ngynResourceProvider.actions = {
         'update': { method: 'PUT' }
       };
-      ngynResourceProvider.success = function( response ) {
+      ngynResourceProvider.success = function( response, headerFn ) {
         response.addedData = 'success';
         this.totalCount = response.length;
         response.totalCount = response.length;
+        this._meta = response._meta;
       };
       ngynResourceProvider.error = function( response ) {
         response.error = 'error';
         this.error = 'error';
+        this._meta = response._meta;
       };
     } );
 
@@ -155,6 +157,23 @@ describe( 'ngyn resource extensions', function() {
     } );
     $httpBackend.flush();
     expect( users.error ).toEqual( 'error' );
+  } ) );
+
+  it( 'should be able to send request args to a successful response', inject( function( $httpBackend, $resource ) {
+    $httpBackend.whenGET( /.+/ ).respond( [] );
+    var User = $resource( 'api/users/:userid' );
+    var users = User.query( { foo: 'bar' } );
+    $httpBackend.flush();
+    expect( users._meta.requestArgs ).toEqual( { foo: 'bar', addedArg: 'success' } );
+  } ) );
+
+
+  it( 'should be able to send request args to a erroneous response', inject( function( $httpBackend, $resource ) {
+    $httpBackend.whenGET( /.+/ ).respond(  500, [] );
+    var User = $resource( 'api/users/:userid' );
+    var users = User.query( { foo: 'bar' } );
+    $httpBackend.flush();
+    expect( users._meta.requestArgs ).toEqual( { foo: 'bar', addedArg: 'success' } );
   } ) );
 
   it( 'should be possible to provide new default_actions', inject( function( $resource, $httpBackend ) {

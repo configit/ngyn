@@ -14,7 +14,7 @@
   };
 
   // This method is intended for encoding *key* or *value* parts of query component. We need a custom
-  // method becuase encodeURIComponent is too agressive and encodes stuff that doesn't have to be
+  // method because encodeURIComponent is too agressive and encodes stuff that doesn't have to be
   // encoded per http://tools.ietf.org/html/rfc3986:
   //    query       =//( pchar / "/" / "?" )
   //    pchar         = unreserved / pct-encoded / sub-delims / ":" / "@"
@@ -22,7 +22,7 @@
   //    pct-encoded   = "%" HEXDIG HEXDIG
   //    sub-delims    = "!" / "$" / "&" / "'" / "(" / ")"
   //                     / "*" / "+" / "," / ";" / "="
-  encodeUriQuery = function( val, pctEncodeSpaces ) {
+  var encodeUriQuery = function( val, pctEncodeSpaces ) {
     return encodeURIComponent( val ).
       replace( /%40/gi, '@' ).
       replace( /%3A/gi, ':' ).
