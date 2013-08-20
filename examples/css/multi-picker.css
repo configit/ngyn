@@ -1,0 +1,35 @@
+.select-container-overlay {
+  position:absolute;
+  background:red;
+  height:40px;
+  width:200px; 
+}
+
+input {
+  line-height:30px;
+  font-size:20px;
+}
+
+.ngyn-combo-selection {
+  padding-left: 4px;
+  padding-right:2px;
+  margin-right:5px;
+  border-radius:3px;
+  background-color: rgb(238, 238, 238);
+  float:left;
+}
+.ngyn-combo-remove-selection {
+  color:#888888;
+  cursor:pointer;
+}
+.ngyn-combo-remove-selection:hover {
+  color:#880000;
+}
+.ngyn-combo-add-selection {
+  width:auto;
+  outline:none;
+  min-width:40px;
+}
+.ngyn-combo-placeholder {
+  color:#aaaaaa;
+}
