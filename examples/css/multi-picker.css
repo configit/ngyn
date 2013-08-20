@@ -1,0 +1,28 @@
+input {
+  line-height:30px;
+  font-size:20px;
+}
+
+.ngyn-picker-selection {
+  padding-left: 4px;
+  padding-right:2px;
+  margin-right:5px;
+  border-radius:3px;
+  background-color: rgb(238, 238, 238);
+  float:left;
+}
+.ngyn-picker-remove-selection {
+  color:#888888;
+  cursor:pointer;
+}
+.ngyn-picker-remove-selection:hover {
+  color:#880000;
+}
+.ngyn-picker-add-selection {
+  width:auto;
+  outline:none;
+  min-width:40px;
+}
+.ngyn-picker-placeholder {
+  color:#aaaaaa;
+}
