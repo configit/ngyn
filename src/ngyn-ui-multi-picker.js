@@ -31,7 +31,7 @@ angular.module( 'ngyn-ui-multi-picker', [] )
           } )
         }
 
-      var classText = ".ngyn-combo { "+ 
+      var classText = ".ngyn-picker { "+ 
         "border-style: solid; "+ 
         "border-color: #BBBBBB; "+
         "display: inline-block; "+ 
@@ -52,12 +52,12 @@ angular.module( 'ngyn-ui-multi-picker', [] )
       document.documentElement.removeChild(i);
     }
 
-    var myTemplate = '<span class="ngyn-combo">' +
-                '  <span class="ngyn-combo-selection">' +
-                '    <span class="ngyn-combo-remove-selection">&times;</span>' +
+    var myTemplate = '<span class="ngyn-picker">' +
+                '  <span class="ngyn-picker-selection">' +
+                '    <span class="ngyn-picker-remove-selection">&times;</span>' +
                 '  </span>' +
                 '  <span' +
-                '    class="ngyn-combo-add-selection ngyn-combo-placeholder"' +
+                '    class="ngyn-picker-add-selection ngyn-picker-placeholder"' +
                 '    contenteditable ' +
                 '    > ' +
                 '    Add... '+
@@ -86,13 +86,4 @@ angular.module( 'ngyn-ui-multi-picker', [] )
         }
       }
     }
-  })
-
-.directive('ngynComboSelected', function() {
-  return {
-    restrict: 'E',
-    require: '^ngynUiCombo',
-    template: '<span></span>'
-  }
-
-});
+  });
