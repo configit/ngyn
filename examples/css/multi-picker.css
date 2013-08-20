@@ -11,6 +11,17 @@ input {
   background-color: rgb(238, 238, 238);
   float:left;
 }
+.ngyn-picker-options {
+  max-height:200px;
+  position: absolute;
+  border:solid 1px rgb(180,180,180);
+}
+.ngyn-picker-option:hover {
+  background-color: rgb(51, 153, 255); /* use a mid blue if highlight system color isn't available */
+  background-color: highlight;
+  color:white;
+  cursor:pointer;
+}
 .ngyn-picker-remove-selection {
   color:#888888;
   cursor:pointer;
