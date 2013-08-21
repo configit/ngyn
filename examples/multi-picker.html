@@ -20,7 +20,7 @@
         {
           firstname: 'Steve',
           surname: 'Ballmer',
-          title: 'Senior Crowd Entertainer',
+          title: 'Senior Microsoft Developer Entertainer',
           picture: 'images/Ballmer.jpg'
         } ];
 
@@ -36,9 +36,14 @@
         {{ person.surname}}
       </picker-selection>
       <picker-option>
-        <img ng-src="{{person.picture}}" align="left">
-        <strong>{{person.firstname}} {{person.surname}}</strong>
-        <p>{{person.title}}</p>
+        <div style="height:60px;">
+          <img style="width:40px;float:left;" ng-src="{{person.picture}}">
+          <div style="float:left">
+            <strong>{{person.firstname}} {{person.surname}}</strong><br />
+            <em>{{person.title}}</em>
+          </div>
+          <div style="clear:both"></div>
+        </div>
       </picker-option>
     </ngyn-multi-picker>
   </div>
