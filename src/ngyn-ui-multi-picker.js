@@ -1,5 +1,5 @@
 angular.module( 'ngyn-ui-multi-picker', [] )
-  .directive('ngynMultiPicker', function($compile) {
+  .directive('ngynMultiPicker', function($compile, $timeout) {
     setInitialStyles();
 
     function dasherize(str) {
@@ -101,30 +101,40 @@ angular.module( 'ngyn-ui-multi-picker', [] )
         var selection = containerElement.children().eq( 0 );
         var placeholder = containerElement.children().eq( 1 );
         var input = containerElement.children().eq( 2 );
-        selection.attr( 'ng-repeat', repeatableElement + ' in ' + repeatableCollection );
+        selection.attr( 'ng-repeat', repeatableElement + ' in ' + cattrs.ngModel );
         selection.prepend( selectionTemplate.html() );
 
         var menuElement = angular.element( menuTemplateString );
         var option = menuElement.children().eq(0);
         option.attr( 'ng-repeat', repeatableElement + ' in ' + repeatableCollection)
+        optionTemplate.attr( 'ng-click', 'addSelection('+ repeatableElement +')' );
         option.prepend( optionTemplate );
 
         celm.replaceWith();
         celm.append(containerElement);
         celm.append(menuElement);
 
+        function reposition() {
+          menuElement[0].style.left = containerElement[0].offsetLeft + 'px';
+          menuElement[0].style.top = (containerElement[0].offsetTop + containerElement[0].offsetHeight ) + 'px';
+        }
+
         return function link( scope, elm, attrs, model ) {
           scope.showInput = false;
 
+          scope.addSelection = function(s) {
+            scope.$eval(cattrs.ngModel).push(s);
+            $timeout(reposition);
+          }
+
         placeholder.bind('focus', function() {
           menuElement[0].style.display = 'block';
-          menuElement[0].style.left = containerElement[0].offsetLeft + 'px';
-          menuElement[0].style.top = (containerElement[0].offsetTop + containerElement[0].offsetHeight ) + 'px';
+          reposition();
           scope.$apply( function() {
             scope.showInput = true;
             // browsers won't focus something that's hidden
             // and the rest of the code occurs before binding has happened 
-            // and made input visible. Therefor we force it visible immediately.
+            // and made input visible. Therefore we force it visible immediately.
             input[0].style.display = 'inline-block'; 
             input[0].focus();
             var selection = window.getSelection();
@@ -141,6 +151,8 @@ angular.module( 'ngyn-ui-multi-picker', [] )
           }
         });
 
+
+        /* needs to be replaced by more inteligent 'control lost focus' logic
         input.bind('blur', function() {
           menuElement[0].style.display = 'none';
 
@@ -149,6 +161,7 @@ angular.module( 'ngyn-ui-multi-picker', [] )
             scope.showInput = false;
           } );
         });
+        */
 
         }
       }
