@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!-- This is an msbuild proj file and is used by a teamcity build server to run the unit tests and generate a report --> 
-
+<!-- This is an msbuild proj file and is used by a teamcity build server to run the unit tests and generate a report -->
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <Target Name="Build">
+    <Exec Command="&quot;$(MSBuildProjectDirectory)\build.bat&quot; $(KarmaArgs)" />
+  </Target>
+
   <Target Name="Test" DependsOnTargets="Build">
     <Message Text="##teamcity[progressMessage 'Running Karma with args: $(KarmaArgs)']" Importance="high" />
     <Message Text="-------- Running Karma --------" Importance="high" />

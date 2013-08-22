@@ -42,14 +42,28 @@ module.exports = function(grunt) {
     },
     watch: {
       files: ['<%= jshint.files %>'],
-      tasks: ['jshint', 'qunit']
+      tasks: [/*'jshint',*/'concat', 'karma:background:run']
+    },
+    karma: {
+      background: {
+        configFile: 'karma.conf.js',
+        autoWatch: false,
+        background: true
+      },
+      single: {
+        configFile: 'karma.conf.js',
+        singleRun: true,
+        autoWatch: false
+      }
     }
   });
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-concat');
+  grunt.loadNpmTasks('grunt-karma');
 
-  grunt.registerTask('test', ['jshint' ]);
-  grunt.registerTask('default', [/*'jshint',*/ 'concat']);
+  grunt.registerTask('test', [/*'jshint'*/, 'karma:single' ]);
+  grunt.registerTask('build', [/*'jshint',*/ 'concat' ]);
+  grunt.registerTask('default', ['build', 'karma:single']);
 };
