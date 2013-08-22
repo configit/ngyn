@@ -72,11 +72,12 @@ angular.module( 'ngyn-ui-multi-picker', [] )
                 '  <span class="ngyn-picker-selection">' +
                 '    <span class="ngyn-picker-remove-selection">&times;</span>' +
                 '  </span>' +
-                '  <span' +
-                '    class="ngyn-picker-add-selection ngyn-picker-placeholder"' +
-                '    contenteditable ng-focus="test"' +
-                '    > ' +
-                '    Add... '+
+                '  <span class="ngyn-picker-placeholder" ' +
+                '    ng-show="!showInput" contenteditable >' +
+                'Add...'+
+                '  </span>' +
+                '  <span class="ngyn-picker-add-selection" '+ 
+                '   ng-show="showInput" contenteditable >' +
                 '  </span>' +
                 '</span>';
     var menuTemplateString = '<div style="display:none" class="ngyn-picker-options">' +
@@ -88,6 +89,7 @@ angular.module( 'ngyn-ui-multi-picker', [] )
       restrict: 'E',
       require: 'ngModel',
       replace: true,
+      scope: true,
       compile: function(celm, cattrs, transclude) {
         var match = cattrs.options.match(/([^\W]*) in ([^$]*)/);
         var repeatableElement = match[1];
@@ -98,6 +100,7 @@ angular.module( 'ngyn-ui-multi-picker', [] )
         var containerElement = angular.element( containerTemplateString );
         var selection = containerElement.children().eq( 0 );
         var placeholder = containerElement.children().eq( 1 );
+        var input = containerElement.children().eq( 2 );
         selection.attr( 'ng-repeat', repeatableElement + ' in ' + repeatableCollection );
         selection.prepend( selectionTemplate.html() );
 
@@ -108,19 +111,45 @@ angular.module( 'ngyn-ui-multi-picker', [] )
 
         celm.replaceWith();
         celm.append(containerElement);
-        celm.append(menuElement)
+        celm.append(menuElement);
+
+        return function link( scope, elm, attrs, model ) {
+          scope.showInput = false;
 
         placeholder.bind('focus', function() {
           menuElement[0].style.display = 'block';
           menuElement[0].style.left = containerElement[0].offsetLeft + 'px';
           menuElement[0].style.top = (containerElement[0].offsetTop + containerElement[0].offsetHeight ) + 'px';
+          scope.$apply( function() {
+            scope.showInput = true;
+            // browsers won't focus something that's hidden
+            // and the rest of the code occurs before binding has happened 
+            // and made input visible. Therefor we force it visible immediately.
+            input[0].style.display = 'inline-block'; 
+            input[0].focus();
+            var selection = window.getSelection();
+            var range = document.createRange();
+            range.selectNodeContents( input[0] );
+            selection.removeAllRanges();
+            selection.addRange(range);
+          } );
         });
 
-        placeholder.bind('blur', function() {
+        input.bind('keydown', function(ev) {
+          if (ev.keyCode == 13) {
+            ev.preventDefault();
+          }
+        });
+
+        input.bind('blur', function() {
           menuElement[0].style.display = 'none';
+
+          scope.$apply( function() {
+            input.html( '' );
+            scope.showInput = false;
+          } );
         });
 
-        return function link( scope, elm, attrs, model ) {
         }
       }
     }
