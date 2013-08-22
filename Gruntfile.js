@@ -1,4 +1,5 @@
 module.exports = function(grunt) {
+  'use strict';
 
   var pkg = grunt.file.readJSON('package.json');
 
@@ -21,23 +22,18 @@ module.exports = function(grunt) {
         options[subdir] = {
           src: [rootdir + '/' + subdir + '/**/*.js'],
           dest: 'dist/' + pkg.name + '-' + subdir + '.js'
-        }
-    } );
+        };
+      } );
     return options;
-  };
+  }
 
   grunt.initConfig( {
     concat: createConcatOptions(  ),
     jshint: {
       files: ['gruntfile.js', 'src/**/*.js', 'test/**/*.js'],
       options: {
-        // options here to override JSHint defaults
-        globals: {
-          jQuery: true,
-          console: true,
-          module: true,
-          document: true
-        }
+        jshintrc: '.jshintrc',
+        force: true
       }
     },
     watch: {
@@ -63,7 +59,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-karma');
 
-  grunt.registerTask('build', [/*'jshint',*/ 'concat' ]);
+  grunt.registerTask('build', ['jshint', 'concat' ]);
   grunt.registerTask('test', ['karma:single' ]);
   grunt.registerTask('default', ['build', 'karma:single']);
 };
