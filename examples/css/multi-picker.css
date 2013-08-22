@@ -31,8 +31,10 @@ input {
 }
 .ngyn-picker-add-selection {
   width:auto;
+  display:inline-block;
   outline:none;
   min-width:40px;
+  white-space: nowrap;
 }
 .ngyn-picker-placeholder {
   color:#aaaaaa;
