@@ -4,15 +4,15 @@ module.exports = function(grunt) {
 
   function createConcatOptions( ) {
     var options = {
-                    options: {
-                      banner: '/* VERSION: ' + pkg.version + ' */\n',
-                      separator: ';'
-                    },
-                    module: {
-                      src: ['src/' + pkg.name + '.js'],
-                      dest: 'dist/' + pkg.name + '.js'
-                    }
-                  };
+      options: {
+        banner: '/* VERSION: ' + pkg.version + ' */\n',
+        separator: ';'
+      },
+      module: {
+        src: ['src/' + pkg.name + '.js'],
+        dest: 'dist/' + pkg.name + '.js'
+      }
+    };
 
     grunt.file.recurse( 'src',
       function( abspath, rootdir, subdir, filename ) {
@@ -63,7 +63,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-karma');
 
-  grunt.registerTask('test', [/*'jshint'*/, 'karma:single' ]);
   grunt.registerTask('build', [/*'jshint',*/ 'concat' ]);
+  grunt.registerTask('test', ['karma:single' ]);
   grunt.registerTask('default', ['build', 'karma:single']);
 };
