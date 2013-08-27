@@ -10,22 +10,22 @@ angular.module( 'ngyn-ui-multi-picker', [] )
     function dasherize(str) {
       return str.replace(/([A-Z])/g, function(v) { return '-' + angular.lowercase(v); } );
     }
-    /*function capitalize(str) {
+    function capitalize(str) {
       return str.replace(/^([a-z])/, function(v) { return angular.uppercase(v); } );
-    }*/
+    }
 
-    /*function offset( elem ) {
+    function offset( elem ) {
       var offset = { top:0, left:0 };
       do {
         angular.forEach(['top', 'left'], function(dimension) {
           var dimensionValue = elem['offset'+ capitalize(dimension)];
           if ( !isNaN( dimensionValue ) ) {
-            oset[dimension] += dimensionValue;
+            offset[dimension] += dimensionValue;
           }
         } );
       } while( elem = elem.offsetParent );
       return offset;
-    }*/
+    }
 
     function setInitialStyles() {
       // create an initial input element and hide it to get the props from
