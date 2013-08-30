@@ -15,16 +15,18 @@ angular.module( 'ngyn-ui-multi-picker', [] )
     }
 
     function offset( elem ) {
-      var offset = { top:0, left:0 };
+      /*jshint loopfunc: true */
+      var totalOffset = { top:0, left:0 };
       do {
         angular.forEach(['top', 'left'], function(dimension) {
           var dimensionValue = elem['offset'+ capitalize(dimension)];
           if ( !isNaN( dimensionValue ) ) {
-            offset[dimension] += dimensionValue;
+            totalOffset[dimension] += dimensionValue;
           }
         } );
       } while( elem = elem.offsetParent );
-      return offset;
+      /*jshint loopfunc: false */
+      return totalOffset;
     }
 
     function setInitialStyles() {

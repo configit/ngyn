@@ -20,7 +20,7 @@
 
   "globals" : {
     "describe": false,
-    "xdecribe": false,
+    "xdescribe": false,
     "beforeEach": false,
     "afterEach": false,
     "it": false,
