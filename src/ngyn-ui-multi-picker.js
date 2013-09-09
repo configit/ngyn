@@ -1,5 +1,5 @@
 angular.module( 'ngyn-ui-multi-picker', [] )
-  .directive('ngynMultiPicker', function($compile, $timeout) {
+  .directive('ngynMultiPicker', function($compile, $timeout, $document, $window) {
     setInitialStyles();
 
     function dasherize(str) {
@@ -24,11 +24,11 @@ angular.module( 'ngyn-ui-multi-picker', [] )
 
     function setInitialStyles() {
       // create an initial input element and hide it to get the props from
-      var i = document.createElement('input');
+      var i = $document[0].createElement('input');
       i.style.position = 'absolute';
       i.style.visibility = 'hidden';
-      document.documentElement.appendChild(i);
-      var iStyles = window.getComputedStyle(i);
+      $document[0].documentElement.appendChild(i);
+      var iStyles = $window.getComputedStyle(i);
       // IE must read a property twice, the first is the default, the second is the real value. Awesome.
       var discardedWidth = iStyles.width;
 
@@ -60,12 +60,12 @@ angular.module( 'ngyn-ui-multi-picker', [] )
       });
       classText += "}";
 
-      var styleTag = document.createElement('style');
+      var styleTag = $document[0].createElement('style');
       styleTag.type = 'text/css';
       styleTag.innerHTML = classText;
-      document.getElementsByTagName('head')[0].appendChild( styleTag )
+      $document[0].getElementsByTagName('head')[0].appendChild( styleTag )
       
-      document.documentElement.removeChild(i);
+      $document[0].documentElement.removeChild(i);
     }
 
     var containerTemplateString = '<span class="ngyn-picker">' +
@@ -97,6 +97,7 @@ angular.module( 'ngyn-ui-multi-picker', [] )
         var selectionTemplate = celm.find('picker-selection');
         var optionTemplate = celm.find('picker-option');
 
+		var htmlElement = angular.element( $document ).find( 'html' );
         var containerElement = angular.element( containerTemplateString );
         var selection = containerElement.children().eq( 0 );
         var placeholder = containerElement.children().eq( 1 );
@@ -127,6 +128,11 @@ angular.module( 'ngyn-ui-multi-picker', [] )
             $timeout(reposition);
           }
 
+	    containerElement.bind('click', function(ev) {
+		  // Stop event bubbling up to html in order to stop it being closed
+		  ev.stopPropagation();
+		});
+		
         placeholder.bind('focus', function() {
           menuElement[0].style.display = 'block';
           reposition();
@@ -137,8 +143,8 @@ angular.module( 'ngyn-ui-multi-picker', [] )
             // and made input visible. Therefore we force it visible immediately.
             input[0].style.display = 'inline-block'; 
             input[0].focus();
-            var selection = window.getSelection();
-            var range = document.createRange();
+            var selection = $window.getSelection();
+            var range = $document[0].createRange();
             range.selectNodeContents( input[0] );
             selection.removeAllRanges();
             selection.addRange(range);
@@ -150,19 +156,18 @@ angular.module( 'ngyn-ui-multi-picker', [] )
             ev.preventDefault();
           }
         });
-
-
-        /* needs to be replaced by more inteligent 'control lost focus' logic
-        input.bind('blur', function() {
-          menuElement[0].style.display = 'none';
+		
+		htmlElement.bind('click', function() {
+		  // Remove menu when any element is clicked
+		  // Note: the element itself has a click handler which catches 
+		  // the event so it doesn't closed when itself it clicked
+		  menuElement[0].style.display = 'none';
 
           scope.$apply( function() {
             input.html( '' );
             scope.showInput = false;
           } );
-        });
-        */
-
+		});
         }
       }
     }
