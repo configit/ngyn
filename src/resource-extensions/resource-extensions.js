@@ -3,12 +3,18 @@
 
   var injectCallback = function( args, successFn, errorFn ) {
     var oldSuccessFn, oldErrorFn, newargs = [];
+    // if the last 2 arguments are callbacks (success and error)
     if ( args.length >= 2 && angular.isFunction( args[args.length - 2] ) ) {
       oldSuccessFn = args[args.length - 2];
       oldErrorFn = args[args.length - 1];
     }
+    //otherwise if only the last one is a callback (success)
     else if ( angular.isFunction( args[args.length - 1] ) ) {
       oldSuccessFn = args[args.length - 1];
+    }
+
+    if (args.length === 0) {
+      newargs.push( {} );
     }
 
     // push on all arguments, up to the first callback function
