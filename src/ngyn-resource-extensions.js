@@ -120,7 +120,7 @@
             }
 
             if ( ngynResourceProvider.modifyArgs ) {
-              ngynResourceProvider.modifyArgs( methodargs[0], action );
+              ngynResourceProvider.modifyArgs( methodargs[0], hasBody ? methodargs[1] : null, action );
             }
 
             var methodResult = oldMethod.apply( this, methodargs );
