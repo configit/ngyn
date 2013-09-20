@@ -1,0 +1,37 @@
+{
+  "undef" : true,
+  "expr" : true,
+  "unused" : "vars",
+  "trailing": false,
+  "sub": true,
+  "laxcomma" : true,
+  "strict" : true,
+  "indent" : 2,
+  "immed": true,
+  "eqeqeq": true,
+  "latedef" : "nofunc",
+  "noarg": true,
+  "boss": true,
+
+  "devel": true,
+  "browser": true,
+  "jquery" : true,
+  "node" : true,
+
+  "globals" : {
+    "describe": false,
+    "xdescribe": false,
+    "beforeEach": false,
+    "afterEach": false,
+    "it": false,
+    "xit": false,
+    "expect": false,
+    "angular": false,
+    "module": false,
+    "inject": false,
+    "spyOn" : false,
+    "jasmine" : false,
+    "setFixtures" : false,
+    "_" : false
+  }
+}

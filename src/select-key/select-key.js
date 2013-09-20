@@ -1,7 +1,7 @@
 ( function( angular ) {
+  'use strict';
 
-  angular.module( 'ngynSelectKey', [] )
-  .directive( 'select', ['$parse', function( $parse ) {
+  angular.module( 'ngynSelectKey', [] ).directive( 'select', ['$parse', function( $parse ) {
     return {
       restrict: 'E',
       priority: '100',
@@ -13,11 +13,11 @@
           return;
         }
 
-        /* 
+        /*
         * Unfortunately the selectController doesn't expose the collection it is bound to,
         * so we have to emulate the steps it takes to get at the collection
         */
-        var NG_OPTIONS_REGEXP = /^\s*(.*?)(?:\s+as\s+(.*?))?(?:\s+group\s+by\s+(.*))?\s+for\s+(?:([\$\w][\$\w\d]*)|(?:\(\s*([\$\w][\$\w\d]*)\s*,\s*([\$\w][\$\w\d]*)\s*\)))\s+in\s+(.*)$/
+        var NG_OPTIONS_REGEXP = /^\s*(.*?)(?:\s+as\s+(.*?))?(?:\s+group\s+by\s+(.*))?\s+for\s+(?:([\$\w][\$\w\d]*)|(?:\(\s*([\$\w][\$\w\d]*)\s*,\s*([\$\w][\$\w\d]*)\s*\)))\s+in\s+(.*)$/;
         var optionsExp = attrs.ngOptions;
         var match = optionsExp.match( NG_OPTIONS_REGEXP );
         var valuesFn = $parse( match[7] );
@@ -26,7 +26,7 @@
         var modelValue;
 
         /*
-        * retrieve the related element(s) (based on key) 
+        * retrieve the related element(s) (based on key)
         * and use that in place of the supplied object
         */
         function replaceModelValue() {
@@ -46,7 +46,7 @@
           }
         }
 
-        /* 
+        /*
         * Watch the underlying collection for changes and cause reselection
         */
         scope.$watch( function() { return valuesFn( scope ); }, function() {

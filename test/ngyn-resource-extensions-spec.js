@@ -5,13 +5,13 @@ describe( 'ngyn resource extensions', function() {
     module( 'ngynResource' );
 
     module( function( ngynResourceProvider ) {
-      ngynResourceProvider.modifyArgs = function( args, action ) {
+      ngynResourceProvider.modifyArgs = function( args ) {
         args.addedArg = 'success';
       };
       ngynResourceProvider.actions = {
         'update': { method: 'PUT' }
       };
-      ngynResourceProvider.success = function( response, headerFn ) {
+      ngynResourceProvider.success = function( response ) {
         response.addedData = 'success';
         this.totalCount = response.length;
         response.totalCount = response.length;
@@ -47,7 +47,7 @@ describe( 'ngyn resource extensions', function() {
     var header;
 
     var User = $resource( 'api/users/:userid' );
-    var users = User.query( function( data, headerFn ) {
+    User.query( function( data, headerFn ) {
       header = headerFn( 'x-myheader' );
     } );
 
@@ -59,7 +59,7 @@ describe( 'ngyn resource extensions', function() {
     $httpBackend.whenGET( /.+/ ).respond( '[{"name": "fred"}]' );
     var User = $resource( 'api/users/:userid' );
     var cbResponse;
-    var users = User.query( function success( response ) {
+    User.query( function success( response ) {
       cbResponse = response;
     } );
     $httpBackend.flush();
@@ -70,7 +70,7 @@ describe( 'ngyn resource extensions', function() {
     $httpBackend.whenPOST( /.+/ ).respond( '{"name": "fred"}' );
     var User = $resource( 'api/users/:userid' );
     var cbResponse;
-    var users = User.save( function success( response ) {
+    User.save( function success( response ) {
       cbResponse = response;
     } );
     $httpBackend.flush();
@@ -82,13 +82,13 @@ describe( 'ngyn resource extensions', function() {
       500,
       {
         errors: [
-        { propertyName: 'forename', message: "too short" },
+          { propertyName: 'forename', message: "too short" },
         ]
       }
         );
     var User = $resource( 'api/users/:userid' );
     var cbResponse;
-    var users = User.query( angular.noop, function success( response ) {
+    User.query( angular.noop, function success( response ) {
       cbResponse = response.data;
     } );
     $httpBackend.flush();
@@ -100,13 +100,13 @@ describe( 'ngyn resource extensions', function() {
       500,
       {
         errors: [
-        { propertyName: 'forename', message: "too short" },
+          { propertyName: 'forename', message: "too short" },
         ]
       }
         );
     var User = $resource( 'api/users/:userid' );
     var cbResponse;
-    var users = User.query( {}, angular.noop, function success( response ) {
+    User.query( {}, angular.noop, function success( response ) {
       cbResponse = response.data;
     } );
     $httpBackend.flush();
@@ -118,13 +118,13 @@ describe( 'ngyn resource extensions', function() {
       500,
       {
         errors: [
-        { propertyName: 'forename', message: "too short" },
+          { propertyName: 'forename', message: "too short" },
         ]
       }
         );
     var User = $resource( 'api/users/:userid' );
     var cbResponse;
-    var users = User.save( {}, angular.noop, function success( response ) {
+    User.save( {}, angular.noop, function success( response ) {
       cbResponse = response.data;
     } );
     $httpBackend.flush();
@@ -134,12 +134,12 @@ describe( 'ngyn resource extensions', function() {
   it( 'should be able to append arbitrary data to a request', inject( function( $httpBackend, $resource ) {
     $httpBackend.expectGET( /addedArg=success/ ).respond( [{ name: 'fred' }] );
     var User = $resource( 'api/users/:userid' );
-    var users = User.query();
+    User.query();
     $httpBackend.flush();
   } ) );
 
   it( 'should be able to append data to a success response via global callback', inject( function( $httpBackend, $resource ) {
-    $httpBackend.whenGET( /.+/ ).respond( [] )
+    $httpBackend.whenGET( /.+/ ).respond( [] );
     var User = $resource( 'api/users/:userid' );
     var users = User.query( function success( response ) {
       // we expect to get the value pushed on to the data in success conditions
@@ -150,7 +150,7 @@ describe( 'ngyn resource extensions', function() {
   } ) );
 
   it( 'should be able to append data to an error response via global callback', inject( function( $httpBackend, $resource ) {
-    $httpBackend.whenGET( /.+/ ).respond( 500, [] )
+    $httpBackend.whenGET( /.+/ ).respond( 500, [] );
     var User = $resource( 'api/users/:userid' );
     var users = User.query( angular.noop, function error( response ) {
       expect( response.error ).toEqual( 'error' );
@@ -167,7 +167,6 @@ describe( 'ngyn resource extensions', function() {
     expect( users._meta.requestArgs ).toEqual( { foo: 'bar', addedArg: 'success' } );
   } ) );
 
-
   it( 'should be able to send request args to a erroneous response', inject( function( $httpBackend, $resource ) {
     $httpBackend.whenGET( /.+/ ).respond(  500, [] );
     var User = $resource( 'api/users/:userid' );
@@ -177,7 +176,7 @@ describe( 'ngyn resource extensions', function() {
   } ) );
 
   it( 'should be possible to provide new default_actions', inject( function( $resource, $httpBackend ) {
-    $httpBackend.whenPUT( /api\/users/ ).respond( {} )
+    $httpBackend.whenPUT( /api\/users/ ).respond( {} );
     var User = $resource( 'api/users/:userid' );
     User.update();
     $httpBackend.flush();
@@ -194,7 +193,5 @@ describe( 'ngyn resource extensions', function() {
     users.requery( { top: 2 } );
     $httpBackend.flush();
     expect( users.totalCount ).toEqual( 2 );
-
   } ) );
-
 } );

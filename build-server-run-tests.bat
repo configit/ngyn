@@ -1,1 +1,1 @@
-%~dp0run-tests.bat --single-run --no-colors --reporters junit %*
+node "%~dp0node_modules\karma\bin\karma" start --single-run --no-colors --reporters junit %*

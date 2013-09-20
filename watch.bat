@@ -8,4 +8,4 @@ IF NOT DEFINED NODE_FOUND (
 SET PHANTOMJS_BIN=%~dp0node_modules\phantomjs\lib\phantom\phantomjs.exe
 
 cmd /c npm install
-node "%~dp0node_modules\karma\bin\karma" start %*
+node "%~dp0node_modules\grunt-cli\bin\grunt" karma:background watch %*

@@ -43,7 +43,7 @@
 
   // append meta object to obj._meta, creating obj._meta if necessary
   function appendToMeta( obj, meta ) {
-    obj._meta = obj._meta || {}
+    obj._meta = obj._meta || {};
     angular.extend( obj._meta, meta );
   }
 
@@ -105,9 +105,9 @@
               }
             );
 
-            var hasBody = actions[action].method == 'POST' ||
-                          actions[action].method == 'PUT' ||
-                          actions[action].method == 'PATCH';
+            var hasBody = actions[action].method === 'POST' ||
+                          actions[action].method === 'PUT' ||
+                          actions[action].method === 'PATCH';
 
             if ( angular.isFunction( methodargs[0] ) ) {
               // inject new empty arguments to ensure globally added args are possible
@@ -140,7 +140,7 @@
                 resourceResult.query.apply( methodResult, requeryargs );
                 methodResult.parameters = requeryargs[0];
               };
-            };
+            }
 
             methodResult.parameters = methodargs[0];
             return methodResult;

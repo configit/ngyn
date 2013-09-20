@@ -1,10 +1,9 @@
 ﻿describe( 'route', function() {
-  "use strict";
+  'use strict';
 
   beforeEach( function() {
     module( 'ngynRoute' );
   } );
-
 
   it( 'should serve basic route to resourceful index', function() {
     module( function( ngynRouteProvider ) {
@@ -164,7 +163,7 @@
       ngynRouteProvider.resource( { name: 'Products' } );
     } );
 
-    inject( function( $location, $route, $rootScope, $httpBackend, ngynRoute ) {
+    inject( function( $location, $route, $rootScope, $httpBackend ) {
       $httpBackend.whenGET( /.+/ ).respond();
       $location.path( '/products/index' );
       $rootScope.$digest();
