@@ -1,4 +1,6 @@
 describe( 'select-key', function() {
+  'use strict';
+
   var element, scope;
 
   beforeEach( module( 'ngynSelectKey' ) );
@@ -14,7 +16,7 @@ describe( 'select-key', function() {
     scope.person = { name: 'Wilma', remote: true };
     element = $compile( '<select ng-model="person" ng-options="p.name for p in people"></select>' )( scope );
     scope.$digest();
-    expect( element.controller( 'ngModel' ).$modelValue ).not.toEqual( scope.people[1] )
+    expect( element.controller( 'ngModel' ).$modelValue ).not.toEqual( scope.people[1] );
     expect( element.val() ).toEqual( '?' );
   } ) );
 
@@ -22,7 +24,7 @@ describe( 'select-key', function() {
     scope.person = { name: 'Wilma', remote: true };
     element = $compile( '<select key="name" ng-model="person" ng-options="p.name for p in people"></select>' )( scope );
     scope.$digest();
-    expect( element.controller( 'ngModel' ).$modelValue ).toEqual( scope.people[1] )
+    expect( element.controller( 'ngModel' ).$modelValue ).toEqual( scope.people[1] );
     // Wilma is the second item in the list
     expect( element.val() ).toEqual( '1' );
   } ) );

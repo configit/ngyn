@@ -1,15 +1,14 @@
 ( function( angular ) {
-
-  angular.module( 'ngynSelect2', [] )
+  'use strict';
   /*
-  * Applies the jQuery-based select2 to the selected element 
-  * 
+  * Applies the jQuery-based select2 to the selected element
+  *
   * If a custom-rendering attribute is specified the default object structure is not used (id and text properties expected)
   * in favour of using the item itself. This is useful when used with input elements where full responsiblity is taken for querying and formatting results.
-  * 
+  *
   * <input type="hidden" ngyn-select2="options" ng-model="selection" multiple custom-rendering class="span11" ></input>
   */
-  .directive( 'ngynSelect2', ['$parse', '$timeout', function( $parse, $timeout ) {
+  angular.module( 'ngynSelect2', [] ).directive( 'ngynSelect2', ['$parse', '$timeout', function( $parse, $timeout ) {
     return {
       require: '?ngModel',
       priority: '150', // must be higher priority than ngyn-select-key
@@ -37,7 +36,7 @@
           scope.$watch( function() {
             var container = elm.select2( 'container' );
             var newClass = elm.attr( 'class' );
-            if ( newClass != oldClass ) {
+            if ( newClass !== oldClass ) {
               angular.forEach( oldClass.split( ' ' ), function( c ) {
                 container.removeClass( c );
               } );
@@ -61,9 +60,9 @@
             };
           };
 
-          var parseResult = angular.isDefined( attrs.customRendering )
-            ? function( result ) { return result; }
-            : createDefaultResultParser();
+          var parseResult = angular.isDefined( attrs.customRendering ) ?
+            function( result ) { return result; } :
+            createDefaultResultParser();
 
           var parseResults = function( originalValues ) {
             if ( !originalValues ) {
