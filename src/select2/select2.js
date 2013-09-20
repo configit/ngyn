@@ -36,7 +36,7 @@
           scope.$watch( function() {
             var container = elm.select2( 'container' );
             var newClass = elm.attr( 'class' );
-            if ( newClass != oldClass ) {
+            if ( newClass !== oldClass ) {
               angular.forEach( oldClass.split( ' ' ), function( c ) {
                 container.removeClass( c );
               } );

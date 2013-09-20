@@ -1,5 +1,3 @@
-angular.module( 'ngyn-ui-multi-picker', [] )
-  .directive('ngynMultiPicker', function($compile, $timeout, $document, $window) {
 (function( angular ) {
   'use strict';
 
@@ -71,7 +69,7 @@ angular.module( 'ngyn-ui-multi-picker', [] )
       styleTag.type = 'text/css';
       styleTag.innerHTML = classText;
       $document[0].getElementsByTagName('head')[0].appendChild( styleTag );
-      
+
       $document[0].documentElement.removeChild(i);
     }
 
@@ -104,7 +102,7 @@ angular.module( 'ngyn-ui-multi-picker', [] )
         var selectionTemplate = celm.find('picker-selection');
         var optionTemplate = celm.find('picker-option');
 
-		var htmlElement = angular.element( $document ).find( 'html' );
+        var htmlElement = angular.element( $document ).find( 'html' );
         var containerElement = angular.element( containerTemplateString );
         var selection = containerElement.children().eq( 0 );
         var placeholder = containerElement.children().eq( 1 );
@@ -135,47 +133,47 @@ angular.module( 'ngyn-ui-multi-picker', [] )
             $timeout(reposition);
           };
 
-	    containerElement.bind('click', function(ev) {
-		  // Stop event bubbling up to html in order to stop it being closed
-		  ev.stopPropagation();
-		});
-		
-        placeholder.bind('focus', function() {
-          menuElement[0].style.display = 'block';
-          reposition();
-          scope.$apply( function() {
-            scope.showInput = true;
-            // browsers won't focus something that's hidden
-            // and the rest of the code occurs before binding has happened
-            // and made input visible. Therefore we force it visible immediately.
-            input[0].style.display = 'inline-block';
-            input[0].focus();
-            var selection = $window.getSelection();
-            var range = $document[0].createRange();
-            range.selectNodeContents( input[0] );
-            selection.removeAllRanges();
-            selection.addRange(range);
-          } );
-        });
+          containerElement.bind('click', function(ev) {
+            // Stop event bubbling up to html in order to stop it being closed
+            ev.stopPropagation();
+          });
 
-        input.bind('keydown', function(ev) {
-          if (ev.keyCode === 13) {
-            ev.preventDefault();
-          }
-        });
-		
-		htmlElement.bind('click', function() {
-		  // Remove menu when any element is clicked
-		  // Note: the element itself has a click handler which catches 
-		  // the event so it doesn't closed when itself it clicked
-		  menuElement[0].style.display = 'none';
+          placeholder.bind('focus', function() {
+            menuElement[0].style.display = 'block';
+            reposition();
+            scope.$apply( function() {
+              scope.showInput = true;
+              // browsers won't focus something that's hidden
+              // and the rest of the code occurs before binding has happened
+              // and made input visible. Therefore we force it visible immediately.
+              input[0].style.display = 'inline-block';
+              input[0].focus();
+              var selection = $window.getSelection();
+              var range = $document[0].createRange();
+              range.selectNodeContents( input[0] );
+              selection.removeAllRanges();
+              selection.addRange(range);
+            } );
+          });
 
-          scope.$apply( function() {
-            input.html( '' );
-            scope.showInput = false;
-          } );
-		});
-        }
+          input.bind('keydown', function(ev) {
+            if (ev.keyCode === 13) {
+              ev.preventDefault();
+            }
+          });
+
+          htmlElement.bind('click', function() {
+            // Remove menu when any element is clicked
+            // Note: the element itself has a click handler which catches
+            // the event so it doesn't closed when itself it clicked
+            menuElement[0].style.display = 'none';
+
+            scope.$apply( function() {
+              input.html( '' );
+              scope.showInput = false;
+            } );
+          });
+        };
       }
     };
   });
