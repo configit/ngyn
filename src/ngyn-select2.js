@@ -33,6 +33,20 @@
             match = optionsExp.match( NG_OPTIONS_REGEXP );
             valuesFn = $parse( match[7] );
           }
+          var oldClass = "";
+          scope.$watch( function() {
+            var container = elm.select2( 'container' );
+            var newClass = elm.attr( 'class' );
+            if ( newClass != oldClass ) {
+              angular.forEach( oldClass.split( ' ' ), function( c ) {
+                container.removeClass( c );
+              } );
+              angular.forEach( newClass.split( ' ' ), function( c ) {
+                container.addClass( c );
+              } );
+              oldClass = newClass;
+            }
+          } );
 
           var createDefaultResultParser = function() {
             var key = attrs.keyPath || 'id';
