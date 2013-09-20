@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head>
+  <script src="../libs/angular.js"></script>
+  <script src="../src/ngyn-ui-timespan-picker.js"></script>
+  <script>
+    angular.module( 'app', ['ngyn-ui-timespan-picker'] ).controller( 'TestController', function( $scope ) {
+      $scope.timespan1 = 86400;
+      $scope.timespan2 = 86400;
+      $scope.timespan3 = 0;
+      $scope.timespan4 = null;
+    });
+  </script>
+</head>
+<body ng-controller="TestController">
+  <h1>Simple timespan selector</h1>
+  <h3>Auto-units - Timespan 1 = {{ timespan1 }} seconds</h3>
+  <ngyn-timespan-picker ng-model="timespan1"></ngyn-timespan-picker>
+  
+  <h3>Force hours - Timespan 2 = {{ timespan2 }} seconds</h3>
+  <ngyn-timespan-picker ng-model="timespan2" units="hour"></ngyn-timespan-picker>
+  
+  <h3>Auto-units - Timespan 2 = {{ timespan2 }} seconds</h3>
+  <ngyn-timespan-picker ng-model="timespan2"></ngyn-timespan-picker>
+  
+  <h3>Auto-units - (zero) Timespan 3 = {{ timespan3 }} seconds</h3>
+  <ngyn-timespan-picker ng-model="timespan3"></ngyn-timespan-picker>
+  
+  <h3>Auto-units - (null) Timespan 4 = {{ timespan4 }} seconds</h3>
+  <ngyn-timespan-picker ng-model="timespan4"></ngyn-timespan-picker>
+  
+</body>
+</html>
