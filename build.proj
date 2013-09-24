@@ -3,7 +3,15 @@
 <!-- This is an msbuild proj file and is used by a teamcity build server to run the unit tests and generate a report -->
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
+  <PropertyGroup>
+    <Major Condition="'$(Major)' == ''">0</Major>
+    <Minor Condition="'$(Minor)' == ''">0</Minor>
+    <Revision Condition="'$(Revision)' == ''">0</Revision>
+    <Version>$(Major).$(Minor).$(Revision).0</Version>
+  </PropertyGroup>
+
   <Target Name="Build">
+    <RemoveDir Directories="dist" />
     <Exec Command="&quot;$(MSBuildProjectDirectory)\build.bat&quot; $(KarmaArgs)" />
   </Target>
 
@@ -12,5 +20,21 @@
     <Message Text="-------- Running Karma --------" Importance="high" />
     <Exec Command="&quot;$(MSBuildProjectDirectory)\build-server-run-tests.bat&quot; $(KarmaArgs)"  />
     <Message Text="##teamcity[importData type='junit' path='$(MSBuildProjectDirectory)\test-results.xml']" />
+  </Target>
+  
+  <Target Name="BuildPackages">
+    <!-- 
+      The properties below must be defined in a target because the build server supplies SemVerSuffix=;
+      Which does not equate to '' when defined in the Project PropertyGroup (for reasons unknown)
+    -->
+    <PropertyGroup>
+      <SemVerSuffix Condition="'$(is_default_branch)' != 'true' And '$(SemVerSuffix)' == ''">-beta</SemVerSuffix>
+      <SemVersion>$(Major).$(Minor).$(Revision)$(SemVerSuffix)</SemVersion>
+    </PropertyGroup>
+  
+    <Message Text="*********** BUILDING NUGET PACKAGES **************" Importance="High"/>
+    <RemoveDir Directories="packages-build" />
+    <MakeDir Directories="packages-build" />
+    <Exec Command="build\nuget pack .\ngyn.nuspec -outputdirectory packages-build -verbosity detailed -version $(SemVersion)" />
   </Target>
 </Project>
