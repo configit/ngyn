@@ -13,4 +13,10 @@
     <Exec Command="&quot;$(MSBuildProjectDirectory)\build-server-run-tests.bat&quot; $(KarmaArgs)"  />
     <Message Text="##teamcity[importData type='junit' path='$(MSBuildProjectDirectory)\test-results.xml']" />
   </Target>
+  
+  <Target Name="BuildPackages">
+    <Message Text="*********** BUILDING NUGET PACKAGES **************" Importance="High"/>
+    <MakeDir Directories="packages-build" />
+    <Exec Command="build\nuget pack .\ngyn.nuspec -outputdirectory packages-build -verbosity detailed" />
+  </Target>
 </Project>
