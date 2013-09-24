@@ -11,6 +11,7 @@
   </PropertyGroup>
 
   <Target Name="Build">
+    <RemoveDir Directories="dist" />
     <Exec Command="&quot;$(MSBuildProjectDirectory)\build.bat&quot; $(KarmaArgs)" />
   </Target>
 
@@ -32,6 +33,7 @@
     </PropertyGroup>
   
     <Message Text="*********** BUILDING NUGET PACKAGES **************" Importance="High"/>
+    <RemoveDir Directories="packages-build" />
     <MakeDir Directories="packages-build" />
     <Exec Command="build\nuget pack .\ngyn.nuspec -outputdirectory packages-build -verbosity detailed -version $(SemVersion)" />
   </Target>
