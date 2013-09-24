@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>ngyn</id>
+    <version>1.0.0</version>
+    <authors>Configit A/S</authors>
+    <owners>Configit A/S</owners>
+    <licenseUrl>http://www.github.com/configit/ngyn</licenseUrl>
+    <projectUrl>http://configit.github.io/ngyn/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>ngyn is a collection of modules and directives initially extracted from a large scale, entity-centric, configuration management application created by Configit Software.</description>
+    <copyright>Copyright 2013 Configit A/S</copyright>
+    <tags>AngularJS ngyn routing</tags>
+  </metadata>
+  <files>
+    <file src="dist\*.js" target="content\Scripts\ngyn" />
+  </files>
+</package>
