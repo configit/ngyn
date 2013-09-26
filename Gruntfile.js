@@ -48,15 +48,21 @@ module.exports = function(grunt) {
       tasks: ['concat', 'jshint', 'karma:background:run']
     },
     karma: {
+      options: {
+        configFile: 'karma.conf.js'
+      },
       background: {
-        configFile: 'karma.conf.js',
         autoWatch: false,
         background: true
       },
       single: {
-        configFile: 'karma.conf.js',
         singleRun: true,
         autoWatch: false
+      },
+      teamcity: {
+        singleRun: true,
+        autoWatch: false,
+        reporters: 'teamcity'
       }
     },
     exec: {
@@ -66,18 +72,23 @@ module.exports = function(grunt) {
     }
   } );
 
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-karma');
-  grunt.loadNpmTasks('grunt-exec');
+  grunt.loadNpmTasks( 'grunt-contrib-jshint' );
+  grunt.loadNpmTasks( 'grunt-contrib-watch' );
+  grunt.loadNpmTasks( 'grunt-contrib-concat' );
+  grunt.loadNpmTasks( 'grunt-karma' );
+  grunt.loadNpmTasks( 'grunt-exec' );
 
-  grunt.registerTask('build', ['jshint', 'concat' ]);
-  grunt.registerTask('test', ['karma:single' ]);
-  grunt.registerTask('default', ['build', 'karma:single']);
-  grunt.registerTask('packages', 'Create nuget packags', function() {
+  // development tasks
+  grunt.registerTask( 'build', ['jshint', 'concat' ] );
+  grunt.registerTask( 'test', ['karma:single' ] );
+  grunt.registerTask( 'default', ['build', 'karma:single'] );
+
+  // build server tasks
+  grunt.registerTask( 'packages', 'Create nuget packags', function() {
     grunt.file.delete( 'packages-build', { force: true } );
     grunt.file.mkdir( 'packages-build' );
     grunt.task.run( 'exec:nuget' );
   } );
+  grunt.registerTask( 'teamcity.commit', ['build', 'karma:teamcity'] );
+  grunt.registerTask( 'teamcity.full', ['build', 'karma:teamcity', 'packages' ] );
 };

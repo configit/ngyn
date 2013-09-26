@@ -12,7 +12,8 @@
     "grunt-contrib-concat": "~0.3.0",
     "grunt-contrib-watch": "~0.5.2",
     "grunt-karma": "~0.6.1",
-    "grunt-exec": "~0.4.2"
+    "grunt-exec": "~0.4.2",
+    "karma-teamcity-reporter": "~0.1.0"
   },
   "engines": {
     "node": ">0.10.6"
