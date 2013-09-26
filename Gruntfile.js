@@ -1,12 +1,19 @@
 module.exports = function(grunt) {
   'use strict';
 
-  var pkg = grunt.file.readJSON('package.json');
+  var pkg = grunt.file.readJSON('package.json'),
+      major = grunt.option( 'Major') || '0',
+      minor = grunt.option( 'Minor' ) || '0',
+      revision = grunt.option( 'Revision' ) || '0',
+      semVersionSuffix = grunt.option( 'SemVerSuffix') || '-beta',
+      isDefaultBranch = grunt.option( 'is_default_branch' ) === 'true',
+      version = major + '.' + minor + '.' + revision,
+      semVersion = isDefaultBranch ? version : version + semVersionSuffix;
 
   function createConcatOptions( ) {
     var options = {
       options: {
-        banner: '/* VERSION: ' + pkg.version + ' */\n',
+        banner: '/* VERSION: ' + semVersion + ' */\n',
         separator: ';'
       },
       module: {
@@ -38,7 +45,7 @@ module.exports = function(grunt) {
     },
     watch: {
       files: ['<%= jshint.files %>'],
-      tasks: [/*'jshint',*/'concat', 'jshint', 'karma:background:run']
+      tasks: ['concat', 'jshint', 'karma:background:run']
     },
     karma: {
       background: {
@@ -51,15 +58,26 @@ module.exports = function(grunt) {
         singleRun: true,
         autoWatch: false
       }
+    },
+    exec: {
+      nuget: {
+        cmd: 'build\\nuget.exe pack ngyn.nuspec -outputdirectory packages-build -verbosity detailed -version ' + semVersion
+      }
     }
-  });
+  } );
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-karma');
+  grunt.loadNpmTasks('grunt-exec');
 
   grunt.registerTask('build', ['jshint', 'concat' ]);
   grunt.registerTask('test', ['karma:single' ]);
   grunt.registerTask('default', ['build', 'karma:single']);
+  grunt.registerTask('packages', 'Create nuget packags', function() {
+    grunt.file.delete( 'packages-build', { force: true } );
+    grunt.file.mkdir( 'packages-build' );
+    grunt.task.run( 'exec:nuget' );
+  } );
 };

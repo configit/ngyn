@@ -7,7 +7,6 @@
     <Major Condition="'$(Major)' == ''">0</Major>
     <Minor Condition="'$(Minor)' == ''">0</Minor>
     <Revision Condition="'$(Revision)' == ''">0</Revision>
-    <Version>$(Major).$(Minor).$(Revision).0</Version>
   </PropertyGroup>
 
   <Target Name="Build">
@@ -21,9 +20,9 @@
     <Exec Command="&quot;$(MSBuildProjectDirectory)\build-server-run-tests.bat&quot; $(KarmaArgs)"  />
     <Message Text="##teamcity[importData type='junit' path='$(MSBuildProjectDirectory)\test-results.xml']" />
   </Target>
-  
+
   <Target Name="BuildPackages">
-    <!-- 
+    <!--
       The properties below must be defined in a target because the build server supplies SemVerSuffix=;
       Which does not equate to '' when defined in the Project PropertyGroup (for reasons unknown)
     -->
@@ -31,7 +30,7 @@
       <SemVerSuffix Condition="'$(is_default_branch)' != 'true' And '$(SemVerSuffix)' == ''">-beta</SemVerSuffix>
       <SemVersion>$(Major).$(Minor).$(Revision)$(SemVerSuffix)</SemVersion>
     </PropertyGroup>
-  
+
     <Message Text="*********** BUILDING NUGET PACKAGES **************" Importance="High"/>
     <RemoveDir Directories="packages-build" />
     <MakeDir Directories="packages-build" />
