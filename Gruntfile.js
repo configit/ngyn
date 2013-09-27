@@ -1,14 +1,20 @@
 module.exports = function(grunt) {
   'use strict';
 
-  var pkg = grunt.file.readJSON('package.json'),
-      major = grunt.option( 'Major') || '0',
-      minor = grunt.option( 'Minor' ) || '0',
-      revision = grunt.option( 'Revision' ) || '0',
-      semVersionSuffix = grunt.option( 'SemVerSuffix') || '-beta',
-      isDefaultBranch = grunt.option( 'is_default_branch' ) === 'true',
+  var pkg = grunt.file.readJSON( 'package.json'),
+      teamcityPropsFile = grunt.option( 'teamcity.properties' ),
+      teamcityProps = ( teamcityPropsFile && grunt.file.readJSON( teamcityPropsFile ) ) || {},
+      major = option( 'Major', '0' ),
+      minor = option( 'Minor', '0' ),
+      revision = option( 'Revision', '0' ),
+      semVersionSuffix = option( 'SemVerSuffix', '-beta' ),
+      isDefaultBranch = option( 'is_default_branch', false ) === 'true',
       version = major + '.' + minor + '.' + revision,
       semVersion = isDefaultBranch ? version : version + semVersionSuffix;
+
+  function option( name, def ) {
+    return grunt.option( name ) || teamcityProps[ name ] || def;
+  };
 
   function createConcatOptions( ) {
     var options = {
