@@ -84,11 +84,18 @@ module.exports = function(grunt) {
   grunt.registerTask( 'default', ['build', 'karma:single'] );
 
   // build server tasks
+  grunt.registerTask( 'patch.karma-teamcity', function() {
+    // patch to teamcity.reporter
+    // -- from https://github.com/karma-runner/karma-teamcity-reporter/issues/5
+    grunt.file.copy( 'patches/karma-teamcity-reporter/index.js',
+                     'node_modules/karma-teamcity-reporter/index.js' );
+  } );
+
   grunt.registerTask( 'packages', 'Create nuget packags', function() {
     grunt.file.delete( 'packages-build', { force: true } );
     grunt.file.mkdir( 'packages-build' );
     grunt.task.run( 'exec:nuget' );
   } );
-  grunt.registerTask( 'teamcity.commit', ['build', 'karma:teamcity'] );
-  grunt.registerTask( 'teamcity.full', ['build', 'karma:teamcity', 'packages' ] );
+  grunt.registerTask( 'teamcity.commit', ['patch.karma-teamcity', 'build', 'karma:teamcity'] );
+  grunt.registerTask( 'teamcity.full', ['patch.karma-teamcity', 'build', 'karma:teamcity', 'packages' ] );
 };
