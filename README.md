@@ -18,12 +18,6 @@ Full documentation: http://configit.github.io/ngyn
 Todo a single build run
 
 ```bash
-build.bat
-```
-
-or
-
-```bash
 npm install
 node_modules/grunt-cli/bin/grunt
 ```
@@ -32,12 +26,6 @@ This will concat the `src/` files and copy them to the `dist/` folder.
 
 When developing it can be useful to auto build and run tests each time a file is
 modified. To start watching files run
-
-```bash
-watch.bat
-```
-
-or
 
 ```bash
 node_modules/grunt-cli/bin/grunt karma:background watch

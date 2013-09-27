@@ -1,6 +1,12 @@
 module.exports = function(grunt) {
   'use strict';
 
+  grunt.loadNpmTasks( 'grunt-contrib-jshint' );
+  grunt.loadNpmTasks( 'grunt-contrib-watch' );
+  grunt.loadNpmTasks( 'grunt-contrib-concat' );
+  grunt.loadNpmTasks( 'grunt-karma' );
+  grunt.loadNpmTasks( 'grunt-exec' );
+
   var pkg = grunt.file.readJSON( 'package.json'),
       teamcityPropsFile = grunt.option( 'teamcity.properties' ),
       teamcityProps = ( teamcityPropsFile && grunt.file.readJSON( teamcityPropsFile ) ) || {},
@@ -78,16 +84,15 @@ module.exports = function(grunt) {
     }
   } );
 
-  grunt.loadNpmTasks( 'grunt-contrib-jshint' );
-  grunt.loadNpmTasks( 'grunt-contrib-watch' );
-  grunt.loadNpmTasks( 'grunt-contrib-concat' );
-  grunt.loadNpmTasks( 'grunt-karma' );
-  grunt.loadNpmTasks( 'grunt-exec' );
-
   // development tasks
   grunt.registerTask( 'build', ['jshint', 'concat' ] );
   grunt.registerTask( 'test', ['karma:single' ] );
   grunt.registerTask( 'default', ['build', 'karma:single'] );
+  grunt.registerTask( 'packages', 'Create nuget packags', function() {
+    grunt.file.delete( 'packages-build', { force: true } );
+    grunt.file.mkdir( 'packages-build' );
+    grunt.task.run( 'exec:nuget' );
+  } );
 
   // build server tasks
   grunt.registerTask( 'patch.karma-teamcity', function() {
@@ -95,12 +100,6 @@ module.exports = function(grunt) {
     // -- from https://github.com/karma-runner/karma-teamcity-reporter/issues/5
     grunt.file.copy( 'patches/karma-teamcity-reporter/index.js',
                      'node_modules/karma-teamcity-reporter/index.js' );
-  } );
-
-  grunt.registerTask( 'packages', 'Create nuget packags', function() {
-    grunt.file.delete( 'packages-build', { force: true } );
-    grunt.file.mkdir( 'packages-build' );
-    grunt.task.run( 'exec:nuget' );
   } );
   grunt.registerTask( 'teamcity.commit', ['patch.karma-teamcity', 'build', 'karma:teamcity'] );
   grunt.registerTask( 'teamcity.full', ['patch.karma-teamcity', 'build', 'karma:teamcity', 'packages' ] );
