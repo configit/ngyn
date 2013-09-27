@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html ng-app="app">
 <head>
+  <title>Ngyn Examples: Timespan Picker</title>
   <script src="../libs/angular.js"></script>
-  <script src="../src/ngyn-ui-timespan-picker.js"></script>
+  <script src="../src/ui-timespan-picker/ui-timespan-picker.js"></script>
   <script>
-    angular.module( 'app', ['ngyn-ui-timespan-picker'] ).controller( 'TestController', function( $scope ) {
+    angular.module( 'app', ['ngynTimespanPicker'] ).controller( 'TestController', function( $scope ) {
       $scope.timespan1 = 86400;
       $scope.timespan2 = 86400;
       $scope.timespan3 = 0;
@@ -28,6 +29,5 @@
   
   <h3>Auto-units - (null) Timespan 4 = {{ timespan4 }} seconds</h3>
   <ngyn-timespan-picker ng-model="timespan4"></ngyn-timespan-picker>
-  
 </body>
 </html>
