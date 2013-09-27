@@ -3,7 +3,7 @@ describe( 'timespan-picker', function() {
 
   var element, scope;
 
-  beforeEach( module( 'ngyn-ui-timespan-picker' ) );
+  beforeEach( module( 'ngynTimespanPicker' ) );
 
   beforeEach( function() {
     inject( function( $compile, $rootScope ) {
