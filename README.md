@@ -18,12 +18,6 @@ Full documentation: http://configit.github.io/ngyn
 Todo a single build run
 
 ```bash
-build.bat
-```
-
-or
-
-```bash
 npm install
 node_modules/grunt-cli/bin/grunt
 ```
@@ -34,15 +28,15 @@ When developing it can be useful to auto build and run tests each time a file is
 modified. To start watching files run
 
 ```bash
-watch.bat
-```
-
-or
-
-```bash
 node_modules/grunt-cli/bin/grunt karma:background watch
 ```
 
 This will start a [karma](http://karma-runner.github.io/0.10/index.html) process and watch for file changes.
 
+To create nuget package run
 
+```bash
+node_modules/grunt-cli/bin/grunt packages --Major=1 --Minor=2 --Revision=2381
+```
+
+this will create a `packages-build/ngyn-1.2.2381.nupkg` file
