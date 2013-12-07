@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Test</title>
   <script src="../libs/angular.js"></script>
-  <script src="../src/ngyn-ui-multi-picker.js"></script>
+  <script src="../dist/ngyn-ui-multi-picker.js"></script>
   <script type="text/javascript">
     angular.module('app', ['ngyn-ui-multi-picker'])
       .config(function() {
@@ -22,16 +22,21 @@
           surname: 'Ballmer',
           title: 'Senior Microsoft Developer Entertainer',
           picture: 'images/Ballmer.jpg'
+        },
+        {
+          firstname: 'Scott',
+          surname: 'Guthrie',
+          title: 'The Gu',
+          picture: 'images/Scott.jpg'
         } ];
 
         $scope.selectedPeople = [];
       })
   </script>
-  <link rel="stylesheet" href="css/multi-picker.css">
 </head>
 <body>
   <div ng-controller="testController">
-    <ngyn-multi-picker options="person in availablePeople" ng-model="selectedPeople">
+    <ngyn-multi-picker options="person in availablePeople" on-search="changePeople" ng-model="selectedPeople">
       <picker-selection>
         {{ person.surname}}
       </picker-selection>
@@ -46,6 +51,11 @@
         </div>
       </picker-option>
     </ngyn-multi-picker>
+
+    <h3>Selected People</h3>
+    <ul>
+      <li ng-repeat="person in selectedPeople">{{ person.firstname }} {{ person.surname }}</li>
+    </ul>
   </div>
 </body>
 

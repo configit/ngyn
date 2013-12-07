@@ -10,3 +10,8 @@ p, .code {
   background-color:#eeeeee;
   border-radius: 3px;
 }
+
+input {
+  line-height:30px;
+  font-size:20px;
+}

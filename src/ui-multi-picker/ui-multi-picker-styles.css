@@ -1,3 +1,13 @@
+.ngyn-picker {
+  border-style: solid;
+  border-color: #BBBBBB;
+  display: inline-block;
+  cursor: text;"
+  vertical-align: top;
+  -moz-appearance:textfield;
+  -webkit-appearance: textfield;
+}
+
 .ngyn-picker-selection {
   padding-left: 4px;
   padding-right:2px;
