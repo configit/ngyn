@@ -1,8 +1,9 @@
 (function( angular ) {
   'use strict';
 
-  angular.module( 'ngyn-ui-multi-picker', [] ).directive('ngynMultiPicker', function($compile, $timeout, $document, $window) {
+  angular.module( 'ngyn-ui-multi-picker', ['ngyn-web-resources'] ).directive('ngynMultiPicker', function($compile, $timeout, $document, $window, WebResources) {
 
+    WebResources.attachCss('src/ui-multi-picker/ui-multi-picker-styles.css');
     setInitialStyles();
 
     function dasherize(str) {
@@ -52,13 +53,7 @@
         } );
       }
 
-      var classText = ".ngyn-picker { "+
-        "border-style: solid; "+
-        "border-color: #BBBBBB; "+
-        "display: inline-block; "+
-        "vertical-align: top; "+
-        "-moz-appearance:textfield; "+
-        "-webkit-appearance: textfield;";
+      var classText = ".ngyn-picker { ";
       angular.forEach(propKeys, function(propKey) {
         var fromKey = propKey === 'height' ? 'min-height' : propKey;
         classText += dasherize(fromKey) + ":" + iStyles[propKey] + ';';
@@ -73,22 +68,8 @@
       $document[0].documentElement.removeChild(i);
     }
 
-    var containerTemplateString = '<span class="ngyn-picker">' +
-                '  <span class="ngyn-picker-selection">' +
-                '    <span class="ngyn-picker-remove-selection">&times;</span>' +
-                '  </span>' +
-                '  <span class="ngyn-picker-placeholder" ' +
-                '    ng-show="!showInput" contenteditable >' +
-                'Add...'+
-                '  </span>' +
-                '  <span class="ngyn-picker-add-selection" '+
-                '   ng-show="showInput" contenteditable >' +
-                '  </span>' +
-                '</span>';
-    var menuTemplateString = '<div style="display:none" class="ngyn-picker-options">' +
-                '  <div class="ngyn-picker-option"></div>' +
-                '</div>';
-
+    var containerTemplateString = WebResources.files['src/ui-multi-picker/container-template.html'];
+    var menuTemplateString = WebResources.files['src/ui-multi-picker/menu-template.html'];
 
     return {
       restrict: 'E',
@@ -96,6 +77,7 @@
       replace: true,
       scope: true,
       compile: function(celm, cattrs, transclude) {
+
         var match = cattrs.options.match(/([^\W]*) in ([^$]*)/);
         var repeatableElement = match[1];
         var repeatableCollection = match[2];
@@ -107,13 +89,18 @@
         var selection = containerElement.children().eq( 0 );
         var placeholder = containerElement.children().eq( 1 );
         var input = containerElement.children().eq( 2 );
+        input.bind( 'keyup', inputTextChanged );
+        input.bind( 'keydown', inputTextChanging );
+        
         selection.attr( 'ng-repeat', repeatableElement + ' in ' + cattrs.ngModel );
+        var removeButton = selection.children().eq(0);
+        removeButton.attr( 'ng-click', 'removeSelection( ' + repeatableElement + ' ) ' );
         selection.prepend( selectionTemplate.html() );
 
         var menuElement = angular.element( menuTemplateString );
         var option = menuElement.children().eq(0);
-        option.attr( 'ng-repeat', repeatableElement + ' in ' + repeatableCollection);
-        optionTemplate.attr( 'ng-click', 'addSelection('+ repeatableElement +')' );
+        option.attr( 'ng-repeat', repeatableElement + ' in reducedOptions || availableCollectionElements' );
+        optionTemplate.attr( 'ng-click', 'addSelection( ' + repeatableElement + ' ) ' );
         option.prepend( optionTemplate );
 
         celm.replaceWith();
@@ -125,12 +112,126 @@
           menuElement[0].style.top = (containerElement[0].offsetTop + containerElement[0].offsetHeight ) + 'px';
         }
 
+        function inputTextChanging( ev ) {
+          if (ev.keyCode === 38 || ev.keyCode === 40 || ev.keyCode === 13) {
+            // cancel default behavior of up and down keys which moves caret to start and end
+            ev.preventDefault();
+          }
+          //var scope = angular.element( ev.target ).scope();
+          if (ev.keyCode === 9) {
+            // hide menu when user presses tab
+          }
+
+        }
+
+        function inputTextChanged ( ev ) {
+          var scope = angular.element( ev.target ).scope();
+          var c = scope.reducedOptions || scope.availableCollectionElements;
+          var val = ev.target.innerHTML;
+
+          scope.$apply(function() {
+            if (ev.keyCode === 38 && scope.selectedOptionIndex > -1 ) {
+              scope.selectedOptionIndex -= 1;
+              return;
+            }
+            if (ev.keyCode === 40 && scope.selectedOptionIndex < c.length-1 ) {
+              scope.selectedOptionIndex += 1;
+              return;
+            }
+
+            if (ev.keyCode === 13 && scope.selectedOptionIndex > -1) {
+
+              scope.addSelection(c[scope.selectedOptionIndex]);
+              if (scope.selectedOptionIndex === c.length-1) {
+                scope.selectedOptionIndex -= 1;
+              }
+              //scope.$apply();
+              // needed to cause the watch on model to retrigger
+              // but causes error in digest cycle
+            }
+
+            if (ev.keyCode === 8 && scope.availableCollectionElements.length && val.length === 0) {
+              var modelItems = scope.$eval(cattrs.ngModel);
+              scope.removeSelection( modelItems[modelItems.length-1] );
+            }
+
+            if ( !val ) {
+              scope.reducedOptions = null;
+              return;
+            }
+            scope.reducedOptions = [];
+
+            var findProperty = function( prop ) {
+              if ( found ) {
+                return;
+              }
+              if ( typeof(prop) === 'string' && prop[0] !== '$' && prop.search( new RegExp(val, 'i') ) >= 0 ) {
+                found = true;
+              }
+            };
+
+            for (var i = 0; i < scope.availableCollectionElements.length; i++) {
+              var found = false;
+              angular.forEach( scope.availableCollectionElements[i], findProperty );
+              if (found) {
+                scope.reducedOptions.push( scope.availableCollectionElements[i] );
+              }
+            }
+          } );
+        }
+
         return function link( scope, elm, attrs, model ) {
+
           scope.showInput = false;
+          scope.selectedOptionIndex = -1;
+          var originalCollection = scope.$eval ( repeatableCollection );
+          scope.availableCollectionElements = [];
+          
+          scope.$parent.$watch( cattrs.ngModel, function( modelItems, oldModelItems ) {
+            scope.availableCollectionElements.length = 0;
+            for ( var x = 0; x < originalCollection.length; x++ ) {
+              var selected = false;
+              for (var i = 0; i < modelItems.length; i++) {
+                if ( modelItems[i] === originalCollection[x] ) {
+                  selected = true;
+                  break;
+                }
+              }
+              if (!selected) {
+                scope.availableCollectionElements.push(originalCollection[x]);
+              }
+            }
+          }, true);
 
           scope.addSelection = function(s) {
             scope.$eval(cattrs.ngModel).push(s);
-            $timeout(reposition);
+            scope.reducedOptions = null;
+            $timeout(function() {
+              if (scope.availableCollectionElements.length) {
+                placeholder.triggerHandler('focus');
+              }
+              reposition();
+            } );
+          };
+
+          scope.removeSelection = function(s) {
+            var modelItems = scope.$eval(cattrs.ngModel);
+            for (var x = 0; x < modelItems.length; x++) {
+              if (modelItems[x] === s) {
+                modelItems.splice(x, 1);
+                $timeout(reposition);
+                break;
+              }
+            }
+          };
+
+          scope.focusAddSelection = function() {
+            if (!scope.availableCollectionElements.length)
+              return;
+
+            $timeout(function(){
+              placeholder.triggerHandler('focus');
+            });
           };
 
           containerElement.bind('click', function(ev) {
@@ -148,21 +249,10 @@
               // and made input visible. Therefore we force it visible immediately.
               input[0].style.display = 'inline-block';
               input[0].focus();
-              var selection = $window.getSelection();
-              var range = $document[0].createRange();
-              range.selectNodeContents( input[0] );
-              selection.removeAllRanges();
-              selection.addRange(range);
             } );
           });
 
-          input.bind('keydown', function(ev) {
-            if (ev.keyCode === 13) {
-              ev.preventDefault();
-            }
-          });
-
-          htmlElement.bind('click', function() {
+          scope.hideMenu = function() {
             // Remove menu when any element is clicked
             // Note: the element itself has a click handler which catches
             // the event so it doesn't closed when itself it clicked
@@ -172,7 +262,9 @@
               input.html( '' );
               scope.showInput = false;
             } );
-          });
+          };
+
+          htmlElement.bind('click', scope.hideMenu);
         };
       }
     };

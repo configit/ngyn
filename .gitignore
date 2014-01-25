@@ -1,6 +1,7 @@
 /node_modules
 /test-results.xml
 /npm-debug.log
+/tmp
 /dist
 /packages-build
 /packages

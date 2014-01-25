@@ -6,6 +6,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks( 'grunt-contrib-concat' );
   grunt.loadNpmTasks( 'grunt-karma' );
   grunt.loadNpmTasks( 'grunt-exec' );
+  grunt.loadTasks( 'build/tasks' );
 
   var pkg = grunt.file.readJSON( 'package.json'),
       teamcityPropsFile = grunt.option( 'teamcity.properties' ),
@@ -20,9 +21,9 @@ module.exports = function(grunt) {
 
   function option( name, def ) {
     return grunt.option( name ) || teamcityProps[ name ] || def;
-  };
+  }
 
-  function createConcatOptions( ) {
+  function createConcatOptions() {
     var options = {
       options: {
         banner: '/* VERSION: ' + semVersion + ' */\n',
@@ -39,7 +40,7 @@ module.exports = function(grunt) {
         if ( !subdir ) return;
 
         options[subdir] = {
-          src: [rootdir + '/' + subdir + '/**/*.js'],
+          src: [rootdir + '/' + subdir + '/**/*.js', 'tmp/' + subdir + '-resources.js'],
           dest: 'dist/' + pkg.name + '-' + subdir + '.js'
         };
       } );
@@ -57,7 +58,7 @@ module.exports = function(grunt) {
     },
     watch: {
       files: ['<%= jshint.files %>'],
-      tasks: ['concat', 'jshint', 'karma:background:run']
+      tasks: ['ngynWebResources', 'concat', 'jshint', 'karma:background:run']
     },
     karma: {
       options: {
@@ -81,14 +82,24 @@ module.exports = function(grunt) {
       nuget: {
         cmd: 'build\\nuget.exe pack ngyn.nuspec -outputdirectory packages-build -verbosity detailed -version ' + semVersion
       }
+    },
+    ngynWebResources: {
+      options: {
+        module: 'ngyn-web-resources',
+        service: 'WebResources'
+      },
+      all: {
+        src: ['src/ui-multi-picker/*.css', 'src/ui-multi-picker/*.html'],
+        dest: 'tmp/ui-multi-picker-resources.js'
+      }
     }
   } );
 
   // development tasks
-  grunt.registerTask( 'build', ['jshint', 'concat' ] );
+  grunt.registerTask( 'build', ['jshint', 'ngynWebResources', 'concat' ] );
   grunt.registerTask( 'test', ['karma:single' ] );
   grunt.registerTask( 'default', ['build', 'karma:single'] );
-  grunt.registerTask( 'packages', 'Create nuget packags', function() {
+  grunt.registerTask( 'packages', 'Create nuget packages', function() {
     grunt.file.delete( 'packages-build', { force: true } );
     grunt.file.mkdir( 'packages-build' );
     grunt.task.run( 'exec:nuget' );
