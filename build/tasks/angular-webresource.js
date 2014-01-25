@@ -30,6 +30,7 @@ module.exports = function(grunt) {
         } else {
         var contents = grunt.file.read(src)
           .replace(new RegExp('\r\n', 'g'), '\\r\\n')
+          .replace(new RegExp('\n', 'g'), '\\n')
           .replace(/'/g, "\\'");
         }
         result += "  this.files['" + src + "'] = '" + contents + "';\r\n";
