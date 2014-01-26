@@ -94,6 +94,10 @@
 
           if ( elm.is( 'input' ) ) {
             options.multiple = angular.isDefined( attrs.multiple );
+          } else {
+            options.placeholderOption = function() {
+              return elm.find('option[value="?"]'); 
+            }
           }
 
           angular.extend( options, scope.$eval( attrs.ngynSelect2 ) );

@@ -73,6 +73,10 @@
   <p>select2 value and data: <span class="code" id="selectInfoLabel5"></span></p>
   <div><button ng-click="setPickerToPavarottiAndCarrera(0)">Set to Pavarotti and Carrera</button> <button ng-click="clearNames(0)">Clear</button></div>
   <hr>
+
+  <h3>Unmatched option</h3>
+  <select id="input6" ng-model="colorPickers[8]" ng-options="c.name for c in colors" ngyn-select2>
+  </select>
   
   <p><i>jQuery val() results are calculated every second</i></p>
 
