@@ -78,13 +78,13 @@ describe( 'ngyn select2', function() {
       } );
     } );
 
-    xit( 'should observe the disabled attribute', function() {
-      var element = compile( '<select ngyn-select2 ng-model="foo" ng-disabled="disabled"></select>' );
-      expect( element.siblings().hasClass( 'select2-container-disabled' ) ).toBe( false );
+    it( 'should observe the disabled attribute', function() {
+      var element = compile( '<div><select ngyn-select2 ng-model="foo" ng-disabled="disabled"></select></div>' );
+      expect( element.find( '.select2-container' ).hasClass( 'select2-container-disabled' ) ).toBe( false );
       scope.$apply( 'disabled = true' );
-      expect( element.siblings().hasClass( 'select2-container-disabled' ) ).toBe( true );
+      expect( element.find( '.select2-container' ).hasClass( 'select2-container-disabled' ) ).toBe( true );
       scope.$apply( 'disabled = false' );
-      expect( element.siblings().hasClass( 'select2-container-disabled' ) ).toBe( false );
+      expect( element.find( '.select2-container' ).hasClass( 'select2-container-disabled' ) ).toBe( false );
     } );
 
     xit( 'should observe the multiple attribute', function() {
