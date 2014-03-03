@@ -64,6 +64,10 @@
             return angular.isArray( originalValues ) ? results : results[0];
           };
 
+          attrs.$observe( 'disabled', function( value ) {
+            elm.select2( 'enable', !value );
+          } );
+
           if ( !elm.is( 'select' ) ) {
 
             /* Problem 3 */
