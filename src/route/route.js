@@ -301,14 +301,14 @@
 
           return resultPath + ( querystring.length ? '?' + querystring : '' );
         },
-        action: function( action, options ) {
-          return this.link( angular.extend( { action: action }, options ) );
+        action: function( action, options, persistSearch ) {
+          return this.link( angular.extend( { action: action }, options, persistSearch ? $location.search() : {} ) );
         },
-        gotoLink: function( options ) {
-          $location.url( this.link( options ) );
+        gotoLink: function( options, persistSearch ) {
+          $location.url( this.link( angular.extend( options, persistSearch ? $location.search() : {} ) ) );
         },
-        gotoAction: function( action, options ) {
-          $location.url( this.action( action, options ) );
+        gotoAction: function( action, options, persistSearch ) {
+          $location.url( this.action( action, options, persistSearch ) );
         }
       };
     }];
