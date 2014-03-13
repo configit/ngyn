@@ -3,17 +3,16 @@
   "version": "0.0.0",
   "description": "Karma and jasmine test runners for ngyn",
   "devDependencies": {
-    "karma-coffee-preprocessor": "~0.1.3",
-    "karma": "0.10.0",
+    "karma": "0.10.10",
     "phantomjs": "1.9.0-2",
-    "grunt": "~0.4.1",
-    "grunt-cli": "~0.1.9",
-    "grunt-contrib-jshint": "~0.6.0",
-    "grunt-contrib-concat": "~0.3.0",
-    "grunt-contrib-watch": "~0.5.2",
-    "grunt-karma": "~0.6.1",
-    "grunt-exec": "~0.4.2",
-    "karma-teamcity-reporter": "~0.1.0"
+    "grunt": "0.4.1",
+    "grunt-cli": "0.1.9",
+    "grunt-contrib-jshint": "0.6.5",
+    "grunt-contrib-concat": "0.3.0",
+    "grunt-contrib-watch": "0.5.3",
+    "grunt-karma": "0.6.2",
+    "grunt-exec": "0.4.2",
+    "karma-teamcity-reporter": "0.1.0"
   },
   "engines": {
     "node": ">0.10.6"
