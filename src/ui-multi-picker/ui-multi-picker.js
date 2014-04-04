@@ -8,25 +8,7 @@
     function dasherize(str) {
       return str.replace(/([A-Z])/g, function(v) { return '-' + angular.lowercase(v); } );
     }
-    function capitalize(str) {
-      return str.replace(/^([a-z])/, function(v) { return angular.uppercase(v); } );
-    }
-
-    function offset( elem ) {
-      /*jshint loopfunc: true */
-      var totalOffset = { top:0, left:0 };
-      do {
-        angular.forEach(['top', 'left'], function(dimension) {
-          var dimensionValue = elem['offset'+ capitalize(dimension)];
-          if ( !isNaN( dimensionValue ) ) {
-            totalOffset[dimension] += dimensionValue;
-          }
-        } );
-      } while( elem = elem.offsetParent );
-      /*jshint loopfunc: false */
-      return totalOffset;
-    }
-
+    
     function setInitialStyles() {
       // create an initial input element and hide it to get the props from
       var i = $document[0].createElement('input');

@@ -101,7 +101,7 @@
           } else {
             options.placeholderOption = function() {
               return elm.find('option[value="?"]'); 
-            }
+            };
           }
 
           angular.extend( options, scope.$eval( attrs.ngynSelect2 ) );

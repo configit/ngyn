@@ -355,4 +355,46 @@
     } );
   });
 
+  describe('inheritence', function() {
+    beforeEach(function() {
+      module( function( ngynRouteProvider ) {
+        ngynRouteProvider.scope( {}, function() {
+          this.scope( { routeTransform: function( r ) { r.foo = 1; } } , function () {
+            this.resource( { name: 'Categories', routeTransform: function( r ) { r.bar = 2; } }, function() {
+              this.resource( { name: 'Products', routeTransform: function( r ) { r.baz = 3; } } );
+            } );
+          } );
+        } );
+      } );
+    });
+
+    it( 'should inherit routeTransforms from parents', inject( function( $route ) {
+      var routesArray = toArrayOfValues( $route.routes );
+
+      var categoriesIndexRoute = routesArray.filter( function( r ) { 
+        return r.name ==='Categories' && r.action === 'index';
+      } )[0];
+
+      expect( categoriesIndexRoute.foo ).toEqual( 1 );
+      expect( categoriesIndexRoute.bar ).toEqual( 2 );
+      expect( categoriesIndexRoute.baz ).toBeUndefined();
+    } ) );
+
+    it( 'should not inherit a routeTransform defined below it', inject( function( $route ) {
+      var routesArray = toArrayOfValues( $route.routes );
+
+      var productsIndexRoute = routesArray.filter( function( r ) { 
+        return r.name ==='Products' && r.action === 'index';
+      } )[0];
+
+      expect( productsIndexRoute.foo ).toEqual( 1 );
+      expect( productsIndexRoute.bar ).toEqual( 2 );
+      expect( productsIndexRoute.baz ).toEqual( 3 );
+    } ) );
+  } );
+
+  function toArrayOfValues( obj ) {
+    return Object.keys( obj ).map( function( key ) { return obj[key]; } );
+  }
+
 } );

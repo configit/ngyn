@@ -28,7 +28,7 @@
       replace( /%3A/gi, ':' ).
       replace( /%24/g, '$' ).
       replace( /%2C/gi, ',' ).
-      replace( ( pctEncodeSpaces ? null : /%20/g ), '+' );
+      replace(( pctEncodeSpaces ? null : /%20/g ), '+' );
   };
 
   var RouteContext = function( routeProvider ) {
@@ -77,6 +77,12 @@
       routeContext.scopeParent = this;
 
       routeContext.options = angular.extend( {}, this.options, options );
+      routeContext.options.routeTransforms = angular.copy( this.options ? this.options.routeTransforms : [] );
+
+      if ( options.routeTransform ) {
+        routeContext.options.routeTransforms.push( options.routeTransform );
+        delete options.routeTransform;
+      }
 
       var resource = routeContext.options;
       var actions = resource.actions || routeProvider.defaultActions;
@@ -130,8 +136,10 @@
           controllerPath: controllerPath
         };
 
-        if ( resource.routeTransform ) {
-          resource.routeTransform( routeProperties );
+        if ( resource.routeTransforms.length ) {
+          angular.forEach( resource.routeTransforms, function( transformer ) {
+            transformer( routeProperties );
+          } );
         }
 
         routeProvider.$routeProvider.when( routePath + action.key, routeProperties );
@@ -164,8 +172,13 @@
 
     this.scope = function( options, scopedObject ) {
       var scopeContext = new RouteContext( routeProvider );
-      scopeContext.options = options;
-      angular.extend( scopeContext.options, this.options );
+      scopeContext.options = angular.extend( {}, options, this.options );
+      scopeContext.options.routeTransforms = angular.copy( this.options ? this.options.routeTransforms : [] );
+
+      if ( options.routeTransform ) {
+        scopeContext.options.routeTransforms.push( options.routeTransform );
+        delete options.routeTransform;
+      }
 
       scopedObject.call( scopeContext );
       return scopeContext;
@@ -194,13 +207,28 @@
         options = { name: options };
 
       var routeContext = new RouteContext( this );
+
+      options.routeTransforms = [];
+      if ( options.routeTransform ) {
+        options.routeTransforms.push( options.routeTransform );
+        delete options.routeTransform;
+      }
+
       routeContext.resource( options, scopedObject );
       return routeContext;
     };
 
     this.scope = function( options, scopedObject ) {
+
       var routeContext = new RouteContext( this );
       routeContext.options = angular.extend( {}, options, this.options );
+
+      routeContext.options.routeTransforms = [];
+
+      if ( options.routeTransform ) {
+        routeContext.options.routeTransforms.push( options.routeTransform );
+        delete options.routeTransform;
+      }
 
       scopedObject.call( routeContext );
       return routeContext;
