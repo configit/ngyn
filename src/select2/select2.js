@@ -32,6 +32,22 @@
             match = optionsExp.match( NG_OPTIONS_REGEXP );
             valuesFn = $parse( match[7] );
           }
+          
+          // keep class of the select2 in sync with the underlying select
+          var oldClass = '';
+          scope.$watch( function() {
+            var container = elm.select2( 'container' );
+            var newClass = elm.attr( 'class' );
+            if ( newClass !== oldClass ) {
+              angular.forEach( oldClass.split( ' ' ), function( c ) {
+                container.removeClass( c );
+              } );
+              angular.forEach( newClass.split( ' ' ), function( c ) {
+                container.addClass( c );
+              } );
+              oldClass = newClass;
+            }
+          } );
 
           var createDefaultResultParser = function() {
             var key = attrs.keyPath || 'id';
