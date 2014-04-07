@@ -20,7 +20,7 @@ module.exports = function(grunt) {
 
   function option( name, def ) {
     return grunt.option( name ) || teamcityProps[ name ] || def;
-  };
+  }
 
   function createConcatOptions( ) {
     var options = {
@@ -85,15 +85,15 @@ module.exports = function(grunt) {
   } );
 
   // development tasks
-  grunt.registerTask( 'build', ['jshint', 'concat' ] );
-  grunt.registerTask( 'test', ['karma:single' ] );
+  grunt.registerTask( 'build', [ 'jshint', 'concat' ] );
+  grunt.registerTask( 'test', [ 'karma:single' ] );
   grunt.registerTask( 'default', ['build', 'karma:single'] );
   grunt.registerTask( 'packages', 'Create nuget packags', function() {
     grunt.file.delete( 'packages-build', { force: true } );
     grunt.file.mkdir( 'packages-build' );
     grunt.task.run( 'exec:nuget' );
   } );
-
+  
   // build server tasks
   grunt.registerTask( 'patch.karma-teamcity', function() {
     // patch to teamcity.reporter
