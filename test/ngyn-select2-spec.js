@@ -87,13 +87,43 @@ describe( 'ngyn select2', function() {
       expect( element.find( '.select2-container' ).hasClass( 'select2-container-disabled' ) ).toBe( false );
     } );
 
+    it( 'should observe the required attribute and allow clear for non-required', function() {
+      var element = compile( '<div><select ngyn-select2 ng-model="foo" ng-required="required"></select></div>' );
+      expect( element.find( '.select2-container' ).hasClass( 'select2-allowclear' ) ).toBe( true );
+      expect( element.find( '.select2-container' ).hasClass( 'ng-valid-required' ) ).toBe( true );
+      scope.$apply( 'required = true' );
+      expect( element.find( '.select2-container' ).hasClass( 'select2-allowclear' ) ).toBe( false );
+      expect( element.find( '.select2-container' ).hasClass( 'ng-valid-required' ) ).toBe( false );
+      scope.$apply( 'foo = 1' );
+      expect( element.find( '.select2-container' ).hasClass( 'ng-valid-required' ) ).toBe( true );  
+      scope.$apply( 'foo = undefined;required = false' );
+      expect( element.find( '.select2-container' ).hasClass( 'ng-valid-required' ) ).toBe( true );
+
+    } );
+
+    /* 
+     * ngyn-select2 does not support dynamically choosing single/multiple
+     * programatically
+     */
     xit( 'should observe the multiple attribute', function() {
-      var element = compile( '<div><select ngyn-select2 ng-model="foo" ng-multiple="multiple"></select></div>' )( scope );
+      var element = compile( '<div><select ngyn-select2 ng-model="foo" ng-multiple="multiple"></select></div>' );
       expect( element.siblings().hasClass( 'select2-container-multi' ) ).toBe( false );
       scope.$apply( 'multiple = true' );
       expect( element.siblings().hasClass( 'select2-container-multi' ) ).toBe( true );
       scope.$apply( 'multiple = false' );
       expect( element.siblings().hasClass( 'select2-container-multi' ) ).toBe( false );
+    } );
+
+    it (' should sync classes between select and select2', function() {
+      var element = compile( '<div><select ngyn-select2 ng-model="foo"></select></div>' );
+      scope.$apply( element.find('select').addClass('my-class') );
+      expect( element.find('select').select2('container').hasClass('my-class') ).toBe( true );
+    } );
+
+    it (' should not sync select2- classes between select and select2', function() {
+      var element = compile( '<div><select ngyn-select2 ng-model="foo"></select></div>' );
+      scope.$apply( element.find('select').addClass('select2-offscreen') );
+      expect( element.find('select').select2('container').hasClass('select2-offscreen') ).toBe( false );
     } );
   } );
 

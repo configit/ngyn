@@ -43,7 +43,9 @@
                 container.removeClass( c );
               } );
               angular.forEach( newClass.split( ' ' ), function( c ) {
-                container.addClass( c );
+                if ( c.substring(0, 8) !== "select2-" ) {
+                  container.addClass( c );
+                }
               } );
               oldClass = newClass;
             }
@@ -84,6 +86,30 @@
             elm.select2( 'enable', !value );
           } );
 
+          attrs.$observe( 'required', function( required ) {
+            var select2Data = elm.data( 'select2' );
+            var placeholderCurrentlySelected =  !elm.select2( 'val' );
+
+            if ( select2Data ) {
+              select2Data.opts.allowClear = !required;
+            }
+            
+            var container = elm.select2( 'container' );
+            var isCurrentlyRequired = !container.hasClass( 'select2-allowclear' );
+            
+            if ( !placeholderCurrentlySelected ) {
+              if ( isCurrentlyRequired && !required ) {
+                container.addClass( 'select2-allowclear' );
+              }
+              else if ( !isCurrentlyRequired && required ) {
+                container.removeClass( 'select2-allowclear' );
+              }
+            }
+            else {
+              container.removeClass( 'select2-allowclear' );
+            }
+          } );
+          
           if ( !elm.is( 'select' ) ) {
 
             /* Problem 3 */
@@ -116,7 +142,7 @@
             options.multiple = angular.isDefined( attrs.multiple );
           } else {
             options.placeholderOption = function() {
-              return elm.find('option[value="?"]'); 
+              return elm.find('option[value=""],option[value="?"]'); 
             };
           }
 

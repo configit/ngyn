@@ -7,7 +7,7 @@
     "karma-jasmine": "0.1.5",
     "karma-phantomjs-launcher" : "0.1.4",
     "karma-teamcity-reporter": "0.1.1",
-    "phantomjs": "1.9.7-3",
+    "phantomjs": "1.9.7-8",
     "grunt": "0.4.4",
     "grunt-cli": "0.1.13",
     "grunt-contrib-jshint": "0.10.0",
