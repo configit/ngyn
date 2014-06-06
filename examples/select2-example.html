@@ -77,6 +77,14 @@
   <h3>Unmatched option</h3>
   <select id="input6" ng-model="colorPickers[8]" ng-options="c.name for c in colors" ngyn-select2>
   </select>
+
+  <hr>
+
+  <h3>Required</h3>
+  <form name="required-test-form">
+    <select id="input7" name="input7" ng-model="colorPickers[9]" ng-options="c.name for c in colors" ngyn-select2 ng-required="true"></select>
+    <div>model is valid? {{ isInput7Valid() }}</div>
+  </form>
   
   <p><i>jQuery val() results are calculated every second</i></p>
 

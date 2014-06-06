@@ -74,6 +74,10 @@ angular.module('app', ['ngynSelect2', 'ngynSelectKey']).controller('TestControll
       return name.first + name.last;
     }
   }
+
+  $scope.isInput7Valid = function() {
+    return $('#input7').controller('form').input7.$valid;
+  }
     
   window.setTimeout(function() {
     $scope.$apply(function() {
