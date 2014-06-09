@@ -23,6 +23,17 @@ module.exports = function(config) {
 
     ],
 
+    preprocessors: {
+      'dist/**/*.js': ['coverage']
+    },
+
+    coverageReporter: {
+      reporters: [
+        { type: 'html' },
+        { type: 'teamcity' }
+      ]
+    },
+
     // test results reporter to use
     // possible values: 'dots', 'progress', 'junit'
     reporters : ['dots'],

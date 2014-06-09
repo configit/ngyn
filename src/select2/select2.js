@@ -14,175 +14,178 @@
       priority: '150', // must be higher priority than ngyn-select-key
       restrict: 'A',
 
-      compile: function( originalElement ) {
-        var placeholderText,
-            placeholderOption = originalElement.find( 'option[value=""]' );
+      link: function link( scope, elm, attrs, ngModelController ) {
+        var NG_OPTIONS_REGEXP = /^\s*([\s\S]+?)(?:\s+as\s+([\s\S]+?))?(?:\s+group\s+by\s+([\s\S]+?))?\s+for\s+(?:([\$\w][\$\w]*)|(?:\(\s*([\$\w][\$\w]*)\s*,\s*([\$\w][\$\w]*)\s*\)))\s+in\s+([\s\S]+?)(?:\s+track\s+by\s+([\s\S]+?))?$/;
+        var optionsExp = attrs.ngOptions,
+            match,
+            valuesFn,
+            isSelect = elm.is( 'select ');
 
-        if ( placeholderOption.length > 0 ) {
-          placeholderText = placeholderOption.text();
-          placeholderOption.text( '' );
+        if ( optionsExp ) {
+          match = optionsExp.match( NG_OPTIONS_REGEXP );
+          valuesFn = $parse( match[7] );
+        }
+        
+        var options = {};
+        
+        if ( !isSelect ) {
+          options.multiple = angular.isDefined( attrs.multiple );
+        }
+        else {
+          options.placeholderOption = function() {
+            return elm.find( 'option[value=""],option[value="?"]' );
+          };
         }
 
-        return function link( scope, elm, attrs, ngModelController ) {
-          var NG_OPTIONS_REGEXP = /^\s*([\s\S]+?)(?:\s+as\s+([\s\S]+?))?(?:\s+group\s+by\s+([\s\S]+?))?\s+for\s+(?:([\$\w][\$\w]*)|(?:\(\s*([\$\w][\$\w]*)\s*,\s*([\$\w][\$\w]*)\s*\)))\s+in\s+([\s\S]+?)(?:\s+track\s+by\s+([\s\S]+?))?$/;
-          var optionsExp = attrs.ngOptions,
-              match,
-              valuesFn;
-          if ( optionsExp ) {
-            match = optionsExp.match( NG_OPTIONS_REGEXP );
-            valuesFn = $parse( match[7] );
+        var oldClass = '';
+        var oldPlaceholderText = '';
+        scope.$watch( function() {
+          // keep class of the select2 in sync with the underlying select
+          var container = elm.select2( 'container' );
+          var currentClass = elm.attr( 'class' );
+          if ( currentClass !== oldClass ) {
+            angular.forEach( oldClass.split( ' ' ), function( c ) {
+              container.removeClass( c );
+            } );
+            angular.forEach( currentClass.split( ' ' ), function( c ) {
+              if ( c.substring( 0, 8 ) !== "select2-" ) {
+                container.addClass( c );
+              }
+            } );
+            oldClass = currentClass;
           }
           
-          // keep class of the select2 in sync with the underlying select
-          var oldClass = '';
-          scope.$watch( function() {
-            var container = elm.select2( 'container' );
-            var newClass = elm.attr( 'class' );
-            if ( newClass !== oldClass ) {
-              angular.forEach( oldClass.split( ' ' ), function( c ) {
-                container.removeClass( c );
-              } );
-              angular.forEach( newClass.split( ' ' ), function( c ) {
-                if ( c.substring(0, 8) !== "select2-" ) {
-                  container.addClass( c );
-                }
-              } );
-              oldClass = newClass;
+          // keep placeholder text in sync if it's currently visible
+          if ( isSelect && !elm.select2( 'val' ) ) {
+            var currentPlaceholderText = options.placeholderOption().text();
+            if ( currentPlaceholderText !== oldPlaceholderText ) {
+              // update the select2 generated span which holds the placeholder text
+              elm.select2('container').find( '.select2-chosen' ).text( currentPlaceholderText );
             }
-          } );
+            oldPlaceholderText = currentPlaceholderText;
+          }
+        } );
 
-          var createDefaultResultParser = function() {
-            var key = attrs.keyPath || 'id';
-            var display = attrs.displayPath || 'text';
-            var keyParser = $parse( key );
-            var displayParser = $parse( display );
-            return function( result ) {
-              return {
-                id: keyParser( result ),
-                text: displayParser( result )
-              };
+        var createDefaultResultParser = function() {
+          var key = attrs.keyPath || 'id';
+          var display = attrs.displayPath || 'text';
+          var keyParser = $parse( key );
+          var displayParser = $parse( display );
+          return function( result ) {
+            return {
+              id: keyParser( result ),
+              text: displayParser( result )
             };
           };
+        };
 
-          var parseResult = angular.isDefined( attrs.customRendering ) ?
-            function( result ) { return result; } :
-            createDefaultResultParser();
+        var parseResult = angular.isDefined( attrs.customRendering ) ?
+          function( result ) { return result; } :
+          createDefaultResultParser();
 
-          var parseResults = function( originalValues ) {
-            if ( !originalValues ) {
-              return originalValues;
-            }
+        var parseResults = function( originalValues ) {
+          if ( !originalValues ) {
+            return originalValues;
+          }
 
-            var values = angular.isArray( originalValues ) ? originalValues : [originalValues];
+          var values = angular.isArray( originalValues ) ? originalValues : [originalValues];
 
-            var results = [];
-            angular.forEach( values, function( r ) {
-              results.push( parseResult( r ) );
-            } );
-            return angular.isArray( originalValues ) ? results : results[0];
-          };
-
-          attrs.$observe( 'disabled', function( value ) {
-            elm.select2( 'enable', !value );
+          var results = [];
+          angular.forEach( values, function( r ) {
+            results.push( parseResult( r ) );
           } );
+          return angular.isArray( originalValues ) ? results : results[0];
+        };
 
-          attrs.$observe( 'required', function( required ) {
-            var select2Data = elm.data( 'select2' );
-            var placeholderCurrentlySelected =  !elm.select2( 'val' );
+        function updateDisabled( disabled ) {
+          elm.select2( 'enable', !disabled );
+        }
 
-            if ( select2Data ) {
-              select2Data.opts.allowClear = !required;
+        function updateRequired( required ) {
+          var select2Data = elm.data( 'select2' );
+          var placeholderCurrentlySelected = !elm.select2( 'val' );
+
+          if ( select2Data ) {
+            select2Data.opts.allowClear = !required;
+          }
+
+          var container = elm.select2( 'container' );
+          var isCurrentlyRequired = !container.hasClass( 'select2-allowclear' );
+
+          if ( !placeholderCurrentlySelected ) {
+            if ( isCurrentlyRequired && !required ) {
+              container.addClass( 'select2-allowclear' );
             }
-            
-            var container = elm.select2( 'container' );
-            var isCurrentlyRequired = !container.hasClass( 'select2-allowclear' );
-            
-            if ( !placeholderCurrentlySelected ) {
-              if ( isCurrentlyRequired && !required ) {
-                container.addClass( 'select2-allowclear' );
-              }
-              else if ( !isCurrentlyRequired && required ) {
-                container.removeClass( 'select2-allowclear' );
-              }
-            }
-            else {
+            else if ( !isCurrentlyRequired && required ) {
               container.removeClass( 'select2-allowclear' );
             }
+          }
+          else {
+            container.removeClass( 'select2-allowclear' );
+          }
+        }
+
+        attrs.$observe( 'required', updateRequired );
+        attrs.$observe( 'disabled', updateDisabled );
+
+        if ( !isSelect ) {
+
+          /* Problem 3 */
+          ngModelController.$parsers.push( function() {
+            return elm.select2( 'data' );
           } );
-          
-          if ( !elm.is( 'select' ) ) {
 
-            /* Problem 3 */
-            ngModelController.$parsers.push( function() {
-              return elm.select2( 'data' );
+          /* Problem 4 */
+          ngModelController.$formatters.push( function( newval ) {
+            elm.select2( 'data', parseResults( newval ) );
+            return newval;
+          } );
+
+          /* Problem 2 */
+          elm.on( 'change', function( e ) {
+            scope.$apply( function() {
+              ngModelController.$setViewValue( e.val );
             } );
+          } );
+        }
 
-            /* Problem 4 */
-            ngModelController.$formatters.push( function( newval ) {
-              elm.select2( 'data', parseResults( newval ) );
-              return newval;
-            } );
+        angular.extend( options, scope.$eval( attrs.ngynSelect2 ) );
 
-            /* Problem 2 */
-            elm.on( 'change', function( e ) {
-              scope.$apply( function() {
-                ngModelController.$setViewValue( e.val );
-              } );
-            } );
-          }
-
-          // initialize the select2
-          var options = {};
-
-          if ( placeholderText ) {
-            options.placeholder = placeholderText;
-          }
-
-          if ( elm.is( 'input' ) ) {
-            options.multiple = angular.isDefined( attrs.multiple );
-          } else {
-            options.placeholderOption = function() {
-              return elm.find('option[value=""],option[value="?"]'); 
-            };
-          }
-
-          angular.extend( options, scope.$eval( attrs.ngynSelect2 ) );
-
+        if ( isSelect ) {
           /* Problem 1 */
           /*
           * watch the model and the collection to ensure select2 is kept in sync with
           * the underlying select
           */
+          scope.$watch( attrs.ngModel, function() {
+            elm.select2( 'val', elm.val() );
+          } );
 
-          if ( elm.is( 'select' ) ) {
-            scope.$watch( attrs.ngModel, function() {
-              elm.select2( 'val', elm.val() );
-            } );
-
-            if ( valuesFn ) {
-              // watch the collection; re-evaluating it's reresentation and state every $digest
-              scope.$watch( function() { return valuesFn( scope ); }, function( collection ) {
-                if ( !collection || !collection.length ) {
-                  return;
-                }
-                $timeout( function() {
-                  elm.select2( 'val', elm.val() );
-                } );
-              }, true );
-            }
-
+          if ( valuesFn ) {
+            // watch the collection; re-evaluating it's reresentation and state every $digest
+            scope.$watch( function() { return valuesFn( scope ); }, function( collection ) {
+              if ( !collection || !collection.length ) {
+                return;
+              }
+              $timeout( function() {
+                elm.select2( 'val', elm.val() );
+              } );
+            }, true );
           }
 
-          // running in a $timeout yields significant performance improvements
-          // we do however ensure the apply phase is skipped by setting the 3rd arg to false
-          // this also incidentally avoids the dom being corrupted during linking
-          $timeout( function() {
-            elm.select2( options );
-            if ( !elm.is( 'select' ) ) {
-              elm.select2( 'data', parseResults( ngModelController.$modelValue ) );
-            }
-          }, 0, false );
-        };
+        }
+
+        // running in a $timeout yields significant performance improvements
+        // we do however ensure the apply phase is skipped by setting the 3rd arg to false
+        // this also incidentally avoids the dom being corrupted during linking
+        $timeout( function() {
+          elm.select2( options );
+          if ( !isSelect ) {
+            elm.select2( 'data', parseResults( ngModelController.$modelValue ) );
+          }
+          updateDisabled( attrs.disabled );
+          updateRequired( attrs.required );
+        }, 0, false );
       }
     };
   }] );
