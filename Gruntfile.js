@@ -1,5 +1,6 @@
 module.exports = function(grunt) {
   'use strict';
+  var fs = require('fs');
 
   grunt.loadNpmTasks( 'grunt-contrib-jshint' );
   grunt.loadNpmTasks( 'grunt-contrib-watch' );
@@ -74,7 +75,7 @@ module.exports = function(grunt) {
       teamcity: {
         singleRun: true,
         autoWatch: false,
-        reporters: 'teamcity'
+        reporters: 'teamcity,coverage'
       }
     },
     exec: {
@@ -88,10 +89,22 @@ module.exports = function(grunt) {
   grunt.registerTask( 'build', [ 'jshint', 'concat' ] );
   grunt.registerTask( 'test', [ 'karma:single' ] );
   grunt.registerTask( 'default', ['build', 'karma:single'] );
+
   grunt.registerTask( 'packages', 'Create nuget packags', function() {
     grunt.file.delete( 'packages-build', { force: true } );
     grunt.file.mkdir( 'packages-build' );
     grunt.task.run( 'exec:nuget' );
+  } );
+
+  grunt.registerTask('sanitizefoldername', 'Removes the browser specific information from the generated coverage folder name', function() {
+    fs.readdirSync( 'coverage').forEach( function( dir ) {
+      fs.renameSync( 'coverage/' + dir, 'coverage/phantom' );
+    } );
+  } );
+
+  grunt.registerTask('clean', 'Removes the old coverage folder', function() {
+    var rmdir = require('rimraf');
+    rmdir.sync('coverage/phantom', function(error){});
   } );
   
   // build server tasks
@@ -101,6 +114,6 @@ module.exports = function(grunt) {
     grunt.file.copy( 'patches/karma-teamcity-reporter/index.js',
                      'node_modules/karma-teamcity-reporter/index.js' );
   } );
-  grunt.registerTask( 'teamcity.commit', ['patch.karma-teamcity', 'build', 'karma:teamcity'] );
+  grunt.registerTask( 'teamcity.commit', ['clean', 'patch.karma-teamcity', 'build', 'karma:teamcity', 'sanitizefoldername'] );
   grunt.registerTask( 'teamcity.full', ['patch.karma-teamcity', 'build', 'karma:teamcity', 'packages' ] );
 };
