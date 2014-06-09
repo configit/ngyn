@@ -1,6 +1,6 @@
 /*
- * This suite of tests is taken from the angular-ui project as the directives
- * share some of the same requirements.
+ * A large part of this suite of tests is taken from the angular-ui project as the directives
+ * share most of the same requirements.
  */
 describe( 'ngyn select2', function() {
   'use strict';
@@ -78,7 +78,14 @@ describe( 'ngyn select2', function() {
       } );
     } );
 
-    it( 'should observe the disabled attribute', function() {
+    it( 'should follow the disabled attribute when it is set before select2 initializes', function() {
+      scope.disabled = true;
+      var element = compile( '<div><select ngyn-select2 ng-model="foo" ng-disabled="disabled"></select></div>' );
+      expect( element.find( '.select2-container' ).hasClass( 'select2-container-disabled' ) ).toBe( true );
+      expect( element.find( '.select2-container' ).hasClass( 'select2-container-disabled' ) ).toBe( true );
+    } );
+
+    it( 'should follow the disabled attribute when it is set after select2 initializes', function() {
       var element = compile( '<div><select ngyn-select2 ng-model="foo" ng-disabled="disabled"></select></div>' );
       expect( element.find( '.select2-container' ).hasClass( 'select2-container-disabled' ) ).toBe( false );
       scope.$apply( 'disabled = true' );
@@ -87,7 +94,22 @@ describe( 'ngyn select2', function() {
       expect( element.find( '.select2-container' ).hasClass( 'select2-container-disabled' ) ).toBe( false );
     } );
 
-    it( 'should observe the required attribute and allow clear for non-required', function() {
+    it( 'should follow the required attribute when it is set to true before select2 initializes', function() {
+      scope.required = true;
+      var element = compile( '<div><select ngyn-select2 ng-model="foo" ng-required="required"></select></div>' );
+      expect( element.find( '.select2-container' ).hasClass( 'select2-allowclear' ) ).toBe( false );
+      expect( element.find( '.select2-container' ).hasClass( 'ng-valid-required' ) ).toBe( false );
+    } );
+
+    it( 'should follow the required attribute when it is set to false before select2 initializes', function() {
+      scope.required = false;
+      var element = compile( '<div><select ngyn-select2 ng-model="foo" ng-required="required"></select></div>' );
+      expect( element.find( '.select2-container' ).hasClass( 'select2-allowclear' ) ).toBe( true );
+      expect( element.find( '.select2-container' ).hasClass( 'ng-valid-required' ) ).toBe( true );
+    } );
+
+
+    it( 'should follow the required attribute and allow clear for non-required', function() {
       var element = compile( '<div><select ngyn-select2 ng-model="foo" ng-required="required"></select></div>' );
       expect( element.find( '.select2-container' ).hasClass( 'select2-allowclear' ) ).toBe( true );
       expect( element.find( '.select2-container' ).hasClass( 'ng-valid-required' ) ).toBe( true );
@@ -98,7 +120,49 @@ describe( 'ngyn select2', function() {
       expect( element.find( '.select2-container' ).hasClass( 'ng-valid-required' ) ).toBe( true );  
       scope.$apply( 'foo = undefined;required = false' );
       expect( element.find( '.select2-container' ).hasClass( 'ng-valid-required' ) ).toBe( true );
+    } );
 
+    it( 'should handle a static placeholder correctly', function() {
+      var placeholderText = 'Select Something...';
+      scope.opts = [ { id: 1, name: 'test 1' }, { id: 2, name: 'test 2' } ];      
+      var element = compile( 
+        '<div><select ngyn-select2 ng-model="selected">' +
+          '<option value="">' + placeholderText + '</option>' +
+        '</select></div>' );
+
+      expect( element.find( 'select option' ).eq(0).text() ).toBe( placeholderText );
+    } );
+
+    it( 'should handle a dynamic placeholder correctly', function() {
+      scope.opts = [ { id: 1, name: 'test 1' }, { id: 2, name: 'test 2' } ];      
+      scope.entityName = 'Car';
+      var element = compile( 
+        '<div><select ngyn-select2 ng-model="selected">' +
+          '<option value="">Select {{ entityName }}...</option>' +
+        '</select></div>' );
+      expect( element.find( 'select option' ).text() ).toBe( 'Select Car...' );
+      expect( element.select2('container').find( '.select2-chosen' ).text() ).toBe( 'Select Car...' );
+
+      scope.$apply( function() { scope.entityName = 'Cat'; });
+      expect( element.find( 'select option' ).eq(0).text() ).toBe( 'Select Cat...' );
+      expect( element.select2('container').find( '.select2-chosen' ).text() ).toBe( 'Select Cat...' );
+    } );
+
+    it( 'should handle a dynamic placeholder correctly when switching away and back from the placeholder', function() {
+      scope.opts = [ { id: 1, name: 'test 1' }, { id: 2, name: 'test 2' } ];      
+      scope.entityName = 'Car';
+      scope.selected = scope.opts[0];
+      var element = compile( 
+        '<div><select ngyn-select2 ng-options="opt.name for opt in opts" ng-model="selected">' +
+          '<option value="">Select {{ entityName }}...</option>' +
+        '</select></div>' );
+
+      // ensure the placeholder is not currently selected
+      expect( element.find('select').select2( 'val' ) ).toBeTruthy();
+
+      scope.$apply( function() { scope.entityName = 'Cat'; scope.selected = null; });
+      expect( element.find( 'select option' ).eq(0).text() ).toBe( 'Select Cat...' );
+      expect( element.select2('container').find( '.select2-chosen' ).text() ).toBe( 'Select Cat...' );
     } );
 
     /* 
