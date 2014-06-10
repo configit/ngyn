@@ -126,7 +126,7 @@ describe( 'ngyn select2', function() {
       var placeholderText = 'Select Something...';
       scope.opts = [ { id: 1, name: 'test 1' }, { id: 2, name: 'test 2' } ];      
       var element = compile( 
-        '<div><select ngyn-select2 ng-model="selected">' +
+        '<div><select ngyn-select2 ng-model="selected" ng-options="opt.name for opt in opts">' +
           '<option value="">' + placeholderText + '</option>' +
         '</select></div>' );
 
@@ -137,10 +137,10 @@ describe( 'ngyn select2', function() {
       scope.opts = [ { id: 1, name: 'test 1' }, { id: 2, name: 'test 2' } ];      
       scope.entityName = 'Car';
       var element = compile( 
-        '<div><select ngyn-select2 ng-model="selected">' +
+        '<div><select ngyn-select2 ng-model="selected" ng-options="opt.name for opt in opts">' +
           '<option value="">Select {{ entityName }}...</option>' +
         '</select></div>' );
-      expect( element.find( 'select option' ).text() ).toBe( 'Select Car...' );
+      expect( element.find( 'select option' ).eq(0).text() ).toBe( 'Select Car...' );
       expect( element.select2('container').find( '.select2-chosen' ).text() ).toBe( 'Select Car...' );
 
       scope.$apply( function() { scope.entityName = 'Cat'; });
@@ -163,6 +163,19 @@ describe( 'ngyn select2', function() {
       scope.$apply( function() { scope.entityName = 'Cat'; scope.selected = null; });
       expect( element.find( 'select option' ).eq(0).text() ).toBe( 'Select Cat...' );
       expect( element.select2('container').find( '.select2-chosen' ).text() ).toBe( 'Select Cat...' );
+    } );
+
+    it( 'should handle a dynamic placeholder correctly for a multi select', function() {
+      scope.opts = [ { id: 1, name: 'test 1' }, { id: 2, name: 'test 2' } ];      
+      scope.entityName = 'Car';
+      var element = compile( 
+        '<div><select ngyn-select2 ng-model="selected" ng-options="opt.name for opt in opts" multiple>' +
+          '<option value="">Select {{ entityName }}...</option>' +
+        '</select></div>' );
+      expect( element.select2('container').find( 'input.select2-default' ).val() ).toBe( 'Select Car...' );
+
+      scope.$apply( function() { scope.entityName = 'Cat'; });
+      expect( element.select2('container').find( 'input.select2-default' ).val() ).toBe( 'Select Cat...' );
     } );
 
     /* 
