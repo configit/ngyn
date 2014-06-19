@@ -8,7 +8,7 @@
   *
   * <input type="hidden" ngyn-select2="options" ng-model="selection" multiple custom-rendering class="span11" ></input>
   */
-  angular.module( 'ngynSelect2', [] ).directive( 'ngynSelect2', ['$parse', '$timeout', function( $parse, $timeout ) {
+  angular.module( 'ngynSelect2', [] ).directive( 'ngynSelect2', ['$parse', '$interpolate', '$timeout', function( $parse, $interpolate, $timeout ) {
     return {
       require: '?ngModel',
       priority: '150', // must be higher priority than ngyn-select-key
@@ -19,15 +19,16 @@
         var optionsExp = attrs.ngOptions,
             match,
             valuesFn,
-            isSelect = elm.is( 'select ');
+            isSelect = elm.is( 'select ' ),
+            originalPlaceholderText;
 
         if ( optionsExp ) {
           match = optionsExp.match( NG_OPTIONS_REGEXP );
           valuesFn = $parse( match[7] );
         }
-        
+
         var options = {};
-        
+
         if ( !isSelect ) {
           options.multiple = angular.isDefined( attrs.multiple );
         }
@@ -35,6 +36,7 @@
           options.placeholderOption = function() {
             return elm.find( 'option[value=""],option[value="?"]' );
           };
+          originalPlaceholderText = options.placeholderOption().text();
         }
 
         var oldClass = '';
@@ -43,6 +45,7 @@
           // keep class of the select2 in sync with the underlying select
           var container = elm.select2( 'container' );
           var currentClass = elm.attr( 'class' );
+          var select2initialized = select2initialized || !!elm.data( 'select2' );
           if ( currentClass !== oldClass ) {
             angular.forEach( oldClass.split( ' ' ), function( c ) {
               container.removeClass( c );
@@ -54,15 +57,28 @@
             } );
             oldClass = currentClass;
           }
-          
+
           // keep placeholder text in sync if it's currently visible
-          if ( isSelect && !elm.select2( 'val' ) ) {
-            var currentPlaceholderText = options.placeholderOption().text();
-            if ( currentPlaceholderText !== oldPlaceholderText ) {
-              // update the select2 generated span which holds the placeholder text
-              elm.select2('container').find( '.select2-chosen' ).text( currentPlaceholderText );
+          if ( isSelect ) {
+            var placeholderVisible = !elm.select2( 'val' ) || elm.select2( 'val' ).length === 0;
+            // if it's a multi-select and it has been initialized
+            if ( attrs.multiple && select2initialized ) {
+              elm.data( 'select2' ).opts.placeholder = $interpolate( originalPlaceholderText )( scope );
+              // if the placeholder is currently visible, update it
+              if ( placeholderVisible ) {
+                elm.select2( 'container' ).find( 'input.select2-default' ).val( $interpolate( originalPlaceholderText )( scope ) );
+              }
             }
-            oldPlaceholderText = currentPlaceholderText;
+            else if ( select2initialized ) {
+              var currentPlaceholderText = options.placeholderOption().text();
+              if ( currentPlaceholderText !== oldPlaceholderText ) {
+                // update the select2 generated span which holds the placeholder text
+                if ( placeholderVisible ) {
+                  elm.select2( 'container' ).find( '.select2-chosen' ).text( currentPlaceholderText );
+                }
+              }
+              oldPlaceholderText = currentPlaceholderText;
+            }
           }
         } );
 
@@ -103,7 +119,7 @@
 
         function updateRequired( required ) {
           var select2Data = elm.data( 'select2' );
-          var placeholderCurrentlySelected = !elm.select2( 'val' );
+          var placeholderCurrentlySelected = ( !elm.select2( 'val' ) || elm.select2( 'val' ).length === 0 );
 
           if ( select2Data ) {
             select2Data.opts.allowClear = !required;
