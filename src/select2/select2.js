@@ -4,7 +4,7 @@
   * Applies the jQuery-based select2 to the selected element
   *
   * If a custom-rendering attribute is specified the default object structure is not used (id and text properties expected)
-  * in favour of using the item itself. This is useful when used with input elements where full responsiblity is taken for querying and formatting results.
+  * in favour of using the item itself. This is useful when used with input elements where full responsibility is taken for querying and formatting results.
   *
   * <input type="hidden" ngyn-select2="options" ng-model="selection" multiple custom-rendering class="span11" ></input>
   */
@@ -178,7 +178,7 @@
           } );
 
           if ( valuesFn ) {
-            // watch the collection; re-evaluating it's reresentation and state every $digest
+            // watch the collection; re-evaluating its representation and state every $digest
             scope.$watch( function() { return valuesFn( scope ); }, function( collection ) {
               if ( !collection || !collection.length ) {
                 return;
