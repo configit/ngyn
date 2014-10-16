@@ -10,10 +10,8 @@ configuration management application created by [Configit Software](http://www.c
 
 These components typically help reduce some of the inevitable boilerplate code which creeps into larger applications.
 
-# Modules
-
 <a id="resourceful_routing"></a>
-## Resourceful Routing
+# Resourceful Routing
 
 Angular provides a simple, robust routing component. This is fine for applications serving entirely arbitrary routes or for applications with very few routes. As an application grows though, especially one with a large number of entities, it's likely that you'll find yourself looking to either manage a large number of routes or searching for one, or a number of special *magic routes* to help with this.
 
@@ -96,28 +94,30 @@ Besides `action` the functions also take the following parameters
 
 ---
 <a id="ngresource_extensions"></a>
-## ngResource Extensions
-### JavaScript
+# ngResource Extensions
+#### JavaScript
 ```javascript
 // !! May be deprecated when angular 1.2 brings advanced interceptors
 ```
 ---
 
 <a id="select_extensions"></a>
-## Select Extensions
+# Select Extensions
 
-The AngularJS select directive lacks the capability to select an existing option based on anything other than referential equality. The `ngynSelectKey` module extends select with the capability to specify how items should be compared. This makes it trivial to match an item in the select list with a value being returned, for example from a query.
+*NOTE: In later versions of angular this is implemented natively as `track by` ([see docs](https://docs.angularjs.org/api/ng/directive/ngRepeat))*
+
+The AngularJS the `select` directive lacks the capability to choose an existing option based on anything other than referential equality. The `ngynSelectKey` module extends select with the capability to specify how items should be compared. This makes it trivial to match an item in the select list with a value being returned, for example from a query.
 
 Usage is simple, just supply a value within a `key` attribute, this will typically be a property name but it can be anything which will resolve using `$scope.$eval()`, such as a function on each attribute.
 
-### HTML
+#### HTML
 ```html
 <select ng-model="user.role" 
         ng-options="r.name for r in user.availableRoles" 
         key="id">
 </select>
 ```
-### JavaScript
+#### JavaScript
 ```javascript
   $scope.user = {};
   $scope.user.role = { id: 1, name: 'Administrator' };
@@ -125,6 +125,49 @@ Usage is simple, just supply a value within a `key` attribute, this will typical
 ```
 
 See the **select-key-example** in the [examples](https://github.com/configit/ngyn/tree/master/examples) folder for more information.
+
+---
+
+<a id="server_connection"></a>
+# Server Connection
+
+Server Connection represents a technology agnostic persistent connection to the web server.
+
+### ServerConnection factory
+You use the ServerConnection factory to create a new instance of a ServerConnection, specifying the location of the remote endpoint and wiring up event receivers. Once you have an instance of ServerConnection you can trigger server methods directly on it.
+
+#### Example
+```javascript
+// Create an instance
+var carsServerConnection = ServerConnection('carsEndpoint');
+
+// Connect to the server and supply callbacks
+carsServerConnection.connect( 
+  $scope, 
+  {
+    carAdded: function( car ) { $scope.cars.push( car ); },
+    carExploded: function( car ) { throw Error( car.reg + ' exploded' ) }
+  }
+).done(
+  // done fires immediately after connect returns and is the correct place to put
+  // code which relies on the underlying connection - exposed as server - being available
+  function() {
+    carsServerConnection.server.getCars().then( function( cars ) {
+      $scope.$apply( function() {
+        $scope.cars = cars;
+      }
+    });
+  }
+);
+```
+
+### Benefits
+The primary benefit Server Connection provides is automatic connection management. We want our connection to be open whilst any controller bound to the currently visible DOM is requesting it, and closed when this is no longer the case. When you first call `connect`, you provide the current scope. The Server Connection is bound to this scope and will instigate a cleanup when this scope is disposed. If all scopes which require a Server Connection are disposed, the connection is closed.
+
+If you call `connect` whilst a connection is already open the method will return immediately and any code registered in the `done` callback will fire.
+
+### SignalR ServerConnectionBackend factory
+To allow Server Connection to be technology agnostic and to aid in testing, the actual transport mechanism used is pluggable. Currently the only implemention available is against SignalR. In this configuration the string passed into `connect` is the name of the server hub
 
 # Directives
 
@@ -135,7 +178,7 @@ Applies the jQuery [Select2 plugin](http://ivaynberg.github.io/select2/) to an a
 
 See the **select2-example** in the [examples](https://github.com/configit/ngyn/tree/master/examples) folder for more information and a demonstration of it's capabilities.
 
-### html
+#### html
 ```html
 <select nygn-select2="optionalSelect2options" options="f.name for f in friends">
   <option value="">Choose a friend</value>
