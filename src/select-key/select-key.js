@@ -42,7 +42,11 @@
             } );
           } );
           if ( mappedVals.length > 0 ) {
-            ngModelController.$modelValue = angular.isArray( modelValue ) ? mappedVals : mappedVals[0];
+            var value = angular.isArray( modelValue ) ? mappedVals : mappedVals[0];
+	        	
+	        	var modelGetter = $parse(attrs['ngModel']);
+	        	var modelSetter = modelGetter.assign;
+	        	modelSetter(scope, value);	  
           }
         }
 
