@@ -123,7 +123,7 @@
           var placeholderCurrentlySelected = ( !elm.select2( 'val' ) || elm.select2( 'val' ).length === 0 );
 
           if ( select2Data ) {
-            if ( isSelect && elm.find('option[value=""]').length) {
+            if ( isSelect && elm.find( 'option[value=""]' ).length ) {
               select2Data.opts.allowClear = !required;
             } else {
               select2Data.opts.allowClear = false;
