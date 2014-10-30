@@ -7,8 +7,8 @@ angular.module('app', ['ngynSelectKey']).controller('TestController', function($
 
   $scope.user = { name: 'Misko Hevery', role: {id:2, name: 'Editor'} };
   $scope.advancedUser = { name: 'Igor Minar', roles: [
-    {id:1, name: 'Admin'},
-    {id:3, name:'Reviewer'}
+    {id:1, name: 'Admin', undefined_key_value: undefined },
+    {id:3, name:'Reviewer', undefined_key_value: undefined }
   ] };
 
   $scope.pp = function(obj) {

@@ -36,6 +36,7 @@
           options.placeholderOption = function() {
             return elm.find( 'option[value=""],option[value="?"]' );
           };
+
           originalPlaceholderText = options.placeholderOption().text();
         }
 
@@ -122,7 +123,11 @@
           var placeholderCurrentlySelected = ( !elm.select2( 'val' ) || elm.select2( 'val' ).length === 0 );
 
           if ( select2Data ) {
-            select2Data.opts.allowClear = !required;
+            if ( isSelect && elm.find('option[value=""]').length) {
+              select2Data.opts.allowClear = !required;
+            } else {
+              select2Data.opts.allowClear = false;
+            }
           }
 
           var container = elm.select2( 'container' );
