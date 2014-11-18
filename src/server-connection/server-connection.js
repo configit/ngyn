@@ -1,4 +1,4 @@
-﻿angular.module( 'ngynServerConnection', [] )
+﻿angular.module( 'ngynServerConnection' )
   /**
    * A factory which creates a ServerConnection object that lets you interact with a realtime
    * server connection technology such as SignalR; this underlying technology is expected to be
@@ -16,7 +16,7 @@
    *    var myhub = new ServerConnection('MyHub');
    *    myHub.connect( scope, { onMyEvent: function( e ) { console.log( e ) } } )
    */
-  .factory( 'ServerConnection', function( ServerConnectionBackend, $log, $timeout ) {
+  .factory( 'ServerConnection', ["ServerConnectionBackend", "$log", "$timeout", function( ServerConnectionBackend, $log, $timeout ) {
     var reconnectTimeout = 5000; // amount of time to wait between losing the connection and reconnecting
     var openConnections = [];
     var connectionOpen = false;
@@ -35,6 +35,7 @@
     var ServerConnection = function( name ) {
       var self = this;
       var allListeners = {};
+      this.responseInterceptors = [];
 
       /**
        * Deregisters the intended connection for this instance.
@@ -48,12 +49,94 @@
             break;
           }
         };
+
         if ( isLastScopeListening ) {
           log( '[ServerConnection] all listeners unregistered, closing SignalR connection' );
           ServerConnectionBackend.stop();
           connectionOpen = false;
         }
       };
+
+      /**
+       * Rewrites response based on the registered response interceptors
+       */
+      function applyResponseInterceptors( hubName, methodName, args ) {
+        var newArgs = args;
+        angular.forEach( self.responseInterceptors, function( ri ) {
+          newArgs = ri( hubName, methodName, newArgs );
+        } );
+
+        return newArgs;
+      }
+
+      /**
+       * Returns a proxy object that wraps the server object
+       * to allow rewriting of the response
+       */
+      function createServerProxy( hubName, server ) {
+        var proxy = {};
+
+        function _addCallback( callbackArray, callback ) {
+          if ( !angular.isUndefined( callback ) ) {
+            callbackArray.push( callback );
+          }
+        };
+
+        angular.forEach( Object.keys( server ), function( fnName ) {
+          proxy[fnName] = function() {
+            var promise = {
+              _callbacks: {
+                done: [], fail: [], progress: []
+              },
+              then: function( fnDone, fnFail, fnProgress ) {
+                _addCallback( this._callbacks.done, fnDone );
+                _addCallback( this._callbacks.fail, fnFail );
+                _addCallback( this._callbacks.progress, fnProgress );
+                return this;
+              },
+              always: function( fnAlways ) {
+                this.then( fnAlways, fnAlways );
+                return this;
+              },
+              done: function( fnDone ) {
+                this.then( fnDone );
+                return this;
+              },
+              fail: function( fnFail ) {
+                this.then( undefined, fnFail );
+                return this;
+              },
+              progress: function( fnProgress ) {
+                this.then( undefined, undefined, fnProgress );
+                return this;
+              }
+            };
+
+            var serverPromise = server[fnName].apply( server, arguments );
+
+            function createResponseInterceptorWrapper( callbacks ) {
+              return function() {
+                var promiseArgs = applyResponseInterceptors( hubName, fnName, arguments );
+
+                angular.forEach( callbacks, function( handler ) {
+                  handler.apply( handler, promiseArgs );
+                } );
+              };
+            }
+
+            serverPromise
+              .then(
+                createResponseInterceptorWrapper( promise._callbacks.done ),
+                createResponseInterceptorWrapper( promise._callbacks.fail ),
+                createResponseInterceptorWrapper( promise._callbacks.progress )
+              );
+
+            return promise;
+          };
+        } );
+
+        return proxy;
+      }
 
       /**
        * Creates the server property on the instance and fires all done handlers.
@@ -67,7 +150,8 @@
             has a hub property which relates back to the original hub which requested it.
             We set the server property on that hub so clients can now talk to the server
           */
-          handler.hub.server = ServerConnectionBackend.server( handler.hubName );
+          var serverProxy = createServerProxy( handler.hubName, ServerConnectionBackend.server( handler.hubName ) );
+          handler.hub.server = serverProxy;
           handler.doneFn();
         } );
         doneHandlers.length = 0;
@@ -96,7 +180,7 @@
           false // do not invoke apply
         );
       } );
-      
+
       /**
        * Registers an intended connection for this instance.
        * If it is the first it opens the underlying connection.
@@ -121,12 +205,12 @@
           }
 
           log( '[ServerConnection] pushing on listener for ' + name + '.' + listenerKey );
-          
+
           // if the function wrapper is not already there, push it on
           if ( allListeners[listenerKey].length === 0 ) {
             ServerConnectionBackend.on( name, listenerKey, function() {
-              var args = arguments;
-              angular.forEach( allListeners[listenerKey], function ( scopeListener ) {
+              var args = applyResponseInterceptors( name, listenerKey, arguments );
+              angular.forEach( allListeners[listenerKey], function( scopeListener ) {
                 scopeListener.listener.apply( this, args );
               } );
             } );
@@ -191,4 +275,4 @@
       Instance.prototype = new ServerConnection( name );
       return new Instance();
     };
-  } );
+  }] );

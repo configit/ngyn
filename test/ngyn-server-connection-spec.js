@@ -272,5 +272,81 @@
       expect( ChatMessages.server.say.callCount ).toBe( 1 );
     } ) );
   } );
+  
+  ddescribe( 'Response interceptors', function() { 
+    beforeEach( function() { 
+      ChatMessages.responseInterceptors.push( function ( hubName, methodName, args ) { return [ { rewrittenObject: true } ] } ); } 
+    );
+  
+    it( 'should unbox typed return values from SignalR', inject( function( $rootScope ) {
+      var scope = $rootScope.$new();
+      backend.addServerMethods( 'ChatMessages', { getAll: function() { return { $type: 'SomeClrType', $values: [ { text: 'Message1' }, { text: 'Message2' } ] }; } } );
 
+      var response;
+      ChatMessages.connect( scope ).done( function() {
+        ChatMessages.server.getAll().then( function( messages ) { response = messages; } );
+
+        backend.flush();
+
+        expect( response.rewrittenObject ).toBeDefined();
+      } );
+
+      backend.completeConnection();
+    } ) ) ;
+    
+    it( 'should unbox typed return values from SignalR using done', inject( function( $rootScope ) {
+      var scope = $rootScope.$new();
+      backend.addServerMethods( 'ChatMessages', { getAll: function() { return { $type: 'SomeClrType', $values: [ { text: 'Message1' }, { text: 'Message2' } ] }; } } );
+
+      var response;
+      ChatMessages.connect( scope ).done( function() {
+        ChatMessages.server.getAll().done( function( messages ) { response = messages; } );
+
+        backend.flush();
+
+        expect( response.rewrittenObject ).toBeDefined();
+      } );
+
+      backend.completeConnection();
+    } ) ) ;
+    
+    it( 'should call all chained methods', inject( function( $rootScope ) {
+      var scope = $rootScope.$new();
+      backend.addServerMethods( 'ChatMessages', { getAll: function() { return { $type: 'SomeClrType', $values: [ { text: 'Message1' }, { text: 'Message2' } ] }; } } );
+
+      var response, response2;
+      ChatMessages.connect( scope ).done( function() {
+        ChatMessages.server.getAll()
+          .then( function( messages ) { response = messages; } )
+          .then( function( messages ) { response2 = messages; } );
+
+        backend.flush();
+
+        expect( response.rewrittenObject ).toBeDefined();
+        expect( response2.rewrittenObject ).toBeDefined();
+      } );
+
+      backend.completeConnection();
+    } ) ) ;
+  } );
+  
+  ddescribe( 'Default Response interceptors', function() { 
+    it ( 'the built in jsonNetStipper formatter should work', inject ( function ( $rootScope, defaultResponseInterceptors ) {
+      ChatMessages.responseInterceptors.push( defaultResponseInterceptors.jsonNetStripper );
+      
+      var scope = $rootScope.$new();
+      backend.addServerMethods( 'ChatMessages', { getAll: function() { return { $type: 'SomeClrType', $values: [ { text: 'Message1' }, { text: 'Message2' } ] }; } } );
+      
+      var response;
+      ChatMessages.connect( scope ).done( function() {
+        ChatMessages.server.getAll().done( function( messages ) { response = messages; } );
+
+        backend.flush();
+
+        expect( angular.isArray( response ) ).toBe( true );
+      } );
+
+      backend.completeConnection();
+    } ) );
+  } );
 } );
