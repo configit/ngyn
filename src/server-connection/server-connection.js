@@ -82,6 +82,10 @@
           }
         };
 
+        if ( !server ) {
+          return proxy;
+        }
+
         angular.forEach( Object.keys( server ), function( fnName ) {
           proxy[fnName] = function() {
             var promise = {

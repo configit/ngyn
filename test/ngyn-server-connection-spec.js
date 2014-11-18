@@ -224,9 +224,9 @@
 
       ChatMessages.connect( scope ).done( function() {
         ChatMessages.server.say( 'hello' );
-        expect( ChatMessages.server.say.callCount ).toBe( 1 );
+        expect( backend.server( 'ChatMessages' ).say.callCount ).toBe( 1 );
         ChatMessages.server.say( 'world' );
-        expect( ChatMessages.server.say.callCount ).toBe( 2 );
+        expect( backend.server( 'ChatMessages' ).say.callCount ).toBe( 2 );
       } );
 
       backend.completeConnection();
@@ -269,18 +269,19 @@
       backend.completeConnection();
 
       ChatMessages.server.say( 'hello' );
-      expect( ChatMessages.server.say.callCount ).toBe( 1 );
+      expect( backend.server( 'ChatMessages' ).say.callCount ).toBe( 1 );
     } ) );
   } );
-  
-  ddescribe( 'Response interceptors', function() { 
-    beforeEach( function() { 
-      ChatMessages.responseInterceptors.push( function ( hubName, methodName, args ) { return [ { rewrittenObject: true } ] } ); } 
+
+  describe( 'Response interceptors', function() {
+    beforeEach( function() {
+      ChatMessages.responseInterceptors.push( function( hubName, methodName, args ) { return [{ rewrittenObject: true }] } );
+    }
     );
-  
+
     it( 'should unbox typed return values from SignalR', inject( function( $rootScope ) {
       var scope = $rootScope.$new();
-      backend.addServerMethods( 'ChatMessages', { getAll: function() { return { $type: 'SomeClrType', $values: [ { text: 'Message1' }, { text: 'Message2' } ] }; } } );
+      backend.addServerMethods( 'ChatMessages', { getAll: function() { return { $type: 'SomeClrType', $values: [{ text: 'Message1' }, { text: 'Message2' }] }; } } );
 
       var response;
       ChatMessages.connect( scope ).done( function() {
@@ -292,11 +293,11 @@
       } );
 
       backend.completeConnection();
-    } ) ) ;
-    
+    } ) );
+
     it( 'should unbox typed return values from SignalR using done', inject( function( $rootScope ) {
       var scope = $rootScope.$new();
-      backend.addServerMethods( 'ChatMessages', { getAll: function() { return { $type: 'SomeClrType', $values: [ { text: 'Message1' }, { text: 'Message2' } ] }; } } );
+      backend.addServerMethods( 'ChatMessages', { getAll: function() { return { $type: 'SomeClrType', $values: [{ text: 'Message1' }, { text: 'Message2' }] }; } } );
 
       var response;
       ChatMessages.connect( scope ).done( function() {
@@ -308,11 +309,11 @@
       } );
 
       backend.completeConnection();
-    } ) ) ;
-    
+    } ) );
+
     it( 'should call all chained methods', inject( function( $rootScope ) {
       var scope = $rootScope.$new();
-      backend.addServerMethods( 'ChatMessages', { getAll: function() { return { $type: 'SomeClrType', $values: [ { text: 'Message1' }, { text: 'Message2' } ] }; } } );
+      backend.addServerMethods( 'ChatMessages', { getAll: function() { return { $type: 'SomeClrType', $values: [{ text: 'Message1' }, { text: 'Message2' }] }; } } );
 
       var response, response2;
       ChatMessages.connect( scope ).done( function() {
@@ -327,16 +328,16 @@
       } );
 
       backend.completeConnection();
-    } ) ) ;
+    } ) );
   } );
-  
-  ddescribe( 'Default Response interceptors', function() { 
-    it ( 'the built in jsonNetStipper formatter should work', inject ( function ( $rootScope, defaultResponseInterceptors ) {
+
+  describe( 'Default Response interceptors', function() {
+    it( 'the built in jsonNetStipper formatter should work', inject( function( $rootScope, defaultResponseInterceptors ) {
       ChatMessages.responseInterceptors.push( defaultResponseInterceptors.jsonNetStripper );
-      
+
       var scope = $rootScope.$new();
-      backend.addServerMethods( 'ChatMessages', { getAll: function() { return { $type: 'SomeClrType', $values: [ { text: 'Message1' }, { text: 'Message2' } ] }; } } );
-      
+      backend.addServerMethods( 'ChatMessages', { getAll: function() { return { $type: 'SomeClrType', $values: [{ text: 'Message1' }, { text: 'Message2' }] }; } } );
+
       var response;
       ChatMessages.connect( scope ).done( function() {
         ChatMessages.server.getAll().done( function( messages ) { response = messages; } );
