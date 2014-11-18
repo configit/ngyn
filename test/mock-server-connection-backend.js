@@ -11,11 +11,11 @@
  * 
  * 
  */
-angular.module( 'ngynMocks', [] ).factory( 'ServerConnectionBackend', function( $q, $rootScope, $timeout ) {
-  return new ServerConnectionBackend( $q, $rootScope, $timeout );
+angular.module( 'ngynMocks', [] ).factory( 'ServerConnectionBackend', function( $rootScope, $timeout ) {
+  return new ServerConnectionBackend( $rootScope, $timeout );
 } );
 
-var ServerConnectionBackend = function( $q, $rootScope, $timeout ) {
+var ServerConnectionBackend = function( $rootScope, $timeout ) {
   var doneFns = [];
   var serverMethods = {};
   var clientMethods = {};
@@ -90,9 +90,9 @@ var ServerConnectionBackend = function( $q, $rootScope, $timeout ) {
       serverMethods[hubName][fnKey] = function() {
         var args = [].splice.call( arguments, 0 );
         serverMethods[hubName][fnKey].callCount++;
-        var defer = $q.defer();
+        var defer = jQuery.Deferred();
         pendingServerRequests.push( { defer: defer, fn: fn, args: args } );
-        return defer.promise;
+        return defer.promise();
       };
       serverMethods[hubName][fnKey].callCount = 0;
     } );
