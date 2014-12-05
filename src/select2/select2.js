@@ -185,9 +185,7 @@
           if ( valuesFn ) {
             // watch the collection; re-evaluating its representation and state every $digest
             scope.$watch( function() { return valuesFn( scope ); }, function( collection ) {
-              if ( !collection || !collection.length ) {
-                return;
-              }
+
               $timeout( function() {
                 elm.select2( 'val', elm.val() );
               } );
