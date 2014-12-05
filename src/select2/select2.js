@@ -185,7 +185,7 @@
           if ( valuesFn ) {
             // watch the collection; re-evaluating its representation and state every $digest
             scope.$watch( function() { return valuesFn( scope ); }, function( collection ) {
-              if ( !collection || !collection.length ) {
+              if ( !collection || collection.length === 0 || angular.equals(collection, {}) ) {
                 return;
               }
               $timeout( function() {
