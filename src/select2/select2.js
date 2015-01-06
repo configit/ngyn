@@ -115,7 +115,7 @@
         };
 
         function updateDisabled( disabled ) {
-          elm.select2( 'enable', !disabled );
+          elm.select2( disabled ? 'disable' : 'enable' );
         }
 
         function updateRequired( required ) {
