@@ -109,9 +109,9 @@
           ( routeContext.scopeParent.options || { name: '' } ).name || '',
         parentPath = ( path + parentName ) ? trail( path + parentName, '/' ) : '',
         aliasedParentPath = ( path + aliasedParentName ) ? trail( path + aliasedParentName, '/' ) : '',
-        parentParam = !parentName ? '' : ( ':' + ( routeContext.scopeParent.options || { name: '' } ).name + '_id/' ),
+        parentParam = !parentName ? '' : ( ':' + ( routeContext.scopeParent.options || { name: '' } ).name.replace( '-', '_' ) + '_id/' ),
         resourcePath = parentPath + resource.name + '/',
-        resourceParam = ':' + angular.lowercase( resource.name ) + '_id/',
+        resourceParam = ':' + angular.lowercase( resource.name ).replace( '-', '_' ) + '_id/',
         viewLocation = angular.lowercase( trail( routeProvider.appRoot, '/' ) + resourcePath + ( action.alias || action.key ) + '.html' ),
         routeWithoutKey = angular.lowercase( aliasedParentPath + parentParam + ( angular.isDefined( resource.urlAlias ) ? resource.urlAlias : resource.name ) + '/' ).replace( '//', '/' );
 
