@@ -102,7 +102,7 @@
       expect( $location.path() ).toEqual( '/products/index' );
     } );
   } );
-
+  
   // note that products/missing is not technically incorrect as missing will become the :id parameter.
   it( 'should not serve route to missing action', function() {
     module( function( ngynRouteProvider ) {
@@ -272,7 +272,24 @@
         ) ).toMatch( 'theatres/1/screens/3/details' );
     } );
   } );
+  
+  it( 'should handle parameters on routes with hyphens', function() {
+    module( function( ngynRouteProvider ) {
+      ngynRouteProvider.resource( { name: 'Theatres' }, function() {
+        this.resource( { name: 'Theatre-Screen' } );
+      } );
+    } );
 
+    inject( function( $route, $httpBackend, $location, $rootScope, ngynRoute ) {
+      $httpBackend.whenGET( /.+/ ).respond();
+      $location.path( '/theatres/1/theatre-screen/' );
+      $rootScope.$digest();	  
+      expect( ngynRoute.link(
+          { action: 'details', theatres_id: 1, 'theatre_screen_id': 3 }
+        ) ).toMatch( 'theatres/1/theatre-screen/3/details' );
+    } );
+  } );
+    
   it( 'should route to complex nested controller/action path', function() {
     module( function( $routeProvider, ngynRouteProvider ) {
       $routeProvider.when( '/', { template: 'test' } );
