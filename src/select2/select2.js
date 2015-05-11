@@ -188,7 +188,7 @@
 
               $timeout( function() {
                 elm.select2( 'val', elm.val() );
-              } );
+              }, 0, false );
             }, true );
           }
 
