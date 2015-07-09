@@ -102,7 +102,7 @@
       expect( $location.path() ).toEqual( '/products/index' );
     } );
   } );
-  
+
   // note that products/missing is not technically incorrect as missing will become the :id parameter.
   it( 'should not serve route to missing action', function() {
     module( function( ngynRouteProvider ) {
@@ -272,7 +272,7 @@
         ) ).toMatch( 'theatres/1/screens/3/details' );
     } );
   } );
-  
+
   it( 'should handle parameters on routes with hyphens', function() {
     module( function( ngynRouteProvider ) {
       ngynRouteProvider.resource( { name: 'Theatres' }, function() {
@@ -283,13 +283,13 @@
     inject( function( $route, $httpBackend, $location, $rootScope, ngynRoute ) {
       $httpBackend.whenGET( /.+/ ).respond();
       $location.path( '/theatres/1/theatre-screen/' );
-      $rootScope.$digest();	  
+      $rootScope.$digest();
       expect( ngynRoute.link(
           { action: 'details', theatres_id: 1, 'theatre_screen_id': 3 }
         ) ).toMatch( 'theatres/1/theatre-screen/3/details' );
     } );
   } );
-    
+
   it( 'should route to complex nested controller/action path', function() {
     module( function( $routeProvider, ngynRouteProvider ) {
       $routeProvider.when( '/', { template: 'test' } );
@@ -372,6 +372,19 @@
     } );
   });
 
+  it( 'should have a route label', function() {
+    module( function( ngynRouteProvider ) {
+      ngynRouteProvider.resource( { name: 'Products', label: 'Product Site' } );
+    } );
+
+    inject( function( $location, $route, $rootScope, $httpBackend ) {
+      $httpBackend.whenGET( /.+/ ).respond();
+      $location.path( '/p/index' );
+      $rootScope.$digest();
+      expect( $route.current.label ).toEqual( 'Product Site' );
+    } );
+  } );
+
   describe('inheritence', function() {
     beforeEach(function() {
       module( function( ngynRouteProvider ) {
@@ -388,7 +401,7 @@
     it( 'should inherit routeTransforms from parents', inject( function( $route ) {
       var routesArray = toArrayOfValues( $route.routes );
 
-      var categoriesIndexRoute = routesArray.filter( function( r ) { 
+      var categoriesIndexRoute = routesArray.filter( function( r ) {
         return r.name ==='Categories' && r.action === 'index';
       } )[0];
 
@@ -400,7 +413,7 @@
     it( 'should not inherit a routeTransform defined below it', inject( function( $route ) {
       var routesArray = toArrayOfValues( $route.routes );
 
-      var productsIndexRoute = routesArray.filter( function( r ) { 
+      var productsIndexRoute = routesArray.filter( function( r ) {
         return r.name ==='Products' && r.action === 'index';
       } )[0];
 

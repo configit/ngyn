@@ -123,6 +123,7 @@
 
         var routeProperties = {
           name: resource.name,
+		  label: resource.label,
           templateUrl: viewLocation,
           reloadOnSearch: angular.isDefined( resource.reloadOnSearch ) ? resource.reloadOnSearch : true,
           layoutUrl: resource.layoutUrl,
