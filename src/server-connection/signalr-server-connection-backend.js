@@ -1,4 +1,4 @@
-﻿angular.module( 'ngynServerConnection' )
+﻿angular.module( 'ngynSignalRServerConnectionBackend', [] )
   /**
    * The service circumvents the intended behaviour of SignalR with regards to client side methods. 
    * (http://stackoverflow.com/a/15074002/187157)
