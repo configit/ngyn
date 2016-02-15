@@ -36,7 +36,7 @@
           options.placeholderOption = function() {
             return elm.find( 'option[value=""],option[value="?"]' );
           };
-
+          
           originalPlaceholderText = options.placeholderOption().text();
         }
 
@@ -66,7 +66,7 @@
             if ( attrs.multiple && select2initialized ) {
               elm.data( 'select2' ).opts.placeholder = $interpolate( originalPlaceholderText )( scope );
               // if the placeholder is currently visible, update it
-              if ( placeholderVisible ) {
+              if ( placeholderVisible && originalPlaceholderText ) {
                 elm.select2( 'container' ).find( 'input.select2-default' ).val( $interpolate( originalPlaceholderText )( scope ) );
               }
             }
