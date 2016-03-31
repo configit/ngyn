@@ -8,8 +8,8 @@
     module( 'ngynServerConnection', 'ngynMocks' );
 
     inject( function( ServerConnection, ServerConnectionBackend ) {
-      ChatMessages = ServerConnection( 'ChatMessages' );
-      Participants = ServerConnection( 'Participants' );
+      ChatMessages = new ServerConnection( 'ChatMessages' );
+      Participants = new ServerConnection( 'Participants' );
       backend = ServerConnectionBackend;
     } );
   } );
@@ -215,6 +215,17 @@
       scope2.$destroy();
       expect( backend.off ).toHaveBeenCalled();
     } ) );
+    
+    it( 'listener callback should occur inside an $apply', inject( function( $rootScope ) {
+      //NOTE: This test only really tests the mock, but it's left here to show set expectations for backend implementations
+      
+      var scope = $rootScope.$new();
+      var inDigest = false;
+      ChatMessages.connect( scope, { messageReceived: function() { inDigest = !!scope.$$phase } } );
+      backend.completeConnection();
+      backend.trigger( 'ChatMessages', 'messageReceived' );
+      expect( inDigest ).toBe( true );
+    } ) );
   } );
 
   describe( 'client invoked events', function() {
@@ -263,13 +274,27 @@
 
     it( 'should be able to use the hub after connection, outside of done after connection has completed', inject( function( $rootScope ) {
       var scope = $rootScope.$new();
-      backend.addServerMethods( 'ChatMessages', { say: angular.noop } );
+      backend.addServerMethods( 'ChatMessages', { say: function() { angular.noop } } );
 
       ChatMessages.connect( scope );
       backend.completeConnection();
 
       ChatMessages.server.say( 'hello' );
       expect( backend.server( 'ChatMessages' ).say.callCount ).toBe( 1 );
+    } ) );
+    
+    it( 'invocation promise should occur inside a $digest', inject( function( $rootScope) {
+      var scope = $rootScope.$new();
+      var inDigest = false;
+      backend.addServerMethods( 'ChatMessages', { say: function() { angular.noop } } );
+      
+      ChatMessages.connect( scope );
+      backend.completeConnection();
+      
+      ChatMessages.server.say( 'hello' ).then( function() { inDigest = !!scope.$$phase  } ) ;
+      backend.flush();
+        
+      expect( inDigest ).toBe( true );
     } ) );
   } );
 
