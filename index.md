@@ -10,6 +10,9 @@ configuration management application created by [Configit Software](http://www.c
 
 These components typically help reduce some of the inevitable boilerplate code which creeps into larger applications.
 
+# Download
+ngyn can be downloaded from the [github releases page](https://github.com/configit/ngyn/releases)
+
 <a id="resourceful_routing"></a>
 # Resourceful Routing
 
@@ -153,9 +156,7 @@ carsServerConnection.connect(
   // code which relies on the underlying connection - exposed as server - being available
   function() {
     carsServerConnection.server.getCars().then( function( cars ) {
-      $scope.$apply( function() {
-        $scope.cars = cars;
-      }
+      $scope.cars = cars;
     });
   }
 );
