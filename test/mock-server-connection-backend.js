@@ -106,8 +106,9 @@ var ServerConnectionBackend = function( $rootScope, $timeout ) {
     while ( pendingServerRequests.length > 0 ) {
       var request = pendingServerRequests.pop();
       var requestResponse = request.fn.apply( this, request.args );
-      request.defer.resolve( requestResponse );
-      $rootScope.$apply();
+      $rootScope.$apply( function() {
+        request.defer.resolve( requestResponse );
+      } );
     }
   };
   /**

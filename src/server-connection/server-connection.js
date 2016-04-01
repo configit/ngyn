@@ -99,20 +99,16 @@
                 return this;
               },
               always: function( fnAlways ) {
-                this.then( fnAlways, fnAlways );
-                return this;
+                return this.then( fnAlways, fnAlways );
               },
               done: function( fnDone ) {
-                this.then( fnDone );
-                return this;
+                return this.then( fnDone );
               },
               fail: function( fnFail ) {
-                this.then( undefined, fnFail );
-                return this;
+                return this.then( undefined, fnFail );
               },
               progress: function( fnProgress ) {
-                this.then( undefined, undefined, fnProgress );
-                return this;
+                return this.then( undefined, undefined, fnProgress );
               }
             };
 
@@ -215,7 +211,9 @@
             ServerConnectionBackend.on( name, listenerKey, function() {
               var args = applyResponseInterceptors( name, listenerKey, arguments );
               angular.forEach( allListeners[listenerKey], function( scopeListener ) {
-                scopeListener.listener.apply( this, args );
+                scope.$apply( function() {
+                  scopeListener.listener.apply( this, args );
+                } )
               } );
             } );
           }

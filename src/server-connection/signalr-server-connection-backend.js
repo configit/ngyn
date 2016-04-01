@@ -85,10 +85,27 @@
       } );
 
       /**
-       * Retrieves the object which contains the server methods related to the specified hub
+       * Retrieves the object which contains the server methods related to the specified hub.
+       * the server object returned expects angular promises, so the ones SignalR returns are converted
        */
       this.server = function( hubName ) {
-        return $.connection[hubName].server;
+        var serverInstance = {};
+        angular.forEach( Object.keys( $.connection[hubName].server ), function( serverMethodKey ) {
+          var defer = $q.defer();
+
+          serverInstance[serverMethodKey] = function() {
+            var args = [].splice.call( arguments, 0 );
+            var nativePromise = $.connection[hubName].server[serverMethodKey].apply( this, args );
+            nativePromise.then( function success( value ) {
+              defer.resolve( value );
+            }, function failure( reason ) {
+              defer.reject( reason );
+            } );
+            return defer.promise;
+          }
+        } );
+
+        return serverInstance;
       };
     };
     return new ServerConnectionBackend();
