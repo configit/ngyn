@@ -95,8 +95,8 @@
 
           serverInstance[serverMethodKey] = function() {
             var args = [].splice.call( arguments, 0 );
-            var rawPromise = $.connection[hubName].server[serverMethodKey].apply( this, args );
-            rawPromise.then( function success( value ) {
+            var nativePromise = $.connection[hubName].server[serverMethodKey].apply( this, args );
+            nativePromise.then( function success( value ) {
               defer.resolve( value );
             }, function failure( reason ) {
               defer.reject( reason );
