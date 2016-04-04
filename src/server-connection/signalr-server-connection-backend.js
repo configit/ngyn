@@ -20,7 +20,7 @@
   /**
    * Implements the ServerConnectionBackend specifically to pass through to signalr
    */
-  .factory( 'ServerConnectionBackend', function() {
+  .factory( 'ServerConnectionBackend', function( $q ) {
 
     function ServerConnectionBackend() {
       /**
