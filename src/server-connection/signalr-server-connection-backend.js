@@ -20,7 +20,7 @@
   /**
    * Implements the ServerConnectionBackend specifically to pass through to signalr
    */
-  .factory( 'ServerConnectionBackend', function( $q ) {
+  .factory( 'ServerConnectionBackend', [ '$q', function( $q ) {
 
     function ServerConnectionBackend() {
       /**
@@ -109,4 +109,4 @@
       };
     };
     return new ServerConnectionBackend();
-  } );
+  } ] );
