@@ -16,11 +16,13 @@ angular.module( 'ngynMocks', [] ).factory( 'ServerConnectionBackend', function( 
 } );
 
 var ServerConnectionBackend = function( $rootScope, $timeout ) {
+  var self = this;
   var doneFns = [];
-  var serverMethods = {};
   var clientMethods = {};
   var pendingServerRequests = [];
   var disconnectFn = null;
+
+  self.serverMethods = {};
 
   /* Debug helpers for inspecting current state */
 
@@ -31,8 +33,23 @@ var ServerConnectionBackend = function( $rootScope, $timeout ) {
 
   this.logging = function() { return true; };
 
-  this.server = function( hubName ) {
-    return serverMethods[hubName];
+  this.getMethodNames = function( hubName ) {
+    if ( !self.serverMethods[hubName] ) {
+      return [];
+    }
+    
+    return Object.keys( self.serverMethods[hubName] );
+  };
+
+  this.callServer = function( hubName, methodName, args, successCallback, failureCallback, progressCallback ) {
+    return self.serverMethods[hubName][methodName].apply( null, args ).then( 
+      function success( response ) {
+        successCallback( response );
+      }, function failure( response ) {
+        failureCallback( response );
+      }, function progress( response ) {
+        progressCallback( response );
+      } );
   };
 
   this.start = function() {
@@ -84,17 +101,17 @@ var ServerConnectionBackend = function( $rootScope, $timeout ) {
    * @param {object} fns - The names and bodies of the functions to have created on the ServerConnection as a key/value pair
    */
   this.addServerMethods = function( hubName, fns ) {
-    serverMethods[hubName] = serverMethods[hubName] || [];
+    self.serverMethods[hubName] = self.serverMethods[hubName] || [];
     angular.forEach( Object.keys( fns ), function( fnKey ) {
       var fn = fns[fnKey];
-      serverMethods[hubName][fnKey] = function() {
+      self.serverMethods[hubName][fnKey] = function() {
         var args = [].splice.call( arguments, 0 );
-        serverMethods[hubName][fnKey].callCount++;
+        self.serverMethods[hubName][fnKey].callCount++;
         var defer = jQuery.Deferred();
         pendingServerRequests.push( { defer: defer, fn: fn, args: args } );
         return defer.promise();
       };
-      serverMethods[hubName][fnKey].callCount = 0;
+      self.serverMethods[hubName][fnKey].callCount = 0;
     } );
   };
 
@@ -106,9 +123,8 @@ var ServerConnectionBackend = function( $rootScope, $timeout ) {
     while ( pendingServerRequests.length > 0 ) {
       var request = pendingServerRequests.pop();
       var requestResponse = request.fn.apply( this, request.args );
-      $rootScope.$apply( function() {
-        request.defer.resolve( requestResponse );
-      } );
+      request.defer.resolve( requestResponse );
+      $timeout.flush();
     }
   };
   /**

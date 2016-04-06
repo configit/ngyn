@@ -20,7 +20,7 @@
   /**
    * Implements the ServerConnectionBackend specifically to pass through to signalr
    */
-  .factory( 'ServerConnectionBackend', [ '$q', function( $q ) {
+  .factory( 'ServerConnectionBackend', [ function() {
 
     function ServerConnectionBackend() {
       /**
@@ -84,29 +84,26 @@
         } );
       } );
 
+      this.getMethodNames = function( hubName ) {
+        return Object.keys( $.connection[hubName].server );
+      };
+
       /**
        * Retrieves the object which contains the server methods related to the specified hub.
        * the server object returned expects angular promises, so the ones SignalR returns are converted
        */
-      this.server = function( hubName ) {
-        var serverInstance = {};
-        angular.forEach( Object.keys( $.connection[hubName].server ), function( serverMethodKey ) {
-          var defer = $q.defer();
-
-          serverInstance[serverMethodKey] = function() {
-            var args = [].splice.call( arguments, 0 );
-            var nativePromise = $.connection[hubName].server[serverMethodKey].apply( this, args );
-            nativePromise.then( function success( value ) {
-              defer.resolve( value );
-            }, function failure( reason ) {
-              defer.reject( reason );
-            } );
-            return defer.promise;
+      this.callServer = function( hubName, methodName, args, successCallback, failureCallback, progressCallback ) {
+        $.connection[hubName].server[methodName].apply( null, args ).then( 
+          function success( response ) {
+            successCallback( response );
+          }, function failure( response ) {
+            failureCallback( response );
+          }, function progress( response ) {
+            progressCallback( response );
           }
-        } );
-
-        return serverInstance;
+        );
       };
+      
     };
     return new ServerConnectionBackend();
   } ] );

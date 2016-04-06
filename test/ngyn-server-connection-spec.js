@@ -235,9 +235,9 @@
 
       ChatMessages.connect( scope ).done( function() {
         ChatMessages.server.say( 'hello' );
-        expect( backend.server( 'ChatMessages' ).say.callCount ).toBe( 1 );
+        expect( backend.serverMethods.ChatMessages.say.callCount ).toBe( 1 );
         ChatMessages.server.say( 'world' );
-        expect( backend.server( 'ChatMessages' ).say.callCount ).toBe( 2 );
+        expect( backend.serverMethods.ChatMessages.say.callCount ).toBe( 2 );
       } );
 
       backend.completeConnection();
@@ -280,21 +280,30 @@
       backend.completeConnection();
 
       ChatMessages.server.say( 'hello' );
-      expect( backend.server( 'ChatMessages' ).say.callCount ).toBe( 1 );
+      expect( backend.serverMethods.ChatMessages.say.callCount ).toBe( 1 );
     } ) );
     
     it( 'invocation promise should occur inside a $digest', inject( function( $rootScope) {
       var scope = $rootScope.$new();
-      var inDigest = false;
+      var digestOccurred, callbackExecuted = false;
       backend.addServerMethods( 'ChatMessages', { say: function() { angular.noop } } );
       
       ChatMessages.connect( scope );
+      
       backend.completeConnection();
       
-      ChatMessages.server.say( 'hello' ).then( function() { inDigest = !!scope.$$phase  } ) ;
+      ChatMessages.server.say( 'hello' ).then( function() { 
+        callbackExecuted = true;
+      } ) ;
+
+      scope.$watch( function() {
+        digestOccurred = true;
+      } );
+      
       backend.flush();
         
-      expect( inDigest ).toBe( true );
+      expect( callbackExecuted ).toBe( true );
+      expect( digestOccurred ).toBe( true );
     } ) );
   } );
 
@@ -365,7 +374,9 @@
 
       var response;
       ChatMessages.connect( scope ).done( function() {
-        ChatMessages.server.getAll().done( function( messages ) { response = messages; } );
+        ChatMessages.server.getAll().done( function( messages ) { 
+          response = messages; 
+        } );
 
         backend.flush();
 
