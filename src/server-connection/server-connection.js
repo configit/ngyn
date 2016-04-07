@@ -61,19 +61,19 @@
        * Rewrites response based on the registered response interceptors
        */
       function applyResponseInterceptors( hubName, methodName, args ) {
-        var newArgs = args;
-        angular.forEach( self.responseInterceptors, function( ri ) {
-          newArgs = ri( hubName, methodName, newArgs );
+        var response = args;
+        angular.forEach( self.responseInterceptors, function( interceptor ) {
+          response = interceptor( hubName, methodName, response );
         } );
 
-        return newArgs;
+        return response;
       }
 
       /**
        * Returns a proxy object that wraps the server object
        * to allow rewriting of the response
        */
-      function createServerProxy( hubName, server ) {
+      function createServerProxy( hubName ) {
         var proxy = {};
 
         function _addCallback( callbackArray, callback ) {
@@ -81,13 +81,11 @@
             callbackArray.push( callback );
           }
         };
+        
+        var serverMethodNames = ServerConnectionBackend.getMethodNames( hubName );
 
-        if ( !server ) {
-          return proxy;
-        }
-
-        angular.forEach( Object.keys( server ), function( fnName ) {
-          proxy[fnName] = function() {
+        angular.forEach( serverMethodNames, function( methodName ) {
+          proxy[methodName] = function() {
             var promise = {
               _callbacks: {
                 done: [], fail: [], progress: []
@@ -112,25 +110,30 @@
               }
             };
 
-            var serverPromise = server[fnName].apply( server, arguments );
-
-            function createResponseInterceptorWrapper( callbacks ) {
-              return function() {
-                var promiseArgs = applyResponseInterceptors( hubName, fnName, arguments );
-
-                angular.forEach( callbacks, function( handler ) {
-                  handler.apply( handler, promiseArgs );
+            ServerConnectionBackend.callServer( hubName, methodName, arguments,
+              function success( response ) {
+                $timeout( function() {
+                  callResponseInterceptorWrapper( promise._callbacks.done, response )
                 } );
-              };
-            }
+              }, function failure( response ) {
+                $timeout( function() {
+                  callResponseInterceptorWrapper( promise._callbacks.fail, response )
+                } );
+              }, function progress( response ) {
+                $timeout( function() {
+                  callResponseInterceptorWrapper( promise._callbacks.progress, response )
+                } );
+              } );
 
-            serverPromise
-              .then(
-                createResponseInterceptorWrapper( promise._callbacks.done ),
-                createResponseInterceptorWrapper( promise._callbacks.fail ),
-                createResponseInterceptorWrapper( promise._callbacks.progress )
-              );
-
+            function callResponseInterceptorWrapper( callbacks ) {
+              var args = Array.prototype.slice.call( arguments, 1 );
+              var promiseArgs = applyResponseInterceptors( hubName, methodName, args );
+            
+              angular.forEach( callbacks, function( handler ) {
+                handler.apply( handler, promiseArgs );
+              } );
+            };
+              
             return promise;
           };
         } );
@@ -150,8 +153,7 @@
             has a hub property which relates back to the original hub which requested it.
             We set the server property on that hub so clients can now talk to the server
           */
-          var serverProxy = createServerProxy( handler.hubName, ServerConnectionBackend.server( handler.hubName ) );
-          handler.hub.server = serverProxy;
+          handler.hub.server = createServerProxy( handler.hubName );
           handler.doneFn();
         } );
         doneHandlers.length = 0;
@@ -190,15 +192,15 @@
       self.connect = function( scope, listeners ) {
         listeners = listeners || {};
         self.server = {};
-        var server = ServerConnectionBackend.server( name );
-        if ( server ) {
-          angular.forEach( Object.keys( server ), function( fnName ) {
-            self.server[fnName] = function() {
-              throw Error( "Cannot call the " + fnName + " function on the " + name + " hub because the server connection is not established. Place your server calls within the connect(...).done() block" );
-            };
-          } );
-        }
-
+        
+        var serverMethodNames = ServerConnectionBackend.getMethodNames( name );
+        
+        angular.forEach( serverMethodNames, function( fnName ) {
+          self.server[fnName] = function() {
+            throw Error( "Cannot call the " + fnName + " function on the " + name + " hub because the server connection is not established. Place your server calls within the connect(...).done() block" );
+          };
+        } );
+        
         angular.forEach( Object.keys( listeners ), function( listenerKey ) {
           if ( !allListeners[listenerKey] ) {
             allListeners[listenerKey] = [];
