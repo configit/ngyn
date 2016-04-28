@@ -131,6 +131,21 @@
     } );
   } );
 
+  it( 'should strip leading and trailing slashes on link path parameters', function() {
+    module( function( ngynRouteProvider ) {
+      ngynRouteProvider.resource( { name: 'Users', path: 'admin/security' } );
+      ngynRouteProvider.resource( { name: 'Logs', path: 'admin/audit' } );
+    } );
+
+    inject( function( $location, $route, $rootScope, $httpBackend, ngynRoute ) {
+      $httpBackend.whenGET( /.+/ ).respond();
+      $location.path( '/admin/security/users' );
+      $rootScope.$digest();
+      expect( ngynRoute.link( { path: '/admin/audit', controller: 'Logs' } ) ).toEqual( 'admin/audit/logs/index' );
+      expect( ngynRoute.link( { path: 'admin/audit/', controller: 'Logs' } ) ).toEqual( 'admin/audit/logs/index' );
+    } );
+  } );
+
   it( 'should generate collection action link from api call', function() {
     module( function( ngynRouteProvider ) {
       ngynRouteProvider.resource( { name: 'Products' } );
@@ -156,7 +171,7 @@
       expect( ngynRoute.link( { action: 'edit', products_id: 'my-product' } ) ).toEqual( 'products/my-product/edit' );
     } );
   } );
-
+  
   it( 'should observe appRoot', function() {
     module( function( ngynRouteProvider ) {
       ngynRouteProvider.appRoot = 'store';
