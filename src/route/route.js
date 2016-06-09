@@ -264,6 +264,11 @@
           delete unusedOptions.controller;
           delete unusedOptions.action;
           delete unusedOptions.path;
+          
+          //strip trailing and leading forward slashes
+          if ( options.path ) {
+            options.path = options.path.replace( new RegExp( '^\/+|\/+$', 'g' ), '' );
+          }
 
           if ( $route.current ) {
             controller = angular.lowercase( options.controller || $route.current.controllerPath );
