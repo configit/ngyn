@@ -117,15 +117,15 @@ describe( 'ngyn select2', function() {
       expect( element.find( '.select2-container' ).hasClass( 'select2-allowclear' ) ).toBe( false );
       expect( element.find( '.select2-container' ).hasClass( 'ng-valid-required' ) ).toBe( false );
       scope.$apply( 'foo = 1' );
-      expect( element.find( '.select2-container' ).hasClass( 'ng-valid-required' ) ).toBe( true );  
+      expect( element.find( '.select2-container' ).hasClass( 'ng-valid-required' ) ).toBe( true );
       scope.$apply( 'foo = undefined;required = false' );
       expect( element.find( '.select2-container' ).hasClass( 'ng-valid-required' ) ).toBe( true );
     } );
 
     it( 'should handle a static placeholder correctly', function() {
       var placeholderText = 'Select Something...';
-      scope.opts = [ { id: 1, name: 'test 1' }, { id: 2, name: 'test 2' } ];      
-      var element = compile( 
+      scope.opts = [ { id: 1, name: 'test 1' }, { id: 2, name: 'test 2' } ];
+      var element = compile(
         '<div><select ngyn-select2 ng-model="selected">' +
           '<option value="">' + placeholderText + '</option>' +
         '</select></div>' );
@@ -134,9 +134,9 @@ describe( 'ngyn select2', function() {
     } );
 
     it( 'should handle a dynamic placeholder correctly', function() {
-      scope.opts = [ { id: 1, name: 'test 1' }, { id: 2, name: 'test 2' } ];      
+      scope.opts = [ { id: 1, name: 'test 1' }, { id: 2, name: 'test 2' } ];
       scope.entityName = 'Car';
-      var element = compile( 
+      var element = compile(
         '<div><select ngyn-select2 ng-model="selected">' +
           '<option value="">Select {{ entityName }}...</option>' +
         '</select></div>' );
@@ -149,10 +149,10 @@ describe( 'ngyn select2', function() {
     } );
 
     it( 'should handle a dynamic placeholder correctly when switching away and back from the placeholder', function() {
-      scope.opts = [ { id: 1, name: 'test 1' }, { id: 2, name: 'test 2' } ];      
+      scope.opts = [ { id: 1, name: 'test 1' }, { id: 2, name: 'test 2' } ];
       scope.entityName = 'Car';
       scope.selected = scope.opts[0];
-      var element = compile( 
+      var element = compile(
         '<div><select ngyn-select2 ng-options="opt.name for opt in opts" ng-model="selected">' +
           '<option value="">Select {{ entityName }}...</option>' +
         '</select></div>' );
@@ -165,7 +165,7 @@ describe( 'ngyn select2', function() {
       expect( element.select2('container').find( '.select2-chosen' ).text() ).toBe( 'Select Cat...' );
     } );
 
-    /* 
+    /*
      * ngyn-select2 does not support dynamically choosing single/multiple
      * programatically
      */

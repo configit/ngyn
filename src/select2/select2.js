@@ -120,7 +120,8 @@
 
         function updateRequired( required ) {
           var select2Data = elm.data( 'select2' );
-          var placeholderCurrentlySelected = ( !elm.select2( 'val' ) || elm.select2( 'val' ).length === 0 );
+          var elmVal = elm.select2( 'val' );
+          var placeholderCurrentlySelected = ( !elmVal || elmVal.length === 0 ) || elmVal === '?';
 
           if ( select2Data ) {
             if ( isSelect && elm.find( 'option[value=""]' ).length ) {
