@@ -15,7 +15,8 @@ module.exports = function(config) {
       'libs/angular.js',
       'libs/**/*.js',
       'dist/**/*.js',
-      'test/**/*.js'
+      'test/**/*.js',
+      'patches/**/*.js'
     ],
 
     // list of files to exclude
