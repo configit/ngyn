@@ -1,3 +1,5 @@
+'use strict';
+
 angular.module( 'ngynServerConnection' )
   .value( 'defaultResponseInterceptors', {
     jsonNetStripper: function( hubName, methodName, args ) {

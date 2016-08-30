@@ -1,4 +1,5 @@
-﻿angular.module( 'ngynServerConnection' )
+'use strict';
+angular.module( 'ngynServerConnection' )
   /**
    * A factory which creates a ServerConnection object that lets you interact with a realtime
    * server connection technology such as SignalR; this underlying technology is expected to be
@@ -25,7 +26,7 @@
     function log( message ) {
       if ( ServerConnectionBackend.logging() ) {
         $log.info( message );
-      };
+      }
     }
 
     /**
@@ -48,14 +49,14 @@
             openConnections.splice( i, 1 );
             break;
           }
-        };
+        }
 
         if ( isLastScopeListening ) {
           log( '[ServerConnection] all listeners unregistered, closing SignalR connection' );
           ServerConnectionBackend.stop();
           connectionOpen = false;
         }
-      };
+      }
 
       /**
        * Rewrites response based on the registered response interceptors
@@ -80,7 +81,7 @@
           if ( !angular.isUndefined( callback ) ) {
             callbackArray.push( callback );
           }
-        };
+        }
 
         var serverMethodNames = ServerConnectionBackend.getMethodNames( hubName );
 
@@ -113,15 +114,15 @@
             ServerConnectionBackend.callServer( hubName, methodName, arguments,
               function success( response ) {
                 $timeout( function() {
-                  callResponseInterceptorWrapper( promise._callbacks.done, response )
+                  callResponseInterceptorWrapper( promise._callbacks.done, response );
                 } );
               }, function failure( response ) {
                 $timeout( function() {
-                  callResponseInterceptorWrapper( promise._callbacks.fail, response )
+                  callResponseInterceptorWrapper( promise._callbacks.fail, response );
                 } );
               }, function progress( response ) {
                 $timeout( function() {
-                  callResponseInterceptorWrapper( promise._callbacks.progress, response )
+                  callResponseInterceptorWrapper( promise._callbacks.progress, response );
                 } );
               } );
 
@@ -132,7 +133,7 @@
               angular.forEach( callbacks, function( handler ) {
                 handler.apply( handler, promiseArgs );
               } );
-            };
+            }
 
             return promise;
           };
@@ -157,7 +158,7 @@
           handler.doneFn();
         } );
         doneHandlers.length = 0;
-      };
+      }
 
       /**
        * Automatically reconnect when the backend disconnects whilst an open connection is still required
@@ -215,7 +216,7 @@
               angular.forEach( allListeners[listenerKey], function( scopeListener ) {
                 scopeListener.scope.$apply( function() {
                   scopeListener.listener.apply( this, args );
-                } )
+                } );
               } );
             } );
           }

@@ -1,6 +1,7 @@
-﻿angular.module( 'ngynSignalRServerConnectionBackend', [] )
+'use strict';
+angular.module( 'ngynSignalRServerConnectionBackend', [] )
   /**
-   * The service circumvents the intended behaviour of SignalR with regards to client side methods. 
+   * The service circumvents the intended behaviour of SignalR with regards to client side methods.
    * (http://stackoverflow.com/a/15074002/187157)
    * We patch SignalR to ensure each hub has at least one client method registered
    * so that a the hub is is ensured to be active when the connection is established.
@@ -10,7 +11,7 @@
   .run( function() {
     angular.forEach( Object.keys( $.connection ), function( hubKey ) {
       var hub = $.connection[hubKey];
-      // Any hub published on $.connection has a hubName property 
+      // Any hub published on $.connection has a hubName property
       if ( hub.hubName ) {
         hub.client.noop = angular.noop;
       }
@@ -93,7 +94,7 @@
        * the server object returned expects angular promises, so the ones SignalR returns are converted
        */
       this.callServer = function( hubName, methodName, args, successCallback, failureCallback, progressCallback ) {
-        $.connection[hubName].server[methodName].apply( null, args ).then( 
+        $.connection[hubName].server[methodName].apply( null, args ).then(
           function success( response ) {
             successCallback( response );
           }, function failure( response ) {
@@ -103,7 +104,7 @@
           }
         );
       };
-      
-    };
+
+    }
     return new ServerConnectionBackend();
   } ] );

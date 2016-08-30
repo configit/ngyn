@@ -215,13 +215,13 @@
       scope2.$destroy();
       expect( backend.off ).toHaveBeenCalled();
     } ) );
-    
+
     it( 'listener callback should occur inside an $apply', inject( function( $rootScope ) {
       //NOTE: This test only really tests the mock, but it's left here to show set expectations for backend implementations
-      
+
       var scope = $rootScope.$new();
       var inDigest = false;
-      ChatMessages.connect( scope, { messageReceived: function() { inDigest = !!scope.$$phase } } );
+      ChatMessages.connect( scope, { messageReceived: function() { inDigest = !!scope.$$phase; } } );
       backend.completeConnection();
       backend.trigger( 'ChatMessages', 'messageReceived' );
       expect( inDigest ).toBe( true );
@@ -274,7 +274,7 @@
 
     it( 'should be able to use the hub after connection, outside of done after connection has completed', inject( function( $rootScope ) {
       var scope = $rootScope.$new();
-      backend.addServerMethods( 'ChatMessages', { say: function() { angular.noop } } );
+      backend.addServerMethods( 'ChatMessages', { say: function() { angular.noop; } } );
 
       ChatMessages.connect( scope );
       backend.completeConnection();
@@ -282,26 +282,26 @@
       ChatMessages.server.say( 'hello' );
       expect( backend.serverMethods.ChatMessages.say.callCount ).toBe( 1 );
     } ) );
-    
+
     it( 'invocation promise should occur inside a $digest', inject( function( $rootScope) {
       var scope = $rootScope.$new();
       var digestOccurred, callbackExecuted = false;
-      backend.addServerMethods( 'ChatMessages', { say: function() { angular.noop } } );
-      
+      backend.addServerMethods( 'ChatMessages', { say: function() { angular.noop; } } );
+
       ChatMessages.connect( scope );
-      
+
       backend.completeConnection();
-      
-      ChatMessages.server.say( 'hello' ).then( function() { 
+
+      ChatMessages.server.say( 'hello' ).then( function() {
         callbackExecuted = true;
       } ) ;
 
       scope.$watch( function() {
         digestOccurred = true;
       } );
-      
+
       backend.flush();
-        
+
       expect( callbackExecuted ).toBe( true );
       expect( digestOccurred ).toBe( true );
     } ) );
@@ -309,7 +309,7 @@
 
   describe( 'Response interceptors', function() {
     beforeEach( function() {
-      ChatMessages.responseInterceptors.push( function( hubName, methodName, args ) { return [{ rewrittenObject: true }] } );
+      ChatMessages.responseInterceptors.push( function( hubName, methodName, args ) { return [{ rewrittenObject: true }]; } );
     }
     );
 
@@ -374,8 +374,8 @@
 
       var response;
       ChatMessages.connect( scope ).done( function() {
-        ChatMessages.server.getAll().done( function( messages ) { 
-          response = messages; 
+        ChatMessages.server.getAll().done( function( messages ) {
+          response = messages;
         } );
 
         backend.flush();

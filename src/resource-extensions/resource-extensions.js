@@ -129,6 +129,7 @@
               ngynResourceProvider.modifyArgs( methodargs[0], hasBody ? methodargs[1] : null, action );
             }
 
+            /* jshint -W003 */
             var methodResult = oldMethod.apply( this, methodargs );
 
             if ( action === 'query' ) {

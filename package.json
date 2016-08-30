@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "Karma and jasmine test runners for ngyn",
   "devDependencies": {
-    "grunt": "1.0.1",
+    "grunt": "^1.0.1",
     "grunt-cli": "1.2.0",
     "grunt-contrib-concat": "1.0.1",
     "grunt-contrib-jshint": "1.0.0",

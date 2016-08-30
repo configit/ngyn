@@ -53,7 +53,8 @@ module.exports = function(grunt) {
       files: ['gruntfile.js', 'src/**/*.js', 'test/**/*.js'],
       options: {
         jshintrc: '.jshintrc',
-        force: true
+        force: true,
+        verbose: true
       }
     },
     watch: {
@@ -106,7 +107,7 @@ module.exports = function(grunt) {
     var rmdir = require('rimraf');
     rmdir.sync('coverage/phantom', {});
   } );
-  
+
   // build server tasks
   grunt.registerTask( 'patch.karma-teamcity', function() {
     // patch to teamcity.reporter
