@@ -104,7 +104,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('clean', 'Removes the old coverage folder', function() {
     var rmdir = require('rimraf');
-    rmdir.sync('coverage/phantom', function(error){});
+    rmdir.sync('coverage/phantom', {});
   } );
   
   // build server tasks
