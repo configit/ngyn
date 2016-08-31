@@ -22,11 +22,11 @@ describe( 'select-key', function() {
 
   it( 'should select an existing item in the collection based only on key', inject( function( $compile ) {
     scope.person = { name: 'Wilma', remote: true };
-    element = $compile( '<select key="name" ng-model="person" ng-options="p.name for p in people"></select>' )( scope );
+    element = $compile( '<select key="name" ng-model="person" ng-options="p.name for p in people track by p.name"></select>' )( scope );
     scope.$digest();
     expect( element.controller( 'ngModel' ).$modelValue ).toEqual( scope.people[1] );
     // Wilma is the second item in the list
-    expect( element.val() ).toEqual( '1' );
+    expect( element.val() ).toEqual( 'Wilma' );
   } ) );
 
   it( 'should be unable to select an item based on key when no match', inject( function( $compile ) {

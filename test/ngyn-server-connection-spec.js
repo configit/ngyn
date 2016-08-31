@@ -14,12 +14,6 @@
     } );
   } );
 
-  afterEach( function() {
-    if ( backend._connected ) {
-      backend.stop();
-    }
-  } );
-
   describe( 'connection management', function() {
 
     it( 'should automatically open an underlying connection when a service connects', inject( function( $rootScope ) {
@@ -31,16 +25,16 @@
     } ) );
 
     it( 'should not try to open an underlying connection when a second service connects', inject( function( $rootScope ) {
-      spyOn( backend, 'start' ).andCallThrough();
+      spyOn( backend, 'start' ).and.callThrough();
       var scope = $rootScope.$new();
       ChatMessages.connect( scope );
       backend.completeConnection();
       Participants.connect( scope );
-      expect( backend.start.callCount ).toBe( 1 );
+      expect( backend.start.calls.count() ).toBe( 1 );
     } ) );
 
     it( 'should automatically close the underlying connection when all services disconnect', inject( function( $rootScope ) {
-      spyOn( backend, 'stop' ).andCallThrough();
+      spyOn( backend, 'stop' ).and.callThrough();
       var scope = $rootScope.$new();
       ChatMessages.connect( scope );
       backend.completeConnection();
@@ -50,7 +44,7 @@
     } ) );
 
     it( 'should close the connection after a parent scope is destroyed', inject( function( $rootScope ) {
-      spyOn( backend, 'stop' ).andCallThrough();
+      spyOn( backend, 'stop' ).and.callThrough();
       var scope = $rootScope.$new();
       ChatMessages.connect( scope );
       Participants.connect( scope.$new() );
@@ -60,7 +54,7 @@
     } ) );
 
     it( 'should not close the connection when a child scope is destroyed', inject( function( $rootScope ) {
-      spyOn( backend, 'stop' ).andCallThrough();
+      spyOn( backend, 'stop' ).and.callThrough();
       var scope = $rootScope.$new();
       ChatMessages.connect( scope );
       var scope2 = scope.$new();
@@ -95,7 +89,7 @@
   describe( 'server invoked events', function() {
 
     it( 'should attempt to reconnect if a connection is required and the underlying connection drops', inject( function( $rootScope, $timeout ) {
-      spyOn( backend, 'start' ).andCallThrough();
+      spyOn( backend, 'start' ).and.callThrough();
 
       var scope = $rootScope.$new();
       var messagesReceived = 0;
@@ -103,11 +97,11 @@
       backend.completeConnection();
 
       backend.trigger( 'ChatMessages', 'messageReceived' );
-      expect( backend.start.callCount ).toBe( 1 );
+      expect( backend.start.calls.count() ).toBe( 1 );
       backend.severConnection();
       // ServerConnection will automatically call start again if a connection is still required
       $timeout.flush();
-      expect( backend.start.callCount ).toBe( 2 );
+      expect( backend.start.calls.count() ).toBe( 2 );
 
       // Ensure the conection still works as it did before
       backend.completeConnection();
@@ -116,17 +110,17 @@
     } ) );
 
     it( 'Should not reconnect if the connection is no longer needed', inject( function( $rootScope ) {
-      spyOn( backend, 'start' ).andCallThrough();
+      spyOn( backend, 'start' ).and.callThrough();
 
       var scope = $rootScope.$new();
       var messagesReceived = 0;
       ChatMessages.connect( scope, { messageReceived: function() { messagesReceived++; } } );
       backend.completeConnection();
-      expect( backend.start.callCount ).toBe( 1 );
+      expect( backend.start.calls.count() ).toBe( 1 );
       scope.$destroy();
       backend.severConnection();
       // ensure the connection wasn't started again as it is no longer needed
-      expect( backend.start.callCount ).toBe( 1 );
+      expect( backend.start.calls.count() ).toBe( 1 );
 
     } ) );
 
@@ -191,8 +185,8 @@
     } ) );
 
     it( 'should deregister the proxy event handler when the single listener is removed', inject( function( $rootScope ) {
-      spyOn( backend, 'on' ).andCallThrough();
-      spyOn( backend, 'off' ).andCallThrough();
+      spyOn( backend, 'on' ).and.callThrough();
+      spyOn( backend, 'off' ).and.callThrough();
       var scope = $rootScope.$new();
       ChatMessages.connect( scope, { messageReceived: function() { } } );
       expect( backend.on ).toHaveBeenCalled();
@@ -202,13 +196,13 @@
     } ) );
 
     it( 'should not deregister the proxy event handler when only the first of 2 handlers is removed', inject( function( $rootScope ) {
-      spyOn( backend, 'on' ).andCallThrough();
-      spyOn( backend, 'off' ).andCallThrough();
+      spyOn( backend, 'on' ).and.callThrough();
+      spyOn( backend, 'off' ).and.callThrough();
       var scope = $rootScope.$new();
       var scope2 = $rootScope.$new();
       ChatMessages.connect( scope, { messageReceived: function() { } } );
       ChatMessages.connect( scope2, { messageReceived: function() { } } );
-      expect( backend.on.callCount ).toBe( 1 );
+      expect( backend.on.calls.count() ).toBe( 1 );
       backend.completeConnection();
       scope.$destroy();
       expect( backend.off ).not.toHaveBeenCalled();
@@ -231,13 +225,14 @@
   describe( 'client invoked events', function() {
     it( 'should send function invocation request to server', inject( function( $rootScope ) {
       var scope = $rootScope.$new();
-      backend.addServerMethods( 'ChatMessages', { say: angular.noop } );
+      backend.addServerMethods( 'ChatMessages', { say: function() {} } );
+      spyOn( backend.serverMethods.ChatMessages, 'say' ).and.callThrough();
 
       ChatMessages.connect( scope ).done( function() {
         ChatMessages.server.say( 'hello' );
-        expect( backend.serverMethods.ChatMessages.say.callCount ).toBe( 1 );
+        expect( backend.serverMethods.ChatMessages.say.calls.count() ).toBe( 1 );
         ChatMessages.server.say( 'world' );
-        expect( backend.serverMethods.ChatMessages.say.callCount ).toBe( 2 );
+        expect( backend.serverMethods.ChatMessages.say.calls.count() ).toBe( 2 );
       } );
 
       backend.completeConnection();
@@ -269,18 +264,19 @@
       ChatMessages.connect( scope );
       var sayFn = function() { ChatMessages.server.say( 'hello' ); };
       expect( sayFn ).toThrow( new Error( "Cannot call the say function on the ChatMessages hub because the server connection is not established. Place your server calls within the connect(...).done() block" ) );
-
+      backend.completeConnection();
     } ) );
 
     it( 'should be able to use the hub after connection, outside of done after connection has completed', inject( function( $rootScope ) {
       var scope = $rootScope.$new();
       backend.addServerMethods( 'ChatMessages', { say: function() { angular.noop; } } );
+      spyOn( backend.serverMethods.ChatMessages, 'say' ).and.callThrough();
 
       ChatMessages.connect( scope );
       backend.completeConnection();
 
       ChatMessages.server.say( 'hello' );
-      expect( backend.serverMethods.ChatMessages.say.callCount ).toBe( 1 );
+      expect( backend.serverMethods.ChatMessages.say.calls.count() ).toBe( 1 );
     } ) );
 
     it( 'invocation promise should occur inside a $digest', inject( function( $rootScope) {

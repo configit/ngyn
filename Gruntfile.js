@@ -109,12 +109,12 @@ module.exports = function(grunt) {
   } );
 
   // build server tasks
-  /*grunt.registerTask( 'patch.karma-teamcity', function() {
+  grunt.registerTask( 'patch.karma-teamcity', function() {
     // patch to teamcity.reporter
     // -- from https://github.com/karma-runner/karma-teamcity-reporter/issues/5
     grunt.file.copy( 'patches/karma-teamcity-reporter/index.js',
                      'node_modules/karma-teamcity-reporter/index.js' );
-  } );*/
-  grunt.registerTask( 'teamcity.commit', ['clean', /*'patch.karma-teamcity',*/ 'build', /*'karma:teamcity',*/ 'sanitizefoldername'] );
-  grunt.registerTask( 'teamcity.full', [/*'patch.karma-teamcity',*/ 'build', /*'karma:teamcity',*/ 'packages' ] );
+  } );
+  grunt.registerTask( 'teamcity.commit', ['clean', 'patch.karma-teamcity', 'build', 'karma:teamcity', 'sanitizefoldername'] );
+  grunt.registerTask( 'teamcity.full', ['patch.karma-teamcity', 'build', 'karma:teamcity', 'packages' ] );
 };

@@ -36,7 +36,7 @@
           options.placeholderOption = function() {
             return elm.find( 'option[value=""],option[value="?"]' );
           };
-          
+
           originalPlaceholderText = options.placeholderOption().text();
         }
 
@@ -49,10 +49,12 @@
           var select2initialized = select2initialized || !!elm.data( 'select2' );
           if ( currentClass !== oldClass ) {
             angular.forEach( oldClass.split( ' ' ), function( c ) {
-              container.removeClass( c );
+              if ( container ) {
+                container.removeClass( c );
+              }
             } );
             angular.forEach( currentClass.split( ' ' ), function( c ) {
-              if ( c.substring( 0, 8 ) !== "select2-" ) {
+              if ( container && c.substring( 0, 8 ) !== "select2-" ) {
                 container.addClass( c );
               }
             } );
