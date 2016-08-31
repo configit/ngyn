@@ -1,7 +1,7 @@
-angular.module('app', ['ngynRoute'])
+angular.module('app', ['ngRoute', 'ngynRoute'])
 .config(function(ngynRouteProvider,$provide) {
   var httpContent = {
-    'client/app/users/index.html': 
+    'client/app/users/index.html':
       '<h1>Index</h1><a ng-href="{{ngynRoute.action(\'new\')}}">new</a>'
   }
 
