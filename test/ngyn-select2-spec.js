@@ -102,24 +102,33 @@ describe( 'ngyn select2', function() {
     } );
 
     it( 'should follow the required attribute when it is set to false before select2 initializes', function() {
+      scope.opts = ['First', 'Second', 'Third'];
+      scope.foo = 'First';
       scope.required = false;
-      var element = compile( '<div><select ngyn-select2 ng-model="foo" ng-required="required"></select></div>' );
+      var element = compile( '<div><select ngyn-select2 ng-model="foo" ng-required="required"><option value="">placeholder</option></select></div>' );
       expect( element.find( '.select2-container' ).hasClass( 'select2-allowclear' ) ).toBe( true );
       expect( element.find( '.select2-container' ).hasClass( 'ng-valid-required' ) ).toBe( true );
     } );
 
-
-    xit( 'should follow the required attribute and allow clear for non-required', function() {
-      var element = compile( '<div><select ngyn-select2 ng-model="foo" ng-options="a for a in opts track by a" ng-required="required"></select></div>' );
+    it( 'should follow the required attribute and allow clear for non-required', function() {
+      scope.opts = ['First', 'Second', 'Third'];
+      scope.foo = 'First';
+      var element = compile( '<div><select ngyn-select2 ng-model="foo" ng-options="a for a in opts track by a" ng-required="required"><option value="">placeholder</option></select></div>' );
       expect( element.find( '.select2-container' ).hasClass( 'select2-allowclear' ) ).toBe( true );
       expect( element.find( '.select2-container' ).hasClass( 'ng-valid-required' ) ).toBe( true );
       scope.$apply( 'required = true' );
       expect( element.find( '.select2-container' ).hasClass( 'select2-allowclear' ) ).toBe( false );
-      expect( element.find( '.select2-container' ).hasClass( 'ng-valid-required' ) ).toBe( false );
-      scope.$apply( 'foo = 1' );
       expect( element.find( '.select2-container' ).hasClass( 'ng-valid-required' ) ).toBe( true );
-      scope.$apply( 'foo = undefined;required = false' );
-      expect( element.find( '.select2-container' ).hasClass( 'ng-valid-required' ) ).toBe( true );
+      scope.foo = undefined;
+      scope.$apply();
+      $timeout( function() {
+        expect( element.find( '.select2-container' ).hasClass( 'select2-allowclear' ) ).toBe( false );
+        expect( element.find( '.select2-container' ).hasClass( 'ng-valid-required' ) ).toBe( false );
+        scope.$apply( 'foo = opts[0]' );
+        expect( element.find( '.select2-container' ).hasClass( 'ng-valid-required' ) ).toBe( true );
+        scope.$apply( 'foo = undefined;required = false' );
+        expect( element.find( '.select2-container' ).hasClass( 'ng-valid-required' ) ).toBe( true );
+      } );
     } );
 
     it( 'should handle a static placeholder correctly', function() {

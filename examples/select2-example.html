@@ -85,22 +85,35 @@
     <select id="input7" name="input7" ng-model="colorPickers[9]" ng-options="c.name for c in colors" ngyn-select2 ng-required="true"></select>
     <div>model is valid? {{ isInput7Valid() }}</div>
   </form>
-  
+
+  <hr>
+
+  <h3>Required</h3>
+  <form name="required-test-form">
+    <input type="checkbox" ng-model="requiredCheck" />
+    <select id="input10" name="input10" ng-model="colorPickers[10]" ng-options="c.name for c in colors track by c.id" ngyn-select2 ng-required="requiredCheck">
+      <option value="">placeholder</option>
+    </select>
+    <div>model is valid? {{ isInput10Valid() }}</div>
+    <div>model is {{ colorPickers[10] }}</div>
+    <div>requiredCheck? {{ requiredCheck }}</div>
+  </form>
+
   <p><i>jQuery val() results are calculated every second</i></p>
 
   <script>
     window.setInterval(function() {
       for (var x = 1; x <= 5; x++) {
         $( '#valLabel'+x ).text( $( '#input'+x ).val() );
-        $( '#selectInfoLabel'+x ).text( 
-          $( '#input'+x ).select2( 
-            'val' ) + ' / ' + JSON.stringify($( '#input'+x ).select2( 'data'), 
-              function(k, v) { 
-                if (k == 'element') 
-                  return ''; 
+        $( '#selectInfoLabel'+x ).text(
+          $( '#input'+x ).select2(
+            'val' ) + ' / ' + JSON.stringify($( '#input'+x ).select2( 'data'),
+              function(k, v) {
+                if (k == 'element')
+                  return '';
                 return v;
               }
-            ) 
+            )
         );
       }
     }, 1000 );

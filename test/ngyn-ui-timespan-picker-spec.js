@@ -1,7 +1,7 @@
 describe( 'timespan-picker', function() {
   'use strict';
 
-  var element, scope, $timeout;
+  var element, scope;
 
   beforeEach( module( 'ngynTimespanPicker' ) );
 

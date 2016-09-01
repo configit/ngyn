@@ -27,6 +27,10 @@
           valuesFn = $parse( match[7] );
         }
 
+        function findPlaceholder() {
+          return elm.find( 'option[value=""],option[value="?"]' );
+        }
+
         var options = {};
 
         if ( !isSelect ) {
@@ -34,7 +38,7 @@
         }
         else {
           options.placeholderOption = function() {
-            return elm.find( 'option[value=""],option[value="?"]' );
+            return findPlaceholder();
           };
 
           originalPlaceholderText = options.placeholderOption().text();
@@ -134,9 +138,10 @@
 
           var container = elm.select2( 'container' );
           var isCurrentlyRequired = !container.hasClass( 'select2-allowclear' );
+          var placeholder = findPlaceholder();
 
           if ( !placeholderCurrentlySelected ) {
-            if ( isCurrentlyRequired && !required ) {
+            if ( isCurrentlyRequired && !required && placeholder.length > 0 ) {
               container.addClass( 'select2-allowclear' );
             }
             else if ( !isCurrentlyRequired && required ) {

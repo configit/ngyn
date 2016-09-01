@@ -37,9 +37,7 @@
         require: '^ngModel',
         priority: 100,
         replace: true,
-        scope: {
-          model: '='
-        },
+        scope: {},
         compile: function( tElement, tAttrs ) {
           return function( scope, element, attrs, ngModelController ) {
             var formController = element.find( 'ng-form' ).controller( 'form' );
