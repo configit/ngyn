@@ -1,18 +1,19 @@
-﻿angular.module( 'ngynServerConnection' )
+'use strict';
+angular.module( 'ngynServerConnection' )
   /**
    * A factory which creates a ServerConnection object that lets you interact with a realtime
    * server connection technology such as SignalR; this underlying technology is expected to be
    * dependency injected as the ServerConnectionBackend service.
    *
-   * The primary purpose of ServerConnection is to provide automatic connection management, automatically 
+   * The primary purpose of ServerConnection is to provide automatic connection management, automatically
    * starting the underlying connection when the first provider requests it and stopping it when all are no
    * longer requesting it.
    *
    * The secondary purpose is automatic disposal of instance connections.
-   * Each connection registration is tied to a scope, once the scope is destroyed the connection request 
+   * Each connection registration is tied to a scope, once the scope is destroyed the connection request
    * is popped off the stack and the connection may be closed as described above.
-   * 
-   * Usage: 
+   *
+   * Usage:
    *    var myhub = new ServerConnection('MyHub');
    *    myHub.connect( scope, { onMyEvent: function( e ) { console.log( e ) } } )
    */
@@ -25,7 +26,7 @@
     function log( message ) {
       if ( ServerConnectionBackend.logging() ) {
         $log.info( message );
-      };
+      }
     }
 
     /**
@@ -48,14 +49,14 @@
             openConnections.splice( i, 1 );
             break;
           }
-        };
+        }
 
         if ( isLastScopeListening ) {
           log( '[ServerConnection] all listeners unregistered, closing SignalR connection' );
           ServerConnectionBackend.stop();
           connectionOpen = false;
         }
-      };
+      }
 
       /**
        * Rewrites response based on the registered response interceptors
@@ -80,8 +81,8 @@
           if ( !angular.isUndefined( callback ) ) {
             callbackArray.push( callback );
           }
-        };
-        
+        }
+
         var serverMethodNames = ServerConnectionBackend.getMethodNames( hubName );
 
         angular.forEach( serverMethodNames, function( methodName ) {
@@ -113,27 +114,27 @@
             ServerConnectionBackend.callServer( hubName, methodName, arguments,
               function success( response ) {
                 $timeout( function() {
-                  callResponseInterceptorWrapper( promise._callbacks.done, response )
+                  callResponseInterceptorWrapper( promise._callbacks.done, response );
                 } );
               }, function failure( response ) {
                 $timeout( function() {
-                  callResponseInterceptorWrapper( promise._callbacks.fail, response )
+                  callResponseInterceptorWrapper( promise._callbacks.fail, response );
                 } );
               }, function progress( response ) {
                 $timeout( function() {
-                  callResponseInterceptorWrapper( promise._callbacks.progress, response )
+                  callResponseInterceptorWrapper( promise._callbacks.progress, response );
                 } );
               } );
 
             function callResponseInterceptorWrapper( callbacks ) {
               var args = Array.prototype.slice.call( arguments, 1 );
               var promiseArgs = applyResponseInterceptors( hubName, methodName, args );
-            
+
               angular.forEach( callbacks, function( handler ) {
                 handler.apply( handler, promiseArgs );
               } );
-            };
-              
+            }
+
             return promise;
           };
         } );
@@ -157,7 +158,7 @@
           handler.doneFn();
         } );
         doneHandlers.length = 0;
-      };
+      }
 
       /**
        * Automatically reconnect when the backend disconnects whilst an open connection is still required
@@ -192,15 +193,15 @@
       self.connect = function( scope, listeners ) {
         listeners = listeners || {};
         self.server = {};
-        
+
         var serverMethodNames = ServerConnectionBackend.getMethodNames( name );
-        
+
         angular.forEach( serverMethodNames, function( fnName ) {
           self.server[fnName] = function() {
             throw Error( "Cannot call the " + fnName + " function on the " + name + " hub because the server connection is not established. Place your server calls within the connect(...).done() block" );
           };
         } );
-        
+
         angular.forEach( Object.keys( listeners ), function( listenerKey ) {
           if ( !allListeners[listenerKey] ) {
             allListeners[listenerKey] = [];
@@ -213,9 +214,9 @@
             ServerConnectionBackend.on( name, listenerKey, function() {
               var args = applyResponseInterceptors( name, listenerKey, arguments );
               angular.forEach( allListeners[listenerKey], function( scopeListener ) {
-                scope.$apply( function() {
+                scopeListener.scope.$apply( function() {
                   scopeListener.listener.apply( this, args );
-                } )
+                } );
               } );
             } );
           }

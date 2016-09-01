@@ -5,14 +5,6 @@
     return !str.match( new RegExp( ch + '$' ) ) ? str + ch : str;
   };
 
-  var toKeyValue = function( obj ) {
-    var parts = [];
-    angular.forEach( obj, function( value, key ) {
-      parts.push( encodeUriQuery( key, true ) + ( value === true ? '' : '=' + encodeUriQuery( value, true ) ) );
-    } );
-    return parts.length ? parts.join( '&' ) : '';
-  };
-
   // This method is intended for encoding *key* or *value* parts of query component. We need a custom
   // method because encodeURIComponent is too agressive and encodes stuff that doesn't have to be
   // encoded per http://tools.ietf.org/html/rfc3986:
@@ -29,6 +21,14 @@
       replace( /%24/g, '$' ).
       replace( /%2C/gi, ',' ).
       replace(( pctEncodeSpaces ? null : /%20/g ), '+' );
+  };
+
+  var toKeyValue = function( obj ) {
+    var parts = [];
+    angular.forEach( obj, function( value, key ) {
+      parts.push( encodeUriQuery( key, true ) + ( value === true ? '' : '=' + encodeUriQuery( value, true ) ) );
+    } );
+    return parts.length ? parts.join( '&' ) : '';
   };
 
   var RouteContext = function( routeProvider ) {
@@ -264,7 +264,7 @@
           delete unusedOptions.controller;
           delete unusedOptions.action;
           delete unusedOptions.path;
-          
+
           //strip trailing and leading forward slashes
           if ( options.path ) {
             options.path = options.path.replace( new RegExp( '^\/+|\/+$', 'g' ), '' );

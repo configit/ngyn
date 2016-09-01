@@ -1,20 +1,22 @@
-﻿/**
+'use strict';
+/**
  * Mock implementation of ServerConnectionBackend to allow ServerConnection to be tested
  * This is analogous to $httpBackend and provides similar capabilities
- * 
+ *
  * Usage:
  *     var TestHub = new ServerConnection( 'TestHub' );
  *     mockBackend.addServerMethods( 'TestHub', ['run', 'abort'] );
  *     mockBackend.completeConnection();
  *     TestHub.server.run();
  *     expect( TestHub.server.callCount ).toBe( 1 );
- * 
- * 
+ *
+ *
  */
 angular.module( 'ngynMocks', [] ).factory( 'ServerConnectionBackend', function( $rootScope, $timeout ) {
   return new ServerConnectionBackend( $rootScope, $timeout );
 } );
 
+/* jshint -W003 */
 var ServerConnectionBackend = function( $rootScope, $timeout ) {
   var self = this;
   var doneFns = [];
@@ -37,12 +39,12 @@ var ServerConnectionBackend = function( $rootScope, $timeout ) {
     if ( !self.serverMethods[hubName] ) {
       return [];
     }
-    
+
     return Object.keys( self.serverMethods[hubName] );
   };
 
   this.callServer = function( hubName, methodName, args, successCallback, failureCallback, progressCallback ) {
-    return self.serverMethods[hubName][methodName].apply( null, args ).then( 
+    return self.serverMethods[hubName][methodName].apply( null, args ).then(
       function success( response ) {
         successCallback( response );
       }, function failure( response ) {

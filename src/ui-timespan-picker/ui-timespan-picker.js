@@ -37,14 +37,8 @@
         require: '^ngModel',
         priority: 100,
         replace: true,
-        scope: {
-          model: '='
-        },
+        scope: {},
         compile: function( tElement, tAttrs ) {
-          // Fix ngModel for isolate scope
-          tAttrs.$set( 'model', tAttrs.ngModel, false );
-          tAttrs.$set( 'ngModel', 'model', false );
-
           return function( scope, element, attrs, ngModelController ) {
             var formController = element.find( 'ng-form' ).controller( 'form' );
 
@@ -54,7 +48,7 @@
                 // we do not want to run until the change
                 return;
               }
-              
+
               ngModelController.$setValidity( 'number', formController.$valid );
 
               if ( formController.$valid ) {
@@ -73,7 +67,7 @@
                 // When undefined, do not set the model as the value may not have been bound yet
                 return;
               }
-              
+
               scope.unit = attrs.units ? getUnit( attrs.units ) : calculateBestUnits( ngModelController.$viewValue );
               scope.value = ngModelController.$viewValue / scope.unit.value;
             }

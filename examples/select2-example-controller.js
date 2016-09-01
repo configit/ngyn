@@ -21,7 +21,7 @@ angular.module('app', ['ngynSelect2', 'ngynSelectKey']).controller('TestControll
 
   $scope.languagePickers = [];
 
-  // select2 relies on having a property named text, so we add it onto our 
+  // select2 relies on having a property named text, so we add it onto our
   // colors collection in preparation
   angular.forEach($scope.colors, function(color) {
     color.text = color.name;
@@ -31,11 +31,11 @@ angular.module('app', ['ngynSelect2', 'ngynSelectKey']).controller('TestControll
   $scope.setPickerToGreen = function(index) {
     $scope.colorPickers[index] = $scope.colors[1];
   }
-  
+
   $scope.setPickerToRedAndBlue = function(index) {
     $scope.colorPickers[index] = [$scope.colors[0], $scope.colors[2]];
   }
-  
+
   $scope.setPickerToPavarottiAndCarrera = function(index) {
     $scope.namePickers[index] = [$scope.names[0], $scope.names[2]];
   }
@@ -78,7 +78,11 @@ angular.module('app', ['ngynSelect2', 'ngynSelectKey']).controller('TestControll
   $scope.isInput7Valid = function() {
     return $('#input7').controller('form').input7.$valid;
   }
-    
+
+  $scope.isInput10Valid = function() {
+    return $('#input10').controller('form').input10.$valid;
+  }
+
   window.setTimeout(function() {
     $scope.$apply(function() {
       angular.copy($scope.colors, $scope.asyncColors);
