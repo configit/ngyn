@@ -1,5 +1,5 @@
 'use strict';
-angular.module( 'ngynSignalRServerConnectionBackend', [] )
+angular.module( 'ngynServerConnection' )
   /**
    * The service circumvents the intended behaviour of SignalR with regards to client side methods.
    * (http://stackoverflow.com/a/15074002/187157)
@@ -8,7 +8,12 @@ angular.module( 'ngynSignalRServerConnectionBackend', [] )
    * Once connected we can no longer push methods on to hub.client so from there
    * we must use hubProxy.on(...) to subscribe to server invoked methods.
    */
-  .run( function() {
+  .run( function( $log ) {
+    if ( !$.connection ) {
+      $log.warn( 'SignalR not loaded' );
+      return;
+    }
+
     angular.forEach( Object.keys( $.connection ), function( hubKey ) {
       var hub = $.connection[hubKey];
       // Any hub published on $.connection has a hubName property
