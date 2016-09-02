@@ -1,7 +1,7 @@
 ( function ( angular ) {
   'use strict';
-  
-  angular.module( 'ngyn', [ 'ngynSelect2', 'ngynSelectKey',
+
+  angular.module( 'ngyn', [ 'ngynSelect2',
                             'ngynRoute', 'ngynResource',
                             'ngynTimespanPicker', 'ngynServerConnection' ] );
 
