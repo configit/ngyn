@@ -82,10 +82,10 @@
           };
         },
         template:
-          '<div class="ngyn-timespan-picker">' +
+          '<div class="ngyn-duration-picker">' +
             '<ng-form name="validation-form">' +
-              '<input type="number" name="unitValue" class="ngyn-timespan-picker-value" ng-model="value" min="0" required />' +
-              '<select ng-model="unit" class="ngyn-timespan-picker-unit" ng-options="u.label for u in units"></select>' +
+              '<input type="number" name="unitValue" class="ngyn-duration-picker-value" ng-model="value" min="0" required />' +
+              '<select ng-model="unit" class="ngyn-duration-picker-unit" ng-options="u.label for u in units"></select>' +
             '</ng-form>' +
           '</div>'
       };

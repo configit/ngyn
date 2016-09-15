@@ -13,7 +13,7 @@
       oldSuccessFn = args[args.length - 1];
     }
 
-    if (args.length === 0) {
+    if ( args.length === 0 ) {
       newargs.push( {} );
     }
 
@@ -53,11 +53,11 @@
     angular.extend( obj._meta, meta );
   }
 
-  var ngynResourceProvider = {$get:angular.noop};
+  var ngynResourceProvider = { $get: angular.noop };
 
   angular.module( 'ngynResource', ['ng', 'ngResource'] )
-  .config( [ '$provide', function( $provide ) {
-    $provide.provider('ngynResource', ngynResourceProvider);
+  .config( ['$provide', function( $provide ) {
+    $provide.provider( 'ngynResource', ngynResourceProvider );
     $provide.decorator( '$resource', ['$delegate', function( $delegate ) {
       return function $resourceDecoratorFn() {
 
@@ -155,7 +155,7 @@
         } );
         return resourceResult;
       };
-    } ] );
-  } ] );
+    }] );
+  }] );
 
 } )( window.angular );

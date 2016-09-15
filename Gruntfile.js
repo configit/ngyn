@@ -2,7 +2,6 @@ module.exports = function(grunt) {
   'use strict';
   var fs = require('fs');
 
-  grunt.loadNpmTasks( 'grunt-contrib-jshint' );
   grunt.loadNpmTasks( 'grunt-contrib-watch' );
   grunt.loadNpmTasks( 'grunt-contrib-concat' );
   grunt.loadNpmTasks( 'grunt-karma' );
@@ -49,17 +48,9 @@ module.exports = function(grunt) {
 
   grunt.initConfig( {
     concat: createConcatOptions(  ),
-    jshint: {
-      files: ['gruntfile.js', 'src/**/*.js', 'test/**/*.js'],
-      options: {
-        jshintrc: '.jshintrc',
-        force: true,
-        verbose: true
-      }
-    },
     watch: {
-      files: ['<%= jshint.files %>'],
-      tasks: ['concat', 'jshint', 'karma:background:run']
+      files: ['src/**/*.js', 'test/**/*.js'],
+      tasks: ['concat', 'karma:background:start']
     },
     karma: {
       options: {
@@ -67,7 +58,8 @@ module.exports = function(grunt) {
       },
       background: {
         autoWatch: false,
-        background: true
+        singleRun: true,
+        //background: true
       },
       single: {
         singleRun: true,
@@ -87,8 +79,8 @@ module.exports = function(grunt) {
   } );
 
   // development tasks
-  grunt.registerTask( 'build', [ 'jshint', 'concat' ] );
-  grunt.registerTask( 'test', [ 'karma:single' ] );
+  grunt.registerTask( 'build', ['concat'] );
+  grunt.registerTask( 'test', ['karma:single'] );
   grunt.registerTask( 'default', ['build', 'karma:single'] );
 
   grunt.registerTask( 'packages', 'Create nuget packags', function() {
@@ -105,7 +97,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('clean', 'Removes the old coverage folder', function() {
     var rmdir = require('rimraf');
-    rmdir.sync('coverage/phantom', {});
+    rmdir.sync( 'coverage/phantom', {} );
   } );
 
   // build server tasks
@@ -116,5 +108,5 @@ module.exports = function(grunt) {
                      'node_modules/karma-teamcity-reporter/index.js' );
   } );
   grunt.registerTask( 'teamcity.commit', ['clean', 'patch.karma-teamcity', 'build', 'karma:teamcity', 'sanitizefoldername'] );
-  grunt.registerTask( 'teamcity.full', ['patch.karma-teamcity', 'build', 'karma:teamcity', 'packages' ] );
+  grunt.registerTask( 'teamcity.full', ['patch.karma-teamcity', 'build', 'karma:teamcity', 'packages'] );
 };

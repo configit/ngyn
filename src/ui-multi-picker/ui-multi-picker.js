@@ -6,16 +6,16 @@
     setInitialStyles();
 
     function dasherize(str) {
-      return str.replace(/([A-Z])/g, function(v) { return '-' + angular.lowercase(v); } );
+      return str.replace( /([A-Z])/g, function( v ) { return '-' + angular.lowercase( v ); } );
     }
     
     function setInitialStyles() {
       // create an initial input element and hide it to get the props from
-      var i = $document[0].createElement('input');
+      var i = $document[0].createElement( 'input' );
       i.style.position = 'absolute';
       i.style.visibility = 'hidden';
-      $document[0].documentElement.appendChild(i);
-      var iStyles = $window.getComputedStyle(i);
+      $document[0].documentElement.appendChild( i );
+      var iStyles = $window.getComputedStyle( i );
       // IE must read a property twice, the first is the default, the second is the real value. Awesome.
       iStyles.width || undefined;
 
@@ -23,14 +23,14 @@
         'marginLeft', 'marginRight', 'marginTop', 'marginBottom',
         'paddingLeft', 'paddingRight', 'paddingTop', 'paddingBottom',
         'borderLeftWidth', 'borderRightWidth', 'borderTopWidth', 'borderBottomWidth',
-        'fontFamily', 'fontSize', 'lineHeight' ];
+        'fontFamily', 'fontSize', 'lineHeight'];
 
       // it's impossible to get the same style that a firefox input has from computed styles
       // the border it gives us is nearly white so we ignore it
-      var firefox = navigator.userAgent.indexOf('Firefox') >= 0;
+      var firefox = navigator.userAgent.indexOf( 'Firefox' ) >= 0;
       if (!firefox) {
-        angular.forEach( [ 'borderBottomColor', 'borderTopColor', 'borderRightColor', 'borderLeftColor' ], function(propKey) {
-          propKeys.push(propKey);
+        angular.forEach( ['borderBottomColor', 'borderTopColor', 'borderRightColor', 'borderLeftColor'], function( propKey ) {
+          propKeys.push( propKey );
         } );
       }
 
@@ -41,18 +41,18 @@
         "vertical-align: top; "+
         "-moz-appearance:textfield; "+
         "-webkit-appearance: textfield;";
-      angular.forEach(propKeys, function(propKey) {
+      angular.forEach( propKeys, function( propKey ) {
         var fromKey = propKey === 'height' ? 'min-height' : propKey;
-        classText += dasherize(fromKey) + ":" + iStyles[propKey] + ';';
-      });
+        classText += dasherize( fromKey ) + ":" + iStyles[propKey] + ';';
+      } );
       classText += "}";
 
-      var styleTag = $document[0].createElement('style');
+      var styleTag = $document[0].createElement( 'style' );
       styleTag.type = 'text/css';
       styleTag.innerHTML = classText;
-      $document[0].getElementsByTagName('head')[0].appendChild( styleTag );
+      $document[0].getElementsByTagName( 'head' )[0].appendChild( styleTag );
 
-      $document[0].documentElement.removeChild(i);
+      $document[0].documentElement.removeChild( i );
     }
 
     var containerTemplateString = '<span class="ngyn-picker">' +
@@ -77,12 +77,12 @@
       require: 'ngModel',
       replace: true,
       scope: true,
-      compile: function(celm, cattrs, transclude) {
-        var match = cattrs.options.match(/([^\W]*) in ([^$]*)/);
+      compile: function( celm, cattrs, transclude ) {
+        var match = cattrs.options.match( /([^\W]*) in ([^$]*)/ );
         var repeatableElement = match[1];
         var repeatableCollection = match[2];
-        var selectionTemplate = celm.find('picker-selection');
-        var optionTemplate = celm.find('picker-option');
+        var selectionTemplate = celm.find( 'picker-selection' );
+        var optionTemplate = celm.find( 'picker-option' );
 
         var htmlElement = angular.element( $document ).find( 'html' );
         var containerElement = angular.element( containerTemplateString );
@@ -99,8 +99,8 @@
         option.prepend( optionTemplate );
 
         celm.replaceWith();
-        celm.append(containerElement);
-        celm.append(menuElement);
+        celm.append( containerElement );
+        celm.append( menuElement );
 
         function reposition() {
           menuElement[0].style.left = containerElement[0].offsetLeft + 'px';
@@ -111,16 +111,16 @@
           scope.showInput = false;
 
           scope.addSelection = function(s) {
-            scope.$eval(cattrs.ngModel).push(s);
-            $timeout(reposition);
+            scope.$eval( cattrs.ngModel ).push(s);
+            $timeout( reposition );
           };
 
-          containerElement.bind('click', function(ev) {
+          containerElement.bind( 'click', function( ev ) {
             // Stop event bubbling up to html in order to stop it being closed
             ev.stopPropagation();
-          });
+          } );
 
-          placeholder.bind('focus', function() {
+          placeholder.bind( 'focus', function() {
             menuElement[0].style.display = 'block';
             reposition();
             scope.$apply( function() {
@@ -134,17 +134,17 @@
               var range = $document[0].createRange();
               range.selectNodeContents( input[0] );
               selection.removeAllRanges();
-              selection.addRange(range);
+              selection.addRange( range );
             } );
-          });
+          } );
 
-          input.bind('keydown', function(ev) {
+          input.bind( 'keydown', function(ev) {
             if (ev.keyCode === 13) {
               ev.preventDefault();
             }
-          });
+          } );
 
-          htmlElement.bind('click', function() {
+          htmlElement.bind( 'click', function() {
             // Remove menu when any element is clicked
             // Note: the element itself has a click handler which catches
             // the event so it doesn't closed when itself it clicked
@@ -154,7 +154,7 @@
               input.html( '' );
               scope.showInput = false;
             } );
-          });
+          } );
         };
       }
     };
