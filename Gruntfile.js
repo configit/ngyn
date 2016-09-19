@@ -7,6 +7,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks( 'grunt-karma' );
   grunt.loadNpmTasks( 'grunt-exec' );
 
+  grunt.util.linefeed = '\r\n';
+
   var pkg = grunt.file.readJSON( 'package.json'),
       teamcityPropsFile = grunt.option( 'teamcity.properties' ),
       teamcityProps = ( teamcityPropsFile && grunt.file.readJSON( teamcityPropsFile ) ) || {},

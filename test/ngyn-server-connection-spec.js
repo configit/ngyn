@@ -1,4 +1,4 @@
-﻿describe( 'ServerConnection', function() {
+describe( 'ServerConnection', function() {
   'use strict';
 
   var ChatMessages, Participants;
