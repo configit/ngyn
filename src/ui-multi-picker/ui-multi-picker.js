@@ -1,7 +1,7 @@
-(function( angular ) {
+( function( angular ) {
   'use strict';
 
-  angular.module( 'ngyn-ui-multi-picker', [] ).directive('ngynMultiPicker', function($compile, $timeout, $document, $window) {
+  angular.module( 'ngyn-ui-multi-picker', [] ).directive('ngynMultiPicker', function( $compile, $timeout, $document, $window ) {
 
     setInitialStyles();
 
@@ -104,7 +104,7 @@
 
         function reposition() {
           menuElement[0].style.left = containerElement[0].offsetLeft + 'px';
-          menuElement[0].style.top = (containerElement[0].offsetTop + containerElement[0].offsetHeight ) + 'px';
+          menuElement[0].style.top = ( containerElement[0].offsetTop + containerElement[0].offsetHeight ) + 'px';
         }
 
         return function link( scope, elm, attrs, model ) {
@@ -138,7 +138,7 @@
             } );
           } );
 
-          input.bind( 'keydown', function(ev) {
+          input.bind( 'keydown', function( ev ) {
             if (ev.keyCode === 13) {
               ev.preventDefault();
             }
@@ -158,5 +158,5 @@
         };
       }
     };
-  });
-})( window.angular);
+  } );
+} )( window.angular );
