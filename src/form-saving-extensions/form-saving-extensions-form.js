@@ -97,42 +97,49 @@ angular.module( 'ngynFormSavingExtensions' ).directive( 'form', function() {
           return;
         }
         
+        // evaluate the return of the save method, if it doesn't return something we can watch, ignore it
         var action = scope.$eval( saveAction );
+        if ( !action ) {
+          return;
+        }
+
         var promise;
-        if ( action && action.$promise ) {
+        if ( action.$promise ) {
           promise = action.$promise;
         } else if ( angular.isFunction( action.then ) ) {
           promise = action;
         }
 
-        if ( promise ) {
-          ctrl.state = 'saving';
-
-          promise.then( function( response ) {
-            ctrl.markSaved();
-            $rootScope.$broadcast( 'ngyn:form-save-succeeded' );
-          }, function( response ) {
-            ctrl.unhandledServerErrors = [];
-
-            ( response.data.errors || [] ).forEach( function( error ) {
-              ( error.propertyNames || [] ).forEach( function( propertyName ) {
-                if ( ctrl.form[propertyName] ) {
-                  controlsWithServerErrors.push( ctrl.form[propertyName] );
-                  ctrl.form[propertyName].$setValidity( 'serverError', false );
-                  if ( !angular.isArray( ctrl.form[propertyName].$serverErrors ) ) {
-                    ctrl.form[propertyName].$serverErrors = [];
-                  }
-                  ctrl.form[propertyName].$serverErrors.push( error );
-                } else {
-                  ctrl.unhandledServerErrors.push( error );
-                }
-              } );
-            } );
-
-            ctrl.markUnsaved();
-            $rootScope.$broadcast( 'ngyn:form-save-failed' );
-          } );
+        if ( !promise ) {
+          return
         }
+
+        ctrl.state = 'saving';
+
+        promise.then( function( response ) {
+          ctrl.markSaved();
+          $rootScope.$broadcast( 'ngyn:form-save-succeeded' );
+        }, function( response ) {
+          ctrl.unhandledServerErrors = [];
+
+          ( response.data.errors || [] ).forEach( function( error ) {
+            ( error.propertyNames || [] ).forEach( function( propertyName ) {
+              if ( ctrl.form[propertyName] ) {
+                controlsWithServerErrors.push( ctrl.form[propertyName] );
+                ctrl.form[propertyName].$setValidity( 'serverError', false );
+                if ( !angular.isArray( ctrl.form[propertyName].$serverErrors ) ) {
+                  ctrl.form[propertyName].$serverErrors = [];
+                }
+                ctrl.form[propertyName].$serverErrors.push( error );
+              } else {
+                ctrl.unhandledServerErrors.push( error );
+              }
+            } );
+          } );
+
+          ctrl.markUnsaved();
+          $rootScope.$broadcast( 'ngyn:form-save-failed' );
+        } );        
       }
       
       $element.bind( 'submit', function( evt ) {
