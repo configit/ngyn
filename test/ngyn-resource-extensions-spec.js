@@ -9,6 +9,7 @@ describe( 'ngyn resource extensions', function() {
         args.addedArg = 'success';
       };
       ngynResourceProvider.actions = {
+        'query': { method: 'GET', isArray: true },
         'update': { method: 'PUT' }
       };
       ngynResourceProvider.success = function( response ) {
@@ -114,19 +115,19 @@ describe( 'ngyn resource extensions', function() {
   } ) );
 
   it( 'should maintain callbacks when supplied with arguments for a POST (hasBody)', inject( function( $httpBackend, $resource ) {
-    $httpBackend.whenPOST( /.+/ ).respond(
-      500,
-      {
+    $httpBackend.whenPOST( /.+/ ).respond( 500, {
         errors: [
           { propertyName: 'forename', message: "too short" },
         ]
       }
-        );
+    );
+
     var User = $resource( 'api/users/:userid' );
     var cbResponse;
     User.save( {}, angular.noop, function success( response ) {
       cbResponse = response.data;
     } );
+
     $httpBackend.flush();
     expect( cbResponse.errors.length ).toEqual( 1 );
   } ) );
@@ -167,7 +168,7 @@ describe( 'ngyn resource extensions', function() {
     expect( users._meta.requestArgs ).toEqual( { foo: 'bar', addedArg: 'success' } );
   } ) );
 
-  it( 'should be able to send request args to a erroneous response', inject( function( $httpBackend, $resource ) {
+  it( 'should be able to send request args to an erroneous response', inject( function( $httpBackend, $resource ) {
     $httpBackend.whenGET( /.+/ ).respond(  500, [] );
     var User = $resource( 'api/users/:userid' );
     var users = User.query( { foo: 'bar' } );
@@ -175,11 +176,20 @@ describe( 'ngyn resource extensions', function() {
     expect( users._meta.requestArgs ).toEqual( { foo: 'bar', addedArg: 'success' } );
   } ) );
 
-  it( 'should be possible to provide new default_actions', inject( function( $resource, $httpBackend ) {
+  it( 'should be possible to provide new actions', inject( function( $resource, $httpBackend ) {
     $httpBackend.whenPUT( /api\/users/ ).respond( {} );
     var User = $resource( 'api/users/:userid' );
+    // provided by resourceProvider.actions
+    expect( angular.isFunction( User.update ) ).toBe( true )
     User.update();
     $httpBackend.flush();
+  } ) );
+
+  it( 'should be possible to provide new actions and preserve existing ones', inject( function( $resource, $httpBackend ) {
+    var User = $resource( 'api/users/:userid', {}, { uniqueTest: { method: 'GET' } } );
+    expect( User.uniqueTest ).toBeDefined(); // provided by $resource instance
+    expect( User.get ).toBeDefined(); // provided by $resource defaults
+    expect( User.update ).toBeDefined(); // provided by ngynResourceProvider 
   } ) );
 
   it( 'should update additional parameters on collection after requery', inject( function( $resource, $httpBackend ) {

@@ -69,16 +69,17 @@
           'delete': { method: 'DELETE' }
         };
 
-        var factoryArgs = [];
-        for ( var i = 0; i < 3; i++ ) {
-          factoryArgs.push( arguments[i] || {} );
-        }
-        factoryArgs[2] = angular.extend( factoryArgs[2], DEFAULT_ACTIONS, ( ngynResourceProvider.actions || {} ) );
-        var actions = factoryArgs[2];
-        var actionKeys = Object.keys( actions );
-        var resourceResult = $delegate.apply( this, factoryArgs );
+        // following angular's convention of extending the passed in actions with the defaults,
+        // we collect the full action set at this point, because they all need to be wrapped in the loop below
+        var actions = angular.extend( {}, DEFAULT_ACTIONS, arguments[2], ( ngynResourceProvider.actions || {} ) );
 
-        angular.forEach( actionKeys, function( action ) {
+        var resourceArguments = Array.prototype.slice.call( arguments );
+        //overwrite the actions argument to ensure the underlying resource generates the new actions
+        resourceArguments[2] = actions;
+
+        var resourceResult = $delegate.apply( this, resourceArguments );
+
+        angular.forEach( Object.keys( actions ), function( action ) {
           var oldMethod = resourceResult[action];
           resourceResult[action] = function methodOveride() {
             var previousResult = this;
