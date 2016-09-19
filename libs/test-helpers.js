@@ -1,4 +1,4 @@
-﻿( function( angular ) {
+( function( angular ) {
   var sendKeys = function( value ) {
     this.val( value );
 

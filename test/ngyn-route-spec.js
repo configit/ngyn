@@ -1,4 +1,4 @@
-﻿describe( 'route', function() {
+describe( 'route', function() {
   'use strict';
 
   beforeEach( function() {

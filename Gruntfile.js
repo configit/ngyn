@@ -1,6 +1,6 @@
-module.exports = function(grunt) {
+module.exports = function( grunt ) {
   'use strict';
-  var fs = require('fs');
+  var fs = require( 'fs' );
 
   grunt.loadNpmTasks( 'grunt-contrib-watch' );
   grunt.loadNpmTasks( 'grunt-contrib-concat' );
@@ -19,13 +19,13 @@ module.exports = function(grunt) {
       semVersion = isDefaultBranch ? version : version + semVersionSuffix;
 
   function option( name, def ) {
-    return grunt.option( name ) || teamcityProps[ name ] || def;
+    return grunt.option( name ) || teamcityProps[name] || def;
   }
 
   function createConcatOptions( ) {
     var options = {
       options: {
-        banner: '/* VERSION: ' + semVersion + ' */\n',
+        banner: '/* VERSION: ' + semVersion + ' */\r\n',
         separator: ';'
       },
       module: {
