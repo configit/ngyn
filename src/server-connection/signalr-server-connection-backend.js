@@ -8,7 +8,7 @@ angular.module( 'ngynServerConnection' )
    * Once connected we can no longer push methods on to hub.client so from there
    * we must use hubProxy.on(...) to subscribe to server invoked methods.
    */
-  .run( function( $log ) {
+  .run( [ '$log', function( $log ) {
     if ( !$.connection ) {
       $log.warn( 'SignalR not loaded' );
       return;
@@ -21,7 +21,7 @@ angular.module( 'ngynServerConnection' )
         hub.client.noop = angular.noop;
       }
     } );
-  } )
+  } ] )
 
   /**
    * Implements the ServerConnectionBackend specifically to pass through to signalr
