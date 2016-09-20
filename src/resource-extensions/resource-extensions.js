@@ -71,7 +71,7 @@
 
         // following angular's convention of extending the passed in actions with the defaults,
         // we collect the full action set at this point, because they all need to be wrapped in the loop below
-        var actions = angular.extend( {}, DEFAULT_ACTIONS, arguments[2], ( ngynResourceProvider.actions || {} ) );
+        var actions = angular.extend( {}, DEFAULT_ACTIONS, ( ngynResourceProvider.actions || {} ), arguments[2] );
 
         var resourceArguments = Array.prototype.slice.call( arguments );
         //overwrite the actions argument to ensure the underlying resource generates the new actions
