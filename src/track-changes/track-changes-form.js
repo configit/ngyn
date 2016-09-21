@@ -6,7 +6,7 @@ angular.module( 'ngynTrackChanges' ).directive( 'form', function() {
     restrict: 'E',
     scope: false,
     require: ['form', 'ngynTrackChangesForm'],
-    controller: function( $element ) {
+    controller: [ '$element', function( $element ) {
       var ctrl = this;
       ctrl.resetCallbacks = [];
       
@@ -37,12 +37,12 @@ angular.module( 'ngynTrackChanges' ).directive( 'form', function() {
         } );
         updateStatus();
       }
-    },
+    } ],
     link: function( scope, elm, attrs, ctrls ) {
       var form = ctrls[0];
       var ctrl = ctrls[1];
       
       ctrl.form = form;
     }    
-  } 
+  }
 } );
