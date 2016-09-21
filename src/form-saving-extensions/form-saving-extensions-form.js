@@ -5,7 +5,7 @@ angular.module( 'ngynFormSavingExtensions' ).directive( 'form', function() {
     name: 'ngynFormSavingExtensions',
     restrict: 'E',
     require: ['form', 'ngynFormSavingExtensions', '?ngynTrackChangesForm'],
-    controller: function( $attrs, $element, $scope, $rootScope, $timeout, $uibModal, $location ) {
+    controller: [ '$attrs', '$element', '$scope', '$rootScope', '$timeout', '$uibModal', '$location', function( $attrs, $element, $scope, $rootScope, $timeout, $uibModal, $location ) {
       var ctrl = this;
       var controlsWithServerErrors = [];
       var hasSaveActionOnForm = false;
@@ -150,7 +150,7 @@ angular.module( 'ngynFormSavingExtensions' ).directive( 'form', function() {
           evt.preventDefault();
         }
       } );
-    },
+    } ],
     
     link: function( scope, elm, attrs, ctrls ) {
       var form = ctrls[0];

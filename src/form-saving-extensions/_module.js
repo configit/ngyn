@@ -1,1 +1,1 @@
-angular.module( 'ngynFormSavingExtensions', [ 'ui.bootstrap.modal'] );
+angular.module( 'ngynFormSavingExtensions', [ 'ui.bootstrap.modal' ] );
