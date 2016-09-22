@@ -12,10 +12,11 @@ angular.module( 'ngynFormSavingExtensions' ).directive( 'ngynFormSave', function
       formSavingExtensions.setSaveAction( attrs.ngynFormSave, isForm );
 
       if ( !isForm ) {
-        elm.bind( 'click', function() {
+        elm.bind( 'click', function( e )  {
           scope.$apply( function() {
             formSavingExtensions.save( attrs.ngynFormSave, scope );
           } );
+          e.preventDefault();
         } );
       }
     }
