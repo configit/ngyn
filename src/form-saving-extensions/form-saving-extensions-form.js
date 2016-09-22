@@ -9,14 +9,22 @@ angular.module( 'ngynFormSavingExtensions' ).directive( 'form', function() {
       var ctrl = this;
       var controlsWithServerErrors = [];
       var hasSaveActionOnForm = false;
+      var handlingUnsavedChanges = false;
       ctrl._saveAction = null;
       ctrl.state = 'unsaved';
 
       if ( angular.isUndefined( $attrs.noblock ) ) {
         var deregisterLocationChange = $scope.$on( '$locationChangeStart', function( evt, newUrl ) {
-          if ( ctrl.canBeLeft() ){
+          if ( ctrl.canBeLeft() ) {
             return true;
           }
+
+          if ( handlingUnsavedChanges ) {
+            evt.preventDefault();
+            return false;
+          }
+
+          handlingUnsavedChanges = true;
 
           $uibModal.open( {
             template: '<div class="modal-header"><h3>Unsaved Changes</h3></div>' +
@@ -32,6 +40,8 @@ angular.module( 'ngynFormSavingExtensions' ).directive( 'form', function() {
               deregisterLocationChange();
               $location.url( newUrl.substr( pathStartIndex ) );
             }
+
+            handlingUnsavedChanges = false;
           } );
 
           evt.preventDefault();
