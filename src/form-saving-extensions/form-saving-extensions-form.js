@@ -133,18 +133,25 @@ angular.module( 'ngynFormSavingExtensions' ).directive( 'form', function() {
           ctrl.unhandledServerErrors = [];
 
           ( response.data.errors || [] ).forEach( function( error ) {
-            ( error.propertyNames || [] ).forEach( function( propertyName ) {
+            if ( angular.isUndefined( error.propertyName ) ) {
+              ctrl.unhandledServerErrors.push( error );
+            }
+            else {
+              ( error.propertyNames || [] ).forEach( function( propertyName ) {
               if ( ctrl.form[propertyName] ) {
                 controlsWithServerErrors.push( ctrl.form[propertyName] );
                 ctrl.form[propertyName].$setValidity( 'serverError', false );
                 if ( !angular.isArray( ctrl.form[propertyName].$serverErrors ) ) {
                   ctrl.form[propertyName].$serverErrors = [];
                 }
+
                 ctrl.form[propertyName].$serverErrors.push( error );
               } else {
                 ctrl.unhandledServerErrors.push( error );
               }
-            } );
+              
+              } );
+            }
           } );
 
           ctrl.markUnsaved();
