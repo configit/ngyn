@@ -162,7 +162,7 @@ angular.module( 'ngynFormSavingExtensions' ).directive( 'form', function() {
       $element.bind( 'submit', function( evt ) {
         if ( ctrl._saveAction ) {
           $scope.$apply( function() {
-            if ( !attrs.disabled ) {
+            if ( !$attrs.disabled ) {
               ctrl.save( ctrl._saveAction, $scope );
             }
           } );
