@@ -55,7 +55,7 @@ angular.module( 'ngynFormSavingExtensions' ).directive( 'form', function() {
         } );
         ctrl.state = 'unsaved';
       }
-      
+
       ctrl.markSaved = function() {
         if ( ctrl.state !== 'unsaved' ) {
           // if the form has been reset before markSaved is called we remain unsaved
@@ -64,11 +64,11 @@ angular.module( 'ngynFormSavingExtensions' ).directive( 'form', function() {
 
         ctrl.trackChanges.removeAllChangedFields();
       }
-      
+
       ctrl.markUnsaved = function() {
         ctrl.state = 'unsaved';
       }
-      
+
       ctrl.abandonChanges = function() {
         ctrl.state = 'abandoned';
         deregisterLocationChange();
@@ -84,17 +84,17 @@ angular.module( 'ngynFormSavingExtensions' ).directive( 'form', function() {
           hasSaveActionOnForm = true;
         }
       }
-      
+
       ctrl.canBeLeft = function() {
         var changed = ctrl.trackChanges ? ctrl.form.$changed : ctrl.form.$dirty;
 
         return !ctrl._saveAction || !changed || ctrl.state === 'abandoned' || ctrl.state === 'saved';
       }
-      
+
       ctrl.save = function( saveAction, scope ) {
 
         $rootScope.$broadcast( 'ngyn:form-save-triggered' );
-          
+
         // reset all server errors so the form can be resubmitted
         controlsWithServerErrors.forEach( function( control ) {
           control.$setValidity( 'serverError', true );
@@ -106,7 +106,7 @@ angular.module( 'ngynFormSavingExtensions' ).directive( 'form', function() {
           $rootScope.$broadcast( 'ngyn:form-save-failed' );
           return;
         }
-        
+
         // evaluate the return of the save method, if it doesn't return something we can watch, ignore it
         var action = scope.$eval( saveAction );
         if ( !action ) {
@@ -149,35 +149,42 @@ angular.module( 'ngynFormSavingExtensions' ).directive( 'form', function() {
               } else {
                 ctrl.unhandledServerErrors.push( error );
               }
-              
+
               } );
             }
           } );
 
           ctrl.markUnsaved();
           $rootScope.$broadcast( 'ngyn:form-save-failed' );
-        } );        
+        } );
       }
-      
+
       $element.bind( 'submit', function( evt ) {
         if ( ctrl._saveAction ) {
           $scope.$apply( function() {
-            ctrl.save( ctrl._saveAction, $scope );
+            // Because Internet Explorer only respects 'disabled' for clicking
+            // on the actual element, event propogation continues and
+            // the save action is called even if the element is disabled. We
+            // check for the existence of the disabled attribute to stop the
+            // action from executing if the element is disabled.
+            if ( !$attrs.disabled ) {
+              ctrl.save( ctrl._saveAction, $scope );
+            }
           } );
           evt.preventDefault();
         }
       } );
     } ],
-    
+
     link: function( scope, elm, attrs, ctrls ) {
       var form = ctrls[0];
       var ctrl = ctrls[1];
       var trackChanges = ctrls[2];
-      
+
       // pin the other directives to the controller so they can be accessed in the controller(!)
       ctrl.form = form;
       ctrl.trackChanges = trackChanges;
-      
+
       scope.formSavingExtensions = ctrl;
     }
   }
