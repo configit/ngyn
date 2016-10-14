@@ -162,6 +162,11 @@ angular.module( 'ngynFormSavingExtensions' ).directive( 'form', function() {
       $element.bind( 'submit', function( evt ) {
         if ( ctrl._saveAction ) {
           $scope.$apply( function() {
+            // Because Internet Explorer only respects 'disabled' for clicking
+            // on the actual element, event propogation continues and
+            // the save action is called even if the element is disabled. We
+            // check for the existence of the disabled attribute to stop the
+            // action from executing if the element is disabled.
             if ( !$attrs.disabled ) {
               ctrl.save( ctrl._saveAction, $scope );
             }
