@@ -212,6 +212,10 @@
           updateDisabled( attrs.disabled );
           updateRequired( attrs.required );
         }, 0, false );
+
+        scope.$on( '$destroy', function() {
+          elm.select2( 'destroy' );
+        } );
       }
     };
   }] );
