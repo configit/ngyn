@@ -133,7 +133,7 @@ angular.module( 'ngynFormSavingExtensions' ).directive( 'form', function() {
           ctrl.unhandledServerErrors = [];
 
           ( response.data.errors || [] ).forEach( function( error ) {
-            if ( angular.isUndefined( error.propertyName ) ) {
+            if ( angular.isUndefined( error.propertyNames ) ) {
               ctrl.unhandledServerErrors.push( error );
             }
             else {
