@@ -27,9 +27,17 @@ angular.module( 'ngynFormSavingExtensions' ).directive( 'form', function() {
           handlingUnsavedChanges = true;
 
           $uibModal.open( {
-            template: '<div class="modal-header"><h3>Unsaved Changes</h3></div>' +
-                      '<div class="modal-body"><p>The changes you have made have not been saved.</p><p>Are you sure you want to leave this page?</p></div>'+
-                      '<div class="modal-footer"><button class="btn btn-lg btn-primary" ng-click="$close( true )">Continue</button><button class="btn btn-link" ng-click="$close( false )">Cancel</button></div>',
+            template: '<div class="modal-header">' +
+                        '<h3>Unsaved Changes</h3>' +
+                      '</div>' +
+                      '<div class="modal-body">' +
+                        '<p>The changes you have made have not been saved.</p>' +
+                        '<p>Are you sure you want to leave this page?</p>' +
+                      '</div>'+
+                      '<div class="modal-footer">' +
+                        '<button class="btn btn-lg btn-primary" ng-click="$close( true )">Continue</button> ' +
+                        '<button class="btn btn-link" ng-click="$close( false )">Cancel</button>' +
+                      '</div>',
             controller: function() {},
             resolve: {},
             windowClass: 'modal'
