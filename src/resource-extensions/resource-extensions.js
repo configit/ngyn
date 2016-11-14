@@ -135,6 +135,7 @@
 
             if ( action === 'query' ) {
               methodResult.requery = function() {
+                methodResult.loaded = false;
                 var requeryargs = injectCallback( arguments, function( data ) {
                   methodResult.length = 0;
                   angular.forEach( data, function( r ) {
