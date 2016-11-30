@@ -388,6 +388,19 @@ describe( 'route', function() {
     } );
   });
 
+  it( 'should have a route label', function() {
+    module( function( ngynRouteProvider ) {
+      ngynRouteProvider.resource( { name: 'Products', label: 'Product Site' } );
+    } );
+
+    inject( function( $location, $route, $rootScope, $httpBackend ) {
+      $httpBackend.whenGET( /.+/ ).respond();
+      $location.path( '/p/index' );
+      $rootScope.$digest();
+      expect( $route.current.label ).toEqual( 'Product Site' );
+    } );
+  } );
+
   describe('inheritence', function() {
     beforeEach(function() {
       module( function( ngynRouteProvider ) {
