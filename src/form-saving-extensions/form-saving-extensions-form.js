@@ -36,7 +36,7 @@ angular.module( 'ngynFormSavingExtensions' ).directive( 'form', function() {
                       '</div>'+
                       '<div class="modal-footer">' +
                         '<button class="btn btn-lg btn-primary" ng-click="$close( true )">Leave &amp; discard changes</button> ' +
-                        '<button class="btn btn-link" ng-click="$close( false )">Stay</button>' +
+                        '<button class="btn btn-link" ng-click="$close( false )">Stay on page</button>' +
                       '</div>',
             controller: function() {},
             resolve: {},
