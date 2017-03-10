@@ -82,7 +82,10 @@ angular.module( 'ngynFormSavingExtensions' ).directive( 'form', function() {
 
       ctrl.abandonChanges = function() {
         ctrl.state = 'abandoned';
-        deregisterLocationChange();
+        
+        if ( angular.isUndefined( $attrs.noblock ) ) {
+          deregisterLocationChange();
+        }
       }
 
       ctrl.setSaveAction = function( fn, isForm ) {
@@ -104,7 +107,7 @@ angular.module( 'ngynFormSavingExtensions' ).directive( 'form', function() {
 
       ctrl.save = function( saveAction, scope ) {
 
-        $rootScope.$broadcast( 'ngyn:form-save-triggered' );
+        $rootScope.$broadcast( 'ngyn:form-save-triggered', { formName: ctrl.form.$name } );
 
         // reset all server errors so the form can be resubmitted
         controlsWithServerErrors.forEach( function( control ) {
@@ -114,7 +117,7 @@ angular.module( 'ngynFormSavingExtensions' ).directive( 'form', function() {
         controlsWithServerErrors.length = 0;
 
         if ( ctrl.form.$invalid ) {
-          $rootScope.$broadcast( 'ngyn:form-save-failed' );
+          $rootScope.$broadcast( 'ngyn:form-save-failed', { formName: ctrl.form.$name } );
           return;
         }
 
@@ -139,7 +142,7 @@ angular.module( 'ngynFormSavingExtensions' ).directive( 'form', function() {
 
         promise.then( function( response ) {
           ctrl.markSaved();
-          $rootScope.$broadcast( 'ngyn:form-save-succeeded' );
+          $rootScope.$broadcast( 'ngyn:form-save-succeeded', { formName: ctrl.form.$name } );
         }, function( response ) {
           ctrl.unhandledServerErrors = [];
 
@@ -166,7 +169,7 @@ angular.module( 'ngynFormSavingExtensions' ).directive( 'form', function() {
           } );
 
           ctrl.markUnsaved();
-          $rootScope.$broadcast( 'ngyn:form-save-failed' );
+          $rootScope.$broadcast( 'ngyn:form-save-failed', { formName: ctrl.form.$name } );
         } );
       }
 
