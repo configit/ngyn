@@ -40,7 +40,7 @@ angular.module( 'ngynFormSavingExtensions' ).directive( 'form', function() {
                       '</div>',
             controller: function() {},
             resolve: {},
-            windowClass: 'modal'
+            windowClass: 'modal unsaved-changes-modal'
           } )
           .result.then( function( confirmed ) {
             if ( confirmed ) {
