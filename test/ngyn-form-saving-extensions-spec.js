@@ -207,4 +207,20 @@ describe( 'ngyn form saving extensions', function() {
     scope.$apply();
     expect ( scope.formSavingExtensions.unhandledServerErrors.length ).toBe( 1 );   
   } ) );
+
+  it( 'error with empty propertyNames array should be in unhandledServerErrors', inject( function( $location, $q ) {
+    scope.save3 = function() {
+      var defer = $q.defer();
+      var result = {};
+      result.data = {};
+      result.data.errors = [{ error: "error", propertyNames: [] }];
+      defer.reject( result );
+      return { $promise: defer.promise };
+    };
+    var element = compile( '<form name="testForm"><input name="testInput" id="testInput" ng-model="test"><button id="testSubmit" ngyn-form-save="save3()"></button></form>' );
+    element.find( '#testInput' ).sendKeys( 'test' );
+    element.find( '#testSubmit' ).click();
+    scope.$apply();
+    expect ( scope.formSavingExtensions.unhandledServerErrors.length ).toBe( 1 );
+  } ) );
 } );
