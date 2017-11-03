@@ -61,9 +61,8 @@ angular.module( 'ngynServerConnection' )
       /**
        * Rewrites response based on the registered response interceptors
        */
-      function applyResponseInterceptors( hubName, methodName, args ) {
-        var response = args;
-        angular.forEach( self.responseInterceptors, function( interceptor ) {
+      function applyResponseInterceptors( hub, hubName, methodName, response ) {
+        angular.forEach( hub.responseInterceptors, function( interceptor ) {
           response = interceptor( hubName, methodName, response );
         } );
 
@@ -74,7 +73,7 @@ angular.module( 'ngynServerConnection' )
        * Returns a proxy object that wraps the server object
        * to allow rewriting of the response
        */
-      function createServerProxy( hubName ) {
+      function createServerProxy( hub, hubName ) {
         var proxy = {};
 
         function _addCallback( callbackArray, callback ) {
@@ -126,12 +125,11 @@ angular.module( 'ngynServerConnection' )
                 } );
               } );
 
-            function callResponseInterceptorWrapper( callbacks ) {
-              var args = Array.prototype.slice.call( arguments, 1 );
-              var promiseArgs = applyResponseInterceptors( hubName, methodName, args );
+            function callResponseInterceptorWrapper( callbacks, response ) {
+              response = applyResponseInterceptors( hub, hubName, methodName, response );
 
               angular.forEach( callbacks, function( handler ) {
-                handler.apply( handler, promiseArgs );
+                handler( response );
               } );
             }
 
@@ -154,7 +152,7 @@ angular.module( 'ngynServerConnection' )
             has a hub property which relates back to the original hub which requested it.
             We set the server property on that hub so clients can now talk to the server
           */
-          handler.hub.server = createServerProxy( handler.hubName );
+          handler.hub.server = createServerProxy( handler.hub, handler.hubName );
           handler.doneFn();
         } );
         doneHandlers.length = 0;
@@ -212,7 +210,7 @@ angular.module( 'ngynServerConnection' )
           // if the function wrapper is not already there, push it on
           if ( allListeners[listenerKey].length === 0 ) {
             ServerConnectionBackend.on( name, listenerKey, function() {
-              var args = applyResponseInterceptors( name, listenerKey, arguments );
+              var args = applyResponseInterceptors( self, name, listenerKey, arguments );
               angular.forEach( allListeners[listenerKey], function( scopeListener ) {
                 scopeListener.scope.$apply( function() {
                   scopeListener.listener.apply( this, args );

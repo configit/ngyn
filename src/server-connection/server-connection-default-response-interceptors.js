@@ -2,16 +2,11 @@
 
 angular.module( 'ngynServerConnection' )
   .value( 'defaultResponseInterceptors', {
-    jsonNetStripper: function( hubName, methodName, args ) {
-      var newArgs = [];
-      angular.forEach( args, function( arg ) {
-        if ( arg && arg.$values ) {
-          newArgs.push( arg.$values );
-        } else {
-          newArgs.push( arg );
-        }
-      } );
+    jsonNetStripper: function( hubName, methodName, response ) {
+      if ( response.$values ) {
+        return response.$values;
+      }
 
-      return newArgs;
+      return response;
     }
   } );

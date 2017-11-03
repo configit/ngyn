@@ -305,7 +305,7 @@ describe( 'ServerConnection', function() {
 
   describe( 'Response interceptors', function() {
     beforeEach( function() {
-      ChatMessages.responseInterceptors.push( function( hubName, methodName, args ) { return [{ rewrittenObject: true }]; } );
+      ChatMessages.responseInterceptors.push( function( hubName, methodName, response ) { return { rewrittenObject: true }; } );
     }
     );
 
@@ -359,6 +359,36 @@ describe( 'ServerConnection', function() {
 
       backend.completeConnection();
     } ) );
+
+    it( 'should not be shared across hub instances', inject( function( $rootScope ) {
+      var scope = $rootScope.$new();
+
+      Participants.responseInterceptors.push( function() { return 'Participants' } );
+      ChatMessages.responseInterceptors.push( function() { return 'ChatMessages' } );
+
+      backend.addServerMethods( 'Participants', { getName: function() { return ''; } } );
+      backend.addServerMethods( 'ChatMessages', { getName: function() { return ''; } } );
+      
+      ChatMessages.connect( scope ).done( function() {
+        ChatMessages.server.getName()
+          .then( function( name ) {
+            expect( name ).toEqual( 'ChatMessages' );
+          } );
+
+        backend.flush();
+      } );
+
+      Participants.connect( scope ).done( function() {
+        Participants.server.getName()
+          .then( function( name ) {
+            expect( name ).toEqual( 'Participants' );
+          } );
+
+        backend.flush();
+      } );
+
+      backend.completeConnection();
+    } ) );
   } );
 
   describe( 'Default Response interceptors', function() {
@@ -377,6 +407,8 @@ describe( 'ServerConnection', function() {
         backend.flush();
 
         expect( angular.isArray( response ) ).toBe( true );
+        expect( response[0].text ).toEqual( 'Message1' );
+        expect( response[1].text ).toEqual( 'Message2' );
       } );
 
       backend.completeConnection();
