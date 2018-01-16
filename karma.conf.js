@@ -53,6 +53,7 @@ module.exports = function(config) {
     // Start these browsers, currently available:
     // - Chrome
     // - ChromeCanary
+    // - ChromeHeadless
     // - Firefox
     // - Opera
     // - Safari (only Mac)
