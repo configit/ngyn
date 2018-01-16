@@ -146,28 +146,31 @@ angular.module( 'ngynFormSavingExtensions' ).directive( 'form', function() {
         }, function( response ) {
           ctrl.unhandledServerErrors = [];
 
-          ( response.data.errors || [] ).forEach( function( error ) {
-            if ( angular.isUndefined( error.propertyNames ) || !error.propertyNames.length ) {
-              ctrl.unhandledServerErrors.push( error );
-            }
-            else {
-              ( error.propertyNames || [] ).forEach( function( propertyName ) {
-              if ( ctrl.form[propertyName] ) {
-                controlsWithServerErrors.push( ctrl.form[propertyName] );
-                ctrl.form[propertyName].$setValidity( 'serverError', false );
-                if ( !angular.isArray( ctrl.form[propertyName].$serverErrors ) ) {
-                  ctrl.form[propertyName].$serverErrors = [];
-                }
-
-                ctrl.form[propertyName].$serverErrors.push( error );
-              } else {
+          if ( response.data && response.data.errors ) {
+            response.data.errors.forEach( function( error ) {
+              if ( angular.isUndefined( error.propertyNames ) || !error.propertyNames.length ) {
                 ctrl.unhandledServerErrors.push( error );
               }
+              else {
+                ( error.propertyNames || [] ).forEach( function( propertyName ) {
+                if ( ctrl.form[propertyName] ) {
+                  controlsWithServerErrors.push( ctrl.form[propertyName] );
+                  ctrl.form[propertyName].$setValidity( 'serverError', false );
+                  if ( !angular.isArray( ctrl.form[propertyName].$serverErrors ) ) {
+                    ctrl.form[propertyName].$serverErrors = [];
+                  }
 
-              } );
-            }
-          } );
+                  ctrl.form[propertyName].$serverErrors.push( error );
+                }
+                else {
+                  ctrl.unhandledServerErrors.push( error );
+                }
 
+                } );
+              }
+            } );
+          }
+          
           ctrl.markUnsaved();
           $rootScope.$broadcast( 'ngyn:form-save-failed', { formName: ctrl.form.$name } );
         } );
