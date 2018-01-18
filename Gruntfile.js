@@ -91,13 +91,13 @@ module.exports = function( grunt ) {
 
   grunt.registerTask('sanitizefoldername', 'Removes the browser specific information from the generated coverage folder name', function() {
     fs.readdirSync( 'coverage').forEach( function( dir ) {
-      fs.renameSync( 'coverage/' + dir, 'coverage/phantom' );
+      fs.renameSync( 'coverage/' + dir, 'coverage/results' );
     } );
   } );
 
   grunt.registerTask('clean', 'Removes the old coverage folder', function() {
     var rmdir = require('rimraf');
-    rmdir.sync( 'coverage/phantom', {} );
+    rmdir.sync( 'coverage/results', {} );
   } );
 
   // build server tasks

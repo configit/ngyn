@@ -53,12 +53,13 @@ module.exports = function(config) {
     // Start these browsers, currently available:
     // - Chrome
     // - ChromeCanary
+    // - ChromeHeadless
     // - Firefox
     // - Opera
     // - Safari (only Mac)
     // - PhantomJS
     // - IE (only Windows)
-    browsers : ['PhantomJS'],
+    browsers : ['ChromeHeadless'],
 
     // If browser does not capture in given timeout [ms], kill it
     captureTimeout: 100000,
