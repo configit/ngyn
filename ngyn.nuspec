@@ -9,7 +9,7 @@
     <projectUrl>http://configit.github.io/ngyn/</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>ngyn is a collection of modules and directives initially extracted from a large scale, entity-centric, configuration management application created by Configit Software.</description>
-    <copyright>Copyright 2013 Configit A/S</copyright>
+    <copyright>Copyright 2013-present Configit A/S</copyright>
     <tags>AngularJS ngyn routing</tags>
   </metadata>
   <files>

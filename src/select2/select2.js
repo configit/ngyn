@@ -8,7 +8,7 @@
   *
   * <input type="hidden" ngyn-select2="options" ng-model="selection" multiple custom-rendering class="span11" ></input>
   */
-  angular.module( 'ngynSelect2', [] ).directive( 'ngynSelect2', ['$parse', '$interpolate', '$timeout', function( $parse, $interpolate, $timeout ) {
+  angular.module( 'ngynSelect2', [] ).directive( 'ngynSelect2', function( $parse, $interpolate, $timeout ) {
     return {
       require: '?ngModel',
       priority: '150', // must be higher priority than ngyn-select-key
@@ -230,7 +230,7 @@
         } );
       }
     };
-  }] );
+  } );
 
 } )( window.angular );
 
