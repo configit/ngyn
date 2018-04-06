@@ -152,21 +152,23 @@ angular.module( 'ngynFormSavingExtensions' ).directive( 'form', function() {
                 ctrl.unhandledServerErrors.push( error );
               }
               else {
+                var isPropertyError = false;
                 ( error.propertyNames || [] ).forEach( function( propertyName ) {
-                if ( ctrl.form[propertyName] ) {
-                  controlsWithServerErrors.push( ctrl.form[propertyName] );
-                  ctrl.form[propertyName].$setValidity( 'serverError', false );
-                  if ( !angular.isArray( ctrl.form[propertyName].$serverErrors ) ) {
-                    ctrl.form[propertyName].$serverErrors = [];
+                  if ( ctrl.form[propertyName] ) {
+                    controlsWithServerErrors.push( ctrl.form[propertyName] );
+                    ctrl.form[propertyName].$setValidity( 'serverError', false );
+                    if ( !angular.isArray( ctrl.form[propertyName].$serverErrors ) ) {
+                      ctrl.form[propertyName].$serverErrors = [];
+                    }
+
+                    ctrl.form[propertyName].$serverErrors.push( error );
+                    isPropertyError = true;
                   }
 
-                  ctrl.form[propertyName].$serverErrors.push( error );
-                }
-                else {
+                } );
+                if ( !isPropertyError ) {
                   ctrl.unhandledServerErrors.push( error );
                 }
-
-                } );
               }
             } );
           }
