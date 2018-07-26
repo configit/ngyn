@@ -49,7 +49,8 @@
         scope.$watch( function() {
           // keep class of the select2 in sync with the underlying select
           var container = elm.select2( 'container' );
-          var currentClass = elm.attr( 'class' );
+          // element doesn't have to have a class attribute
+          var currentClass = elm.attr( 'class' ) || '';
           var select2initialized = select2initialized || !!elm.data( 'select2' );
           if ( currentClass !== oldClass ) {
             angular.forEach( oldClass.split( ' ' ), function( c ) {
