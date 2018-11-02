@@ -105,9 +105,8 @@ angular.module( 'ngynFormSavingExtensions' ).directive( 'form', function() {
         return !ctrl._saveAction || !changed || ctrl.state === 'abandoned' || ctrl.state === 'saved';
       }
 
-      ctrl.save = function( saveAction, scope ) {
-
-        $rootScope.$broadcast( 'ngyn:form-save-triggered', { formName: ctrl.form.$name } );
+      ctrl.clientValidate = function() {
+        $rootScope.$broadcast( 'ngyn:form-validate-triggered', { formName: ctrl.form.$name } );
 
         // reset all server errors so the form can be resubmitted
         controlsWithServerErrors.forEach( function( control ) {
@@ -117,6 +116,17 @@ angular.module( 'ngynFormSavingExtensions' ).directive( 'form', function() {
         controlsWithServerErrors.length = 0;
 
         if ( ctrl.form.$invalid ) {
+          $rootScope.$broadcast( 'ngyn:form-validate-failed', { formName: ctrl.form.$name } );
+          return false;
+        }
+
+        return true;
+      }
+
+      ctrl.save = function( saveAction, scope ) {
+        $rootScope.$broadcast( 'ngyn:form-save-triggered', { formName: ctrl.form.$name } );
+
+        if ( !ctrl.clientValidate() ) {
           $rootScope.$broadcast( 'ngyn:form-save-failed', { formName: ctrl.form.$name } );
           return;
         }
