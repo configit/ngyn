@@ -16,11 +16,13 @@
 
       link: function link( scope, elm, attrs, ngModelController ) {
         var NG_OPTIONS_REGEXP = /^\s*([\s\S]+?)(?:\s+as\s+([\s\S]+?))?(?:\s+group\s+by\s+([\s\S]+?))?\s+for\s+(?:([\$\w][\$\w]*)|(?:\(\s*([\$\w][\$\w]*)\s*,\s*([\$\w][\$\w]*)\s*\)))\s+in\s+([\s\S]+?)(?:\s+track\s+by\s+([\s\S]+?))?$/;
-        var optionsExp = attrs.ngOptions,
-            match,
-            valuesFn,
-            isSelect = elm.is( 'select ' ),
-            originalPlaceholderText;
+        var optionsExp = attrs.ngOptions;
+        var match;
+        var valuesFn;
+        var isSelect = elm.is( 'select ' );
+        var originalPlaceholderText;
+        var options = {};
+        var select2initialized = false;
 
         if ( optionsExp ) {
           match = optionsExp.match( NG_OPTIONS_REGEXP );
@@ -30,8 +32,6 @@
         function findPlaceholder() {
           return elm.find( 'option[value=""],option[value="?"]' );
         }
-
-        var options = {};
 
         if ( !isSelect ) {
           options.multiple = angular.isDefined( attrs.multiple );
@@ -45,13 +45,11 @@
         }
 
         var oldClass = '';
-        var oldPlaceholderText = '';
-        scope.$watch( function() {
+        function syncClasses() {
           // keep class of the select2 in sync with the underlying select
           var container = elm.select2( 'container' );
           // element doesn't have to have a class attribute
           var currentClass = elm.attr( 'class' ) || '';
-          var select2initialized = select2initialized || !!elm.data( 'select2' );
           if ( currentClass !== oldClass ) {
             angular.forEach( oldClass.split( ' ' ), function( c ) {
               if ( container ) {
@@ -65,7 +63,10 @@
             } );
             oldClass = currentClass;
           }
+        }
 
+        var oldPlaceholderText = '';
+        function syncPlaceholder() {
           // keep placeholder text in sync if it's currently visible
           if ( isSelect ) {
             var placeholderVisible = !elm.select2( 'val' ) || elm.select2( 'val' ).length === 0;
@@ -88,6 +89,12 @@
               oldPlaceholderText = currentPlaceholderText;
             }
           }
+        }
+
+        scope.$watch( function() {
+          select2initialized = select2initialized || !!elm.data( 'select2' )
+          syncClasses();
+          syncPlaceholder();
         } );
 
         var createDefaultResultParser = function() {
@@ -175,6 +182,10 @@
             scope.$apply( function() {
               ngModelController.$setViewValue( e.val );
             } );
+
+            $timeout( function() {
+              syncClasses();
+            }, 0, false );
           } );
         }
 
