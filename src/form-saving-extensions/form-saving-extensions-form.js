@@ -164,6 +164,10 @@ angular.module( 'ngynFormSavingExtensions' ).directive( 'form', function() {
               else {
                 var isPropertyError = false;
                 ( error.propertyNames || [] ).forEach( function( propertyName ) {
+                  if ( angular.isDefined( error.entityIndex ) ) {
+                    propertyName = propertyName + '[' + error.entityIndex + ']';
+                  }
+
                   if ( ctrl.form[propertyName] ) {
                     controlsWithServerErrors.push( ctrl.form[propertyName] );
                     ctrl.form[propertyName].$setValidity( 'serverError', false );
