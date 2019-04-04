@@ -64,7 +64,7 @@
         var DEFAULT_ACTIONS = {
           'get': { method: 'GET' },
           'save': { method: 'POST' },
-          'query': { method: 'GET', isArray: true, cancellable: true },
+          'query': { method: 'GET', isArray: true },
           'remove': { method: 'DELETE' },
           'delete': { method: 'DELETE' }
         };
@@ -143,7 +143,7 @@
                 var requeryargs = injectCallback( arguments, function( data ) {
                   methodResult.length = 0;
                   angular.forEach( data, function( r ) {
-                      methodResult.push( r );
+                    methodResult.push( r );
                     } );
                 } );
 

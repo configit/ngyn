@@ -204,4 +204,25 @@ describe( 'ngyn resource extensions', function() {
     $httpBackend.flush();
     expect( users.totalCount ).toEqual( 2 );
   } ) );
+  
+  it( 'should allow cancelling of a previous query and only return the value of the latest one ', inject( function( $resource, $httpBackend ) {
+    $httpBackend.whenGET( /top=1/ ).respond( [{ name: 'fred' }] );
+    $httpBackend.whenGET( /top=2/ ).respond( [{ name: 'fred' }, { name: 'barney' }] );
+    var User = $resource( 'api/users/:userid', {}, { query: { method: 'GET', isArray: true, cancellable: true } } );
+    var users = User.query( { top: 1 } );
+    $httpBackend.flush();
+    expect( users.totalCount ).toEqual( 1 );
+
+    var cancelledCallback = jasmine.createSpy();
+    var completedCallback = jasmine.createSpy();
+
+    users.requery( { top: 2 }, cancelledCallback );
+    users.requery( { top: 1 }, completedCallback );
+
+    $httpBackend.flush();
+
+    expect( completedCallback ).toHaveBeenCalled();
+    expect( cancelledCallback ).not.toHaveBeenCalled();
+    expect( users.totalCount ).toEqual( 1 );
+  } ) );
 } );
