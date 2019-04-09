@@ -1,7 +1,7 @@
 ( function( angular ) {
   'use strict';
 
-  var trail = function( str, ch ) {
+  function trail( str, ch ) {
     return !str.match( new RegExp( ch + '$' ) ) ? str + ch : str;
   };
 
@@ -14,7 +14,7 @@
   //    pct-encoded   = "%" HEXDIG HEXDIG
   //    sub-delims    = "!" / "$" / "&" / "'" / "(" / ")"
   //                     / "*" / "+" / "," / ";" / "="
-  var encodeUriQuery = function( val, pctEncodeSpaces ) {
+  function encodeUriQuery( val, pctEncodeSpaces ) {
     return encodeURIComponent( val ).
       replace( /%40/gi, '@' ).
       replace( /%3A/gi, ':' ).
@@ -23,13 +23,18 @@
       replace(( pctEncodeSpaces ? null : /%20/g ), '+' );
   };
 
-  var toKeyValue = function( obj ) {
+  function toKeyValue( obj ) {
     var parts = [];
     angular.forEach( obj, function( value, key ) {
       parts.push( encodeUriQuery( key, true ) + ( value === true ? '' : '=' + encodeUriQuery( value, true ) ) );
     } );
     return parts.length ? parts.join( '&' ) : '';
   };
+
+  
+  function values( o ) {
+    return Object.keys( o ).map( function( key ) { return o[key] } );
+  }
 
   var RouteContext = function( routeProvider ) {
 
@@ -99,7 +104,8 @@
       controllerPath = controllerPath.replace( /\/$/, '' );
 
       // put collection actions first to ensure for example, that pr/new is not read as a details route (pr/:code).
-      var orderedKeys = _.sortBy( _.keys( actions ), function( key ) { return actions[key] !== 'collection'; } );
+      var orderedKeys = Object.keys( actions );
+      orderedKeys.sort( function( key ) { return actions[key] !== 'collection'; } );
 
       angular.forEach( orderedKeys, function( key ) {
         var action = objectifyAction( actions[key], key ),
@@ -287,17 +293,17 @@
 
           if ( !intendedRoute ) {
             if ( options.controller && !options.action ) { // we're just moving to a new controller and accepting the default action
-              intendedRoute = _.find( $route.routes, function( r ) {
+              intendedRoute = values( $route.routes ).filter( function( r ) {
                 return angular.lowercase( r.path || '' ) === path &&
                   angular.lowercase( r.controllerPath ) === controller &&
                   ( angular.lowercase( r.action ) === ( options[angular.lowercase( r.name ) + "_id"] ? 'details' : 'index' ) );
-              } );
+              } )[0];
             } else {
-              intendedRoute = _.find( $route.routes, function( r ) {
+              intendedRoute = values( $route.routes ).filter( function( r ) {
                 return ( !$route.current || angular.lowercase( r.path || '' ) === path ) &&
                 angular.lowercase( r.controllerPath ) === controller &&
                 angular.lowercase( r.action ) === action;
-              } );
+              } )[0];
             }
           }
 
@@ -308,11 +314,11 @@
           // carry the search term over if the same route name
           search = $location.search();
 
-          if ( !_.isEmpty( search ) && ( $route.current && intendedRoute.name === $route.current.name ) ) {
+          if ( Object.keys( search ).length && ( $route.current && intendedRoute.name === $route.current.name ) ) {
             if ( intendedRoute.action === 'index' ) {
               querystring = decodeURIComponent( search.back || '' );
             }
-            else if ( _.isUndefined( search.back ) ) {
+            else if ( search.back === undefined ) {
               querystring = 'back=' + encodeUriQuery( toKeyValue( search ) );
             }
             else {
