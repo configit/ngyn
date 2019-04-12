@@ -36,7 +36,7 @@ module.exports = function(config) {
 
     // test results reporter to use
     // possible values: 'dots', 'progress', 'junit'
-    reporters : ['dots', 'teamcity'],
+    reporters : ['dots'],
 
     // web server port
     port : 8080,
