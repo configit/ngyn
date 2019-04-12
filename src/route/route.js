@@ -234,7 +234,7 @@
       return routeContext;
     };
 
-    this.$get = ['$route', '$routeParams', '$location', function( $route, $routeParams, $location ) {
+    this.$get = function( $route, $routeParams, $location ) {
 
       return {
         link: function( options, additionalOptions ) {
@@ -344,12 +344,12 @@
           $location.url( this.action( action, options, persistSearch ) );
         }
       };
-    }];
+    };
   };
 
-  angular.module( 'ngynRoute', ['ngRoute'] ).config( ['$provide', '$routeProvider', function( $provide, $routeProvider ) {
+  angular.module( 'ngynRoute', ['ngRoute'] ).config( function( $provide, $routeProvider ) {
     routeProvider.$routeProvider = $routeProvider;
     $provide.provider( 'ngynRoute', routeProvider );
-  }] );
+  } );
 
 } )( window.angular );

@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module( 'ngynResourcePromise', ['ngResource'] ).config( [ '$provide', function( $provide ) {
+angular.module( 'ngynResourcePromise', ['ngResource'] ).config( function( $provide ) {
       
   var DEFAULT_ACTIONS = {
     'get': { method:'GET' },
@@ -10,8 +10,8 @@ angular.module( 'ngynResourcePromise', ['ngResource'] ).config( [ '$provide', fu
     'delete': { method:'DELETE' }
   };
   
-  $provide.decorator( '$resource', [ '$delegate', '$q', function( $delegate, $q ) {
-    
+  $provide.decorator( '$resource', function( $delegate, $q ) {
+
     return function $resourceDecoratorFn( url, paramDefaults, actions ) {
       var resource = $delegate.apply( this, arguments );
       
@@ -71,5 +71,5 @@ angular.module( 'ngynResourcePromise', ['ngResource'] ).config( [ '$provide', fu
       } );
       return resource;
     }
-  } ] );
-} ] );
+  } );
+} );

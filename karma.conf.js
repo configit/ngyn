@@ -14,7 +14,7 @@ module.exports = function(config) {
       'libs/jasmine-jquery.js',
       'libs/angular.js',
       'libs/**/*.js',
-      'src/**/*.js',
+      'dist/ngyn.min.js',
       'test/**/*.js'
     ],
 

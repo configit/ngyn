@@ -17,7 +17,7 @@ angular.module( 'ngynServerConnection' )
    *    var myhub = new ServerConnection('MyHub');
    *    myHub.connect( scope, { onMyEvent: function( e ) { console.log( e ) } } )
    */
-  .factory( 'ServerConnection', ["ServerConnectionBackend", "$log", "$timeout", function( ServerConnectionBackend, $log, $timeout ) {
+  .factory( 'ServerConnection', function( ServerConnectionBackend, $log, $timeout ) {
     var reconnectTimeout = 5000; // amount of time to wait between losing the connection and reconnecting
     var openConnections = [];
     var connectionOpen = false;
@@ -278,4 +278,4 @@ angular.module( 'ngynServerConnection' )
       Instance.prototype = new ServerConnection( name );
       return new Instance();
     };
-  }] );
+  } );
