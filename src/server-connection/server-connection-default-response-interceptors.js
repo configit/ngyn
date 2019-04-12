@@ -3,7 +3,7 @@
 angular.module( 'ngynServerConnection' )
   .value( 'defaultResponseInterceptors', {
     jsonNetStripper: function( hubName, methodName, response ) {
-      if ( response.$values ) {
+      if ( response && response.$values ) {
         return response.$values;
       }
 
