@@ -11,32 +11,30 @@ Modules Currently include
 * __Resource Extensions__: Hooks for adding data on the way out or parsing it on the way in.
 * __Select Key__: Allows you to specify a way to match an ng-option element to the select's ng-model.
 * __Select2__: A directive to perform an in-place progressive enhancement to convert a select element into a select2 one.
+* __Track Changes__: Tracks changes to form fields in a $changed property. Like $dirty/$pristine, but resets when value matches original.
+* __Form Saving Extensions__: Assists in validating that a form was completed or abandoned, prompting the user to confirm.
 
 Full documentation: http://configit.github.io/ngyn
 
 ## Building
-Todo a single build run
+To perform a single build, which concatenates the source files into `ngyn.js` and `ngyn.min.js` inside the dist folder, run:
 
-```bash
-npm install
-node_modules/grunt-cli/bin/grunt
+```shell
+npm run build
 ```
 
-This will concat the `src/` files and copy them to the `dist/` folder.
+To perform a build then run all tests:
 
-When developing it can be useful to auto build and run tests each time a file is
-modified. To start watching files run
-
-```bash
-node_modules/grunt-cli/bin/grunt karma:background watch
+```shell
+npm test
 ```
 
-This will start a [karma](http://karma-runner.github.io/0.10/index.html) process and watch for file changes.
+When developing the most common task you will require is to watch all source and test files and re-run tests on any change, this is simply:
 
-To create nuget package run
-
-```bash
-node_modules/grunt-cli/bin/grunt packages --Major=1 --Minor=2 --Revision=2381
+```shell
+npm start
+# This is an alias for:
+npm run test:watch
 ```
 
-this will create a `packages-build/ngyn-1.2.2381.nupkg` file
+There is also a `build:watch` task which you may find useful.
