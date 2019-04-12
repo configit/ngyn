@@ -175,11 +175,18 @@ function watchAndBuild( files, callback ) {
 function runTests() {
   const p = new Promise( resolve => {
     log( '(TEST) Test run starting' );
-    const start = new Date();
-    new karma( {
+
+    const karmaConfig = {
       configFile: `${__dirname}/karma.conf.js`,
       singleRun: true
-    }, () => {
+    };
+
+    if ( process.argv.find( a => a.toLowerCase() === '--teamcity' ) ) {
+      karmaConfig.reporters = ['teamcity'];
+    }
+
+    const start = new Date();
+    new karma( karmaConfig, () => {
       log( '(TEST) Finished.', start );
       resolve();
     } ).start();

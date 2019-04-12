@@ -182,12 +182,14 @@ describe( 'ngyn form saving extensions', function() {
       scope.$apply( function() {
         $location.path( '/new-page' );
       } );
+
       expect ( $location.path() ).toBe( '/home' );
 
       element.find( '#testInput' ).sendKeys( 'original' );
       scope.$apply( function() {
         $location.path( '/new-page' );
       } );
+      
       expect ( $location.path() ).toBe( '/new-page' );
     } ) );
   } );
