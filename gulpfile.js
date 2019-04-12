@@ -181,7 +181,8 @@ function runTests() {
       singleRun: true
     };
 
-    if ( process.argv.find( a => a.toLowerCase() === '--teamcity' ) ) {
+    console.log(process.env);
+    if ( process.env['TEAMCITY_VERSION'] ) {
       karmaConfig.reporters = ['teamcity'];
     }
 
