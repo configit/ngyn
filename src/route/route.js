@@ -104,8 +104,15 @@
       controllerPath = controllerPath.replace( /\/$/, '' );
 
       // put collection actions first to ensure for example, that pr/new is not read as a details route (pr/:code).
-      var orderedKeys = Object.keys( actions );
-      orderedKeys.sort( function( key ) { return actions[key] !== 'collection'; } );
+      var orderedKeys = Object.keys( actions ).sort( function( a, b ) {
+        // if the are the same return 0 to sort to indicate no change
+        if ( actions[a] === actions[b] ) {
+          return 0;
+        }
+
+        // if the second item is a collection it is ordered higher; return 1 to sort, otherwise -1
+        return actions[b] === 'collection' ? 1 : -1;
+      } );
 
       angular.forEach( orderedKeys, function( key ) {
         var action = objectifyAction( actions[key], key ),

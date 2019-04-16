@@ -388,6 +388,29 @@ describe( 'route', function() {
     } );
   });
 
+  it ( 'should put collection actions first', function() { 
+    module( function( $routeProvider, ngynRouteProvider ) {
+      $routeProvider.when( '/', { template: 'test' } );
+      ngynRouteProvider.resource( { 
+        name: 'Theatres', 
+        actions: {
+          'details': 'member',
+          'upload': 'collection'
+        } 
+      } );
+    } );
+
+    inject( function( $location, $rootScope, ngynRoute, $httpBackend ) {
+      $httpBackend.expectGET( /client\/app\/theatres\/upload.html/ ).respond();
+
+      ngynRoute.gotoLink( 'theatres#upload' );
+      $rootScope.$digest();
+
+      expect( $location.path() ).toMatch( 'theatres/upload' );
+
+    } );
+  } );
+
   describe('inheritence', function() {
     beforeEach(function() {
       module( function( ngynRouteProvider ) {
