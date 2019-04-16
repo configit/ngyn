@@ -132,7 +132,7 @@
 
             /* jshint -W003 */
             var methodResult = oldMethod.apply( this, methodargs );
-            var previousRequery = undefined;
+            var previousRequery = methodResult;
 
             if ( action === 'query' ) {
               methodResult.requery = function() {
