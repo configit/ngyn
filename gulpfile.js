@@ -181,7 +181,6 @@ function runTests() {
       singleRun: true
     };
 
-    console.log(process.env);
     if ( process.env['TEAMCITY_VERSION'] ) {
       karmaConfig.reporters = ['teamcity'];
     }
