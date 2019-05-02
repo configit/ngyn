@@ -131,21 +131,25 @@
 
             /* jshint -W003 */
             var methodResult = oldMethod.apply( this, methodargs );
+            var previousRequery = methodResult;
 
             if ( action === 'query' ) {
               methodResult.requery = function() {
+                if ( previousRequery && previousRequery.$cancelRequest ) {
+                  previousRequery.$cancelRequest();
+                }
                 methodResult.loaded = false;
                 var requeryargs = injectCallback( arguments, function( data ) {
                   methodResult.length = 0;
                   angular.forEach( data, function( r ) {
                     methodResult.push( r );
-                  } );
+                    } );
                 } );
 
                 requeryargs[0] = angular.extend( {}, methodargs[0], requeryargs[0] );
                 methodargs[0] = requeryargs[0];
 
-                resourceResult.query.apply( methodResult, requeryargs );
+                previousRequery = resourceResult.query.apply( methodResult, requeryargs );
                 methodResult.parameters = requeryargs[0];
               };
             }
