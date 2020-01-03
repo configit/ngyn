@@ -124,15 +124,15 @@
         aliasedParentPath = ( path + aliasedParentName ) ? trail( path + aliasedParentName, '/' ) : '',
         parentParam = !parentName ? '' : ( ':' + ( routeContext.scopeParent.options || { name: '' } ).name.replace( '-', '_' ) + '_id/' ),
         resourcePath = parentPath + resource.name + '/',
-        resourceParam = ':' + angular.lowercase( resource.name ).replace( '-', '_' ) + '_id/',
-        viewLocation = angular.lowercase( trail( routeProvider.appRoot, '/' ) + resourcePath + ( action.alias || action.key ) + '.html' ),
-        routeWithoutKey = angular.lowercase( aliasedParentPath + parentParam + ( angular.isDefined( resource.urlAlias ) ? resource.urlAlias : resource.name ) + '/' ).replace( '//', '/' );
+        resourceParam = ':' + resource.name.toLowerCase().replace( '-', '_' ) + '_id/',
+        viewLocation = ( trail( routeProvider.appRoot, '/' ) + resourcePath + ( action.alias || action.key ) + '.html' ).toLowerCase(),
+        routeWithoutKey = ( aliasedParentPath + parentParam + ( angular.isDefined( resource.urlAlias ) ? resource.urlAlias : resource.name ) + '/' ).replace( '//', '/' ).toLowerCase();
 
         if ( action.type === 'member' ) {
           routeWithoutKey += resourceParam;
         }
 
-        var routePath = angular.lowercase( routePrefix + routeWithoutKey );
+        var routePath = ( routePrefix + routeWithoutKey ).toLowerCase();
 
         var routeProperties = {
           name: resource.name,
@@ -162,7 +162,7 @@
             controllerPath: controllerPath,
             path: routeProperties.path,
             routePath: routePath,
-            redirectTo: angular.lowercase( routePath + action.key )
+            redirectTo: ( routePath + action.key ).toLowerCase()
           } );
         }
       } );
@@ -284,13 +284,13 @@
           }
 
           if ( $route.current ) {
-            controller = angular.lowercase( options.controller || $route.current.controllerPath );
-            action = angular.lowercase( options.action || $route.current.action );
-            path = angular.lowercase( angular.isDefined( options.path ) ? options.path : $route.current.path || '' );
+            controller = ( options.controller || $route.current.controllerPath || '' ).toLowerCase();
+            action = ( options.action || $route.current.action || '' ).toLowerCase();
+            path = ( angular.isDefined( options.path ) ? options.path : $route.current.path || '' ).toLowerCase();
           } else {
-            controller = angular.lowercase( options.controller );
-            action = angular.lowercase( options.action );
-            path = angular.lowercase( options.path );
+            controller = ( options.controller || '' ).toLowerCase();
+            action = ( options.action || '' ).toLowerCase();
+            path = ( options.path || '' ).toLowerCase();
           }
 
           // non-resourceful routes will allow you to change the route params of the current route but no more
@@ -301,15 +301,15 @@
           if ( !intendedRoute ) {
             if ( options.controller && !options.action ) { // we're just moving to a new controller and accepting the default action
               intendedRoute = values( $route.routes ).filter( function( r ) {
-                return angular.lowercase( r.path || '' ) === path &&
-                  angular.lowercase( r.controllerPath ) === controller &&
-                  ( angular.lowercase( r.action ) === ( options[angular.lowercase( r.name ) + "_id"] ? 'details' : 'index' ) );
+                return ( r.path || '' ).toLowerCase() === path &&
+                   (r.controllerPath || '' ).toLowerCase() === controller &&
+                  ( ( r.action || '' ).toLowerCase() === ( options[( r.name || '' ).toLowerCase() + "_id"] ? 'details' : 'index' ) );
               } )[0];
             } else {
               intendedRoute = values( $route.routes ).filter( function( r ) {
-                return ( !$route.current || angular.lowercase( r.path || '' ) === path ) &&
-                angular.lowercase( r.controllerPath ) === controller &&
-                angular.lowercase( r.action ) === action;
+                return ( !$route.current || ( r.path || '' ).toLowerCase() === path ) &&
+                ( r.controllerPath || '' ).toLowerCase() === controller &&
+                ( r.action || '' ).toLowerCase() === action;
               } )[0];
             }
           }
