@@ -12,7 +12,10 @@ module.exports = function(config) {
     files : [
       'libs/jquery.min.js',
       'libs/jasmine-jquery.js',
-      'libs/angular.js',
+      'node_modules/angular/angular.min.js',
+      'node_modules/angular-resource/angular-resource.min.js',
+      'node_modules/angular-route/angular-route.min.js',
+      'node_modules/angular-mocks/angular-mocks.js',
       'libs/**/*.js',
       'dist/ngyn.min.js',
       'test/**/*.js'
