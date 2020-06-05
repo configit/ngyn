@@ -9,7 +9,7 @@
   "devDependencies": {
     "angular": "1.7.9",
     "angular-route": "1.7.9",
-    "angular-resource": "1.7.9",
+    "angular-resource": "1.8.0",
     "angular-mocks": "1.7.9",
     "colors": "1.4.0",
     "gulp": "4.0.2",
