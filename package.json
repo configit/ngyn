@@ -10,7 +10,7 @@
     "angular": "1.7.9",
     "angular-route": "1.7.9",
     "angular-resource": "1.7.9",
-    "angular-mocks": "1.7.9",
+    "angular-mocks": "1.8.2",
     "colors": "1.4.0",
     "gulp": "4.0.2",
     "gulp-ng-annotate": "2.1.0",
