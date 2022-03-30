@@ -5,6 +5,9 @@ angular.module( 'ngynServerConnection' )
    * server connection technology such as SignalR; this underlying technology is expected to be
    * dependency injected as the ServerConnectionBackendCore service.
    *
+   * This one implementation based on @microsoft/signalr library, which allows to interact with .Net Core/6 signalR server implementation.
+   * The old one is not compatible with .Net Core/6 server side.
+   * 
    * The primary purpose of ServerConnectionCore is to provide automatic connection management, automatically
    * starting the underlying connection when the first provider requests it and stopping it when all are no
    * longer requesting it.
@@ -171,7 +174,7 @@ angular.module( 'ngynServerConnection' )
         $timeout(
           function() {
             connectionOpen = false;
-            ServerConnectionBackendCore.start( name ).done( function() {
+            ServerConnectionBackendCore.start( name ).then( function() {
               connectionOpen = true;
             } );
           },
@@ -190,13 +193,6 @@ angular.module( 'ngynServerConnection' )
         listeners = listeners || {};
         self.server = {};
 
-        var serverMethodNames = ServerConnectionBackendCore.getMethodNames( name );
-
-        angular.forEach( serverMethodNames, function( fnName ) {
-          self.server[fnName] = function() {
-            throw Error( "Cannot call the " + fnName + " function on the " + name + " hub because the server connection is not established. Place your server calls within the connect(...).done() block" );
-          };
-        } );
 
         angular.forEach( Object.keys( listeners ), function( listenerKey ) {
           if ( !allListeners[listenerKey] ) {
@@ -231,7 +227,7 @@ angular.module( 'ngynServerConnection' )
 
         if ( openConnections.length === 0 ) {
           log( '[ServerConnectionCore] listeners registered, opening SignalR connection' );
-          ServerConnectionBackendCore.start( name ).done( function() {
+          ServerConnectionBackendCore.start( name ).then( function() {
             connectionOpen = true;
             $timeout( completeConnection, 0 );
           } );

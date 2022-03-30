@@ -8,22 +8,34 @@ angular.module( 'ngynServerConnection' )
 
     function ServerConnectionBackendCore() {
 
-      var connection = {};
+      var disconnectFns = [];
+      this.onDisconnect = function( fn ) {
+        disconnectFns.push( fn );
+      };
+
+      var connection = null;
       function getConnection( hubName ) {
 
-        if(connection && connection.state == HubConnectionState.Connected){
+        if(connection && connection.state == signalR.HubConnectionState.Connected){
           return connection;
         }  
-        var hubConnectionBuilder = new HubConnectionBuilder();
+        var hubConnectionBuilder = new signalR.HubConnectionBuilder();
         
         var transportProtocols =
-        HttpTransportType.WebSockets | HttpTransportType.LongPolling | HttpTransportType.ServerSentEvents;
+        signalR.HttpTransportType.WebSockets | signalR.HttpTransportType.LongPolling | signalR.HttpTransportType.ServerSentEvents;
 
-        hubConnectionBuilder.withUrl('hubs/' + hubName, { transport: transportProtocols });
+        hubConnectionBuilder.withUrl('hubs/' + hubName, { transport: transportProtocols, withCredentials: true });
     
         hubConnectionBuilder.withAutomaticReconnect();
     
         connection = hubConnectionBuilder.build();
+
+        connection.onclose( function() {
+          angular.forEach(disconnectFns, function (fn) {
+            fn();
+          } );
+        } );
+
         return connection;
       };
 
@@ -31,12 +43,9 @@ angular.module( 'ngynServerConnection' )
        * Establish a connection to the hub
        */
       this.start = function( hubName ) {
-        try {
-          getConnection( hubName ).start();
+          var result = getConnection( hubName ).start();
           console.log( 'SignalR Connected.' );
-        } catch ( exception ) {
-          console.error( exception );
-        }
+          return result;
       };
 
       /**
@@ -60,22 +69,12 @@ angular.module( 'ngynServerConnection' )
         getConnection( hubName ).off( methodName );
       };
 
-      var disconnectFns = [];
-      this.onDisconnect = function( fn ) {
-        disconnectFns.push( fn );
-      };
-
-      getConnection('').onclose( function() {
-        angular.forEach(disconnectFns, function (fn) {
-          fn();
-        } );
-      } );
-
       this.getMethodNames = function( hubName ) {
         var functionsList = [];
         getConnection( hubName ).invoke('functionList')
         .then(function(result) {functionsList = result;})
         .catch(function(err) {console.error(err);});
+
         return functionsList;
       };
 
