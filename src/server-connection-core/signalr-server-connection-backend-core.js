@@ -42,10 +42,14 @@ angular.module( 'ngynServerConnection' )
       /**
        * Establish a connection to the hub
        */
-      this.start = function( hubName ) {
+       this.start = function( hubName ) {
+        try {
           var result = getConnection( hubName ).start();
           console.log( 'SignalR Connected.' );
-          return result;
+        } catch ( exception ) {
+          console.error( exception );
+        }
+        return result;
       };
 
       /**
@@ -70,12 +74,9 @@ angular.module( 'ngynServerConnection' )
       };
 
       this.getMethodNames = function( hubName ) {
-        var functionsList = [];
-        getConnection( hubName ).invoke('functionList')
-        .then(function(result) {functionsList = result;})
+        return getConnection( hubName ).invoke('functionList')
+        .then(function(result) {return result;})
         .catch(function(err) {console.error(err);});
-
-        return functionsList;
       };
 
       /**

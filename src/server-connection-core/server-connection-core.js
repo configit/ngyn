@@ -75,6 +75,8 @@ angular.module( 'ngynServerConnection' )
        * to allow rewriting of the response
        */
       function createServerProxy( hub, hubName ) {
+
+      return ServerConnectionBackendCore.getMethodNames( hubName ).then(function(serverMethodNames){
         var proxy = {};
 
         function _addCallback( callbackArray, callback ) {
@@ -82,63 +84,60 @@ angular.module( 'ngynServerConnection' )
             callbackArray.push( callback );
           }
         }
-
-        var serverMethodNames = ServerConnectionBackendCore.getMethodNames( hubName );
-
-        angular.forEach( serverMethodNames, function( methodName ) {
-          proxy[methodName] = function() {
-            var promise = {
-              _callbacks: {
-                done: [], fail: [], progress: []
-              },
-              then: function( fnDone, fnFail, fnProgress ) {
-                _addCallback( this._callbacks.done, fnDone );
-                _addCallback( this._callbacks.fail, fnFail );
-                _addCallback( this._callbacks.progress, fnProgress );
-                return this;
-              },
-              always: function( fnAlways ) {
-                return this.then( fnAlways, fnAlways );
-              },
-              done: function( fnDone ) {
-                return this.then( fnDone );
-              },
-              fail: function( fnFail ) {
-                return this.then( undefined, fnFail );
-              },
-              progress: function( fnProgress ) {
-                return this.then( undefined, undefined, fnProgress );
+          angular.forEach( serverMethodNames, function( methodName ) {
+            proxy[methodName] = function() {
+              var promise = {
+                _callbacks: {
+                  done: [], fail: [], progress: []
+                },
+                then: function( fnDone, fnFail, fnProgress ) {
+                  _addCallback( this._callbacks.done, fnDone );
+                  _addCallback( this._callbacks.fail, fnFail );
+                  _addCallback( this._callbacks.progress, fnProgress );
+                  return this;
+                },
+                always: function( fnAlways ) {
+                  return this.then( fnAlways, fnAlways );
+                },
+                done: function( fnDone ) {
+                  return this.then( fnDone );
+                },
+                fail: function( fnFail ) {
+                  return this.then( undefined, fnFail );
+                },
+                progress: function( fnProgress ) {
+                  return this.then( undefined, undefined, fnProgress );
+                }
+              };
+  
+              ServerConnectionBackendCore.callServer( hubName, methodName, arguments,
+                function success( response ) {
+                  $timeout( function() {
+                    callResponseInterceptorWrapper( promise._callbacks.done, response );
+                  } );
+                }, function failure( response ) {
+                  $timeout( function() {
+                    callResponseInterceptorWrapper( promise._callbacks.fail, response );
+                  } );
+                }, function progress( response ) {
+                  $timeout( function() {
+                    callResponseInterceptorWrapper( promise._callbacks.progress, response );
+                  } );
+                } );
+  
+              function callResponseInterceptorWrapper( callbacks, response ) {
+                response = applyResponseInterceptors( hub, hubName, methodName, response );
+  
+                angular.forEach( callbacks, function( handler ) {
+                  handler( response );
+                } );
               }
+  
+              return promise;
             };
-
-            ServerConnectionBackendCore.callServer( hubName, methodName, arguments,
-              function success( response ) {
-                $timeout( function() {
-                  callResponseInterceptorWrapper( promise._callbacks.done, response );
-                } );
-              }, function failure( response ) {
-                $timeout( function() {
-                  callResponseInterceptorWrapper( promise._callbacks.fail, response );
-                } );
-              }, function progress( response ) {
-                $timeout( function() {
-                  callResponseInterceptorWrapper( promise._callbacks.progress, response );
-                } );
-              } );
-
-            function callResponseInterceptorWrapper( callbacks, response ) {
-              response = applyResponseInterceptors( hub, hubName, methodName, response );
-
-              angular.forEach( callbacks, function( handler ) {
-                handler( response );
-              } );
-            }
-
-            return promise;
-          };
-        } );
-
-        return proxy;
+          } );
+          return proxy;
+        });
       }
 
       /**
@@ -153,8 +152,10 @@ angular.module( 'ngynServerConnection' )
             has a hub property which relates back to the original hub which requested it.
             We set the server property on that hub so clients can now talk to the server
           */
-          handler.hub.server = createServerProxy( handler.hub, handler.hubName );
-          handler.doneFn();
+          createServerProxy( handler.hub, handler.hubName ).then(function(serverProxy){
+            handler.hub.server = serverProxy;
+            handler.doneFn();
+          })
         } );
         doneHandlers.length = 0;
       }
