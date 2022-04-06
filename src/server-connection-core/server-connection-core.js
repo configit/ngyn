@@ -23,7 +23,6 @@ angular.module( 'ngynServerConnection' )
   .factory( 'ServerConnectionCore', function( ServerConnectionBackendCore, $log, $timeout ) {
     var reconnectTimeout = 5000; // amount of time to wait between losing the connection and reconnecting
     var openConnections = [];
-    var connectionOpen = false;
     var doneHandlers = [];
 
     function log( message ) {
@@ -37,6 +36,7 @@ angular.module( 'ngynServerConnection' )
     var ServerConnectionCore = function( name ) {
       var self = this;
       var allListeners = {};
+      var connectionOpen = false;
       this.responseInterceptors = [];
 
       /**
@@ -226,16 +226,6 @@ angular.module( 'ngynServerConnection' )
           }
         };
 
-        if ( openConnections.length === 0 ) {
-          log( '[ServerConnectionCore] listeners registered, opening SignalR connection' );
-          ServerConnectionBackendCore.start( name ).then( function() {
-            connectionOpen = true;
-            $timeout( completeConnection, 0 );
-          } );
-        }
-
-        openConnections.push( { scope: scope, doneFns: [] } );
-
         /**
          * When the scope to which this connection is tied to is destroyed, we deregister the connection
          * and remove any methods subscribed to at connection time. If there are no longer any methods across
@@ -259,6 +249,18 @@ angular.module( 'ngynServerConnection' )
 
         scope.$on( '$destroy', onDestroy );
 
+
+        if ( !openConnections.some(function(x) { return x.name === name })) {
+          log( '[ServerConnectionCore] listeners registered, opening SignalR connection' );
+          ServerConnectionBackendCore.start( name ).then( function() {
+            connectionOpen = true;
+            $timeout( completeConnection, 0 );
+          } );
+        }
+
+        openConnections.push( { name: name, scope: scope, doneFns: [] } );
+
+
         if ( connectionOpen ) {
           $timeout( completeConnection, 0 );
           return connectionState;
@@ -269,8 +271,6 @@ angular.module( 'ngynServerConnection' )
     };
 
     return function( name ) {
-      var Instance = function() { };
-      Instance.prototype = new ServerConnectionCore( name );
-      return new Instance();
+      return new ServerConnectionCore( name );
     };
   } );

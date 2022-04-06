@@ -13,10 +13,11 @@ angular.module( 'ngynServerConnection' )
         disconnectFns.push( fn );
       };
 
-      var connection = null;
+      var connections = {};
       function getConnection( hubName ) {
 
-        if(connection && connection.state == signalR.HubConnectionState.Connected){
+        var connection = connections[hubName];
+        if(connection){
           return connection;
         }  
         var hubConnectionBuilder = new signalR.HubConnectionBuilder();
@@ -36,6 +37,7 @@ angular.module( 'ngynServerConnection' )
           } );
         } );
 
+        connections[hubName] = connection;
         return connection;
       };
 
@@ -45,7 +47,7 @@ angular.module( 'ngynServerConnection' )
        this.start = function( hubName ) {
         try {
           var result = getConnection( hubName ).start();
-          console.log( 'SignalR Connected.' );
+          console.log( 'SignalR hub' + hubName + 'connected.' );
         } catch ( exception ) {
           console.error( exception );
         }
