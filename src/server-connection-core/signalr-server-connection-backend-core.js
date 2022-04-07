@@ -14,7 +14,7 @@ angular.module( 'ngynServerConnection' )
       };
 
       var connections = {};
-      function getConnection( hubName ) {
+      this.getConnection = function( hubName ) {
 
         var connection = connections[hubName];
         if(connection){
@@ -46,8 +46,8 @@ angular.module( 'ngynServerConnection' )
        */
        this.start = function( hubName ) {
         try {
-          var result = getConnection( hubName ).start();
-          console.log( 'SignalR hub' + hubName + 'connected.' );
+          var result = this.getConnection( hubName ).start();
+          console.log( 'Connecting to SignalR ' + hubName );
         } catch ( exception ) {
           console.error( exception );
         }
@@ -58,7 +58,7 @@ angular.module( 'ngynServerConnection' )
        * Terminate the connection to the hub
        */
       this.stop = function( hubName ) {
-        return getConnection( hubName ).stop();
+        return this.getConnection( hubName ).stop();
       };
 
       /**
@@ -68,15 +68,15 @@ angular.module( 'ngynServerConnection' )
        * @param {function} fn - The function to invoke when the method is fired on the hub
        */
       this.on = function( hubName, methodName, fn ) {
-        getConnection( hubName ).on( methodName, fn );
+        this.getConnection( hubName ).on( methodName, fn );
       };
 
       this.off = function( hubName, methodName ) {
-        getConnection( hubName ).off( methodName );
+        this.getConnection( hubName ).off( methodName );
       };
 
       this.getMethodNames = function( hubName ) {
-        return getConnection( hubName ).invoke('functionList')
+        return this.getConnection( hubName ).invoke('functionList')
         .then(function(result) {return result;})
         .catch(function(err) {console.error(err);});
       };
@@ -86,7 +86,7 @@ angular.module( 'ngynServerConnection' )
        * the server object returned expects angular promises, so the ones SignalR returns are converted
        */
       this.callServer = function( hubName, methodName, args, successCallback, failureCallback, progressCallback ) {
-        getConnection( hubName ).invoke( methodName, args ).then(
+        this.getConnection( hubName ).invoke( methodName, args ).then(
           function success( response ) {
             successCallback( response );
           }, function failure( response ) {
