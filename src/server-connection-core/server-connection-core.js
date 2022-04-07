@@ -80,7 +80,7 @@ angular
         /**
          * Automatically reconnect when the backend disconnects whilst an open connection is still required
          */
-        ServerConnectionBackendCore.onDisconnect(function () {
+        ServerConnectionBackendCore.onDisconnect(name, function () {
           if (openConnections.length < 1) {
             // The connection is no longer required so don't bother reconnecting
             return;
@@ -171,7 +171,8 @@ angular
             hub: self,
           };
 
-          if ( !connectionOpen &&
+          if (
+            !connectionOpen &&
             !openConnections.some(function (x) {
               return x.name === name;
             })
