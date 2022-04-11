@@ -23,7 +23,7 @@ angular
    */
   .factory(
     "ServerConnectionCore",
-    function (ServerConnectionBackendCore, $log, $timeout) {
+    function (ServerConnectionBackendCore, defaultResponseInterceptors, $log, $timeout) {
       var reconnectTimeout = 5000; // amount of time to wait between losing the connection and reconnecting
       var openConnections = [];
 
@@ -39,7 +39,7 @@ angular
         var self = this;
         var allListeners = {};
         var connectionOpen = false;
-        this.responseInterceptors = [];
+        this.responseInterceptors = [defaultResponseInterceptors.jsonNetStripper];
 
         /**
          * Deregisters the intended connection for this instance.
@@ -62,6 +62,17 @@ angular
             connectionOpen = false;
           }
         }
+
+              /**
+       * Rewrites response based on the registered response interceptors
+       */
+      function applyResponseInterceptors( hub, hubName, methodName, response ) {
+        angular.forEach( hub.responseInterceptors, function( interceptor ) {
+          response = interceptor( hubName, methodName, response );
+        } );
+
+        return response;
+      }
 
         function createServerProxy(hubName) {
           return ServerConnectionBackendCore.getConnection(hubName);
@@ -128,11 +139,18 @@ angular
 
             // if the function wrapper is not already there, push it on
             if (allListeners[listenerKey].length === 0) {
-              ServerConnectionBackendCore.on(
-                name,
-                listenerKey,
-                listeners[listenerKey]
-              );
+              ServerConnectionBackendCore.on(name, listenerKey, function () {
+
+                var args = applyResponseInterceptors( self, name, listenerKey, arguments );
+                angular.forEach(
+                  allListeners[listenerKey],
+                  function (scopeListener) {
+                    scopeListener.scope.$apply(function () {
+                      scopeListener.listener.apply(this, args);
+                    });
+                  }
+                );
+              });
             }
 
             allListeners[listenerKey].push({
